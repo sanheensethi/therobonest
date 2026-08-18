@@ -1,0 +1,323 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------
+   Design tokens - recovered from Robonest's compiled brand stylesheet
+   ------------------------------------------------------------------ */
+@theme {
+  /* PRIMARY. The design direction is navy + azure + violet, so "brand" is
+     azure blue. Every existing bg-brand / text-brand follows automatically. */
+  --color-brand: #2e86ff;
+  --color-brand-600: #1d6fe0;
+  --color-brand-300: #6bb0ff;
+  --color-brand-100: #dcebff;
+
+  /* Gradient stops for display headlines and the form CTA */
+  --color-cyan: #38bdf8;
+  --color-azure: #3b82f6;
+  --color-violet: #8b5cf6;
+  --color-indigo: #4f46e5;
+
+  /* Retained accent from the original identity, used sparingly */
+  --color-ember: #f97316;
+
+  --color-sky: #c9e2ef;
+  --color-sky-300: #9dc9e0;
+
+  /* Text on light surfaces */
+  --color-ink: #16203a;
+  --color-ink-700: #35415e;
+  --color-ink-400: #6b7793;
+
+  /* Dark SURFACES and image scrims - deep navy, never brown. */
+  --color-night: #0a1326;
+  --color-night-800: #0f1b33;
+  --color-night-700: #16244a;
+  --color-night-900: #060d1a;
+
+  --color-sand: #f4f6fb;
+  --color-paper: #ffffff;
+
+  --font-display: "DynaPuff", ui-rounded, "Varela Round", system-ui, sans-serif;
+  --font-accent: "Handlee", ui-rounded, cursive;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 1.25rem;
+  --ease-brand: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+
+/* The pinned horizontal rail now runs on phones too, not just desktop.
+   It is gated on HEIGHT only: the pinned box locks to one viewport, so the
+   cards must fit inside it. Very short windows (landscape phones, tiny
+   browser windows) fall back to a native swipe rail instead.
+   Keep this in sync with PIN_QUERY in LabsRail.tsx. */
+@custom-variant railpin (@media (min-height: 600px));
+
+/* ------------------------------------------------------------------
+   Base
+   ------------------------------------------------------------------ */
+:root {
+  color-scheme: light;
+  --nav-h: 76px;
+}
+
+html {
+  /* Lenis drives scrolling; native smooth would fight it. */
+  scroll-behavior: auto;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--color-sand);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+.font-display {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-variation-settings: "wdth" 100;
+  font-weight: 500;
+  /* DynaPuff sets wide and tall: pull tracking in and give descenders room,
+     otherwise headings look loose and clip at large sizes. */
+  letter-spacing: -0.005em;
+  line-height: 1.16;
+  padding-bottom: 0.04em;
+}
+
+.font-accent {
+  font-family: var(--font-accent);
+}
+
+::selection {
+  background: var(--color-brand);
+  color: #fff;
+}
+
+/* Anchor targets clear the fixed header */
+[id] {
+  scroll-margin-top: calc(var(--nav-h) + 16px);
+}
+
+/* ------------------------------------------------------------------
+   Lenis
+   ------------------------------------------------------------------ */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* ------------------------------------------------------------------
+   Reveal primitives.
+   Elements start hidden ONLY when JS is driving them: the `.js-motion`
+   class is added to <html> by the motion runtime. Without JS the
+   content stays visible - no blank page if scripts fail.
+   ------------------------------------------------------------------ */
+.js-motion [data-reveal] {
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.reveal-done {
+  will-change: auto;
+}
+
+/* ------------------------------------------------------------------
+   Marquee (CSS-driven so it runs even before GSAP hydrates)
+   ------------------------------------------------------------------ */
+@keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+@keyframes marquee-rev {
+  from {
+    transform: translate3d(-50%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+.marquee-track {
+  animation: marquee 28s linear infinite;
+}
+/* Second row travels the other way, so the two rows read as a weave rather
+   than a single block sliding past. */
+.marquee-track-rev {
+  animation: marquee-rev 28s linear infinite;
+}
+.marquee:hover .marquee-track,
+.marquee:hover .marquee-track-rev {
+  animation-play-state: paused;
+}
+
+/* Vertical scroll cue in the hero */
+@keyframes scrollcue {
+  0% {
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+  45% {
+    transform: scaleY(1);
+    transform-origin: top;
+  }
+  55% {
+    transform: scaleY(1);
+    transform-origin: bottom;
+  }
+  100% {
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+}
+.scroll-cue {
+  animation: scrollcue 2.1s ease-in-out infinite;
+}
+
+/* Fade the marquee edges */
+.marquee-mask {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 8%,
+    #000 92%,
+    transparent
+  );
+}
+
+/* ------------------------------------------------------------------
+   Utilities
+   ------------------------------------------------------------------ */
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Feathers all four edges of the hero media so it dissolves into the navy
+   instead of showing a hard rectangle. A gradient OVERLAY can only darken the
+   photo; it cannot remove the edge itself - a mask actually fades the pixels
+   out, which is what kills the "pasted-in rectangle" look. */
+.media-feather {
+  -webkit-mask-image: radial-gradient(
+    115% 108% at 52% 50%,
+    #000 46%,
+    rgba(0, 0, 0, 0.55) 74%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    115% 108% at 52% 50%,
+    #000 46%,
+    rgba(0, 0, 0, 0.55) 74%,
+    transparent 100%
+  );
+}
+
+/* For copy laid over photography: keeps text legible over busy areas
+   without having to darken the whole image into mush. */
+/* Gradient display text - "School Labs" style */
+.text-gradient {
+  background-image: linear-gradient(
+    100deg,
+    var(--color-cyan) 0%,
+    var(--color-azure) 45%,
+    var(--color-violet) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  /* DynaPuff descenders clip against a background-clip box without this */
+  padding-bottom: 0.08em;
+}
+
+/* Slow float for the hexagon tech badges over the hero media */
+@keyframes hexfloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -9px, 0);
+  }
+}
+.hex-float {
+  animation: hexfloat 6s ease-in-out infinite;
+}
+
+/* Soft pulsing glow behind the hero media */
+@keyframes glowpulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+.glow-pulse {
+  animation: glowpulse 9s ease-in-out infinite;
+}
+
+.text-on-photo {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 8px 28px rgba(0, 0, 0, 0.5);
+}
+
+.grain {
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(255, 255, 255, 0.05) 1px,
+    transparent 0
+  );
+  background-size: 22px 22px;
+}
+
+/* Hide scrollbar on horizontal rails while keeping keyboard access */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* ------------------------------------------------------------------
+   Accessibility: honour reduced-motion everywhere.
+   The motion runtime also disables Lenis + ScrollTrigger scrubbing,
+   but this guarantees nothing animates even if JS misbehaves.
+   ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .js-motion [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .marquee-track,
+  .marquee-track-rev,
+  .hex-float,
+  .glow-pulse,
+  .scroll-cue {
+    animation: none !important;
+  }
+}

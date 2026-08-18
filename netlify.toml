@@ -1,0 +1,45 @@
+[build]
+  command = "npm run build"
+  publish = "out"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Real 301s for the old Odoo URLs. The in-app /about-robonest and /contactus
+# pages are a JS fallback; these take precedence and are what search engines
+# should see. force = true so the redirect wins over the static file.
+[[redirects]]
+  from = "/about-robonest"
+  to = "/about/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/contactus"
+  to = "/contact/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/home"
+  to = "/"
+  status = 301
+  force = true
+
+# Hashed build assets never change under the same name - cache hard.
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    Referrer-Policy = "strict-origin-when-cross-origin"
