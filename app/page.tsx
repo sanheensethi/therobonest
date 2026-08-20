@@ -5,12 +5,15 @@ import AboutShowcase from "@/components/sections/AboutShowcase";
 import LabsRail from "@/components/sections/LabsRail";
 import Hardware from "@/components/sections/Hardware";
 import Team from "@/components/sections/Team";
+import { getTeam } from "@/lib/odoo-content";
 import Gallery from "@/components/sections/Gallery";
 import Journey from "@/components/sections/Journey";
 import Schools from "@/components/sections/Schools";
+import FeaturedVideos from "@/components/sections/FeaturedVideos";
 import EnquiryForm from "@/components/sections/EnquiryForm";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const team = await getTeam();
   return (
     <>
       <Hero />
@@ -19,7 +22,8 @@ export default function HomePage() {
       <AboutShowcase />
       <LabsRail />
       <Hardware />
-      <Team />
+      <Team members={team} />
+      <FeaturedVideos />
       <Gallery />
       <Journey />
       <Schools />

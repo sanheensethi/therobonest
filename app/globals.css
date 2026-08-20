@@ -204,6 +204,124 @@ html.lenis body {
 }
 
 /* ------------------------------------------------------------------
+   Blog / rich-text typography.
+   Odoo's editor HTML arrives with its classes and inline styles stripped
+   (lib/sanitize.ts), so these rules are what actually style a post. That is
+   deliberate: the blog can never visually drift from the rest of the site,
+   no matter how the author formatted it in Odoo.
+   ------------------------------------------------------------------ */
+.prose-robonest {
+  color: var(--color-ink-700);
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+.prose-robonest > * + * {
+  margin-top: 1.15em;
+}
+.prose-robonest h2,
+.prose-robonest h3,
+.prose-robonest h4 {
+  color: var(--color-ink);
+  margin-top: 2em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+}
+.prose-robonest h2 {
+  font-size: 1.75rem;
+}
+.prose-robonest h3 {
+  font-size: 1.35rem;
+}
+.prose-robonest h4 {
+  font-size: 1.15rem;
+}
+.prose-robonest a {
+  color: var(--color-brand);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.prose-robonest a:hover {
+  color: var(--color-brand-600);
+}
+.prose-robonest strong {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+.prose-robonest ul,
+.prose-robonest ol {
+  padding-left: 1.35em;
+}
+.prose-robonest ul {
+  list-style: disc;
+}
+.prose-robonest ol {
+  list-style: decimal;
+}
+.prose-robonest li + li {
+  margin-top: 0.4em;
+}
+.prose-robonest li::marker {
+  color: var(--color-brand);
+}
+.prose-robonest img,
+.prose-robonest iframe {
+  border-radius: 1rem;
+  max-width: 100%;
+  height: auto;
+}
+.prose-robonest iframe {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  height: auto;
+}
+.prose-robonest blockquote {
+  border-left: 3px solid var(--color-brand);
+  padding-left: 1.1em;
+  font-style: italic;
+  color: var(--color-ink);
+}
+.prose-robonest pre {
+  background: var(--color-night);
+  color: #e6edf7;
+  padding: 1.1em 1.25em;
+  border-radius: 0.85rem;
+  overflow-x: auto;
+  font-size: 0.9rem;
+}
+.prose-robonest code {
+  font-size: 0.92em;
+}
+.prose-robonest :not(pre) > code {
+  background: var(--color-brand-100);
+  color: var(--color-brand-600);
+  padding: 0.15em 0.4em;
+  border-radius: 0.35rem;
+}
+.prose-robonest table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  display: block;
+  overflow-x: auto;
+}
+.prose-robonest th,
+.prose-robonest td {
+  border: 1px solid rgb(0 0 0 / 0.08);
+  padding: 0.6em 0.8em;
+  text-align: left;
+}
+.prose-robonest th {
+  background: var(--color-sand);
+  color: var(--color-ink);
+  font-weight: 600;
+}
+.prose-robonest hr {
+  border: 0;
+  border-top: 1px solid rgb(0 0 0 / 0.1);
+  margin: 2.25em 0;
+}
+
+/* ------------------------------------------------------------------
    Utilities
    ------------------------------------------------------------------ */
 .text-balance {

@@ -4,15 +4,23 @@ import { aboutPage } from "@/content/site";
 import PageHero from "@/components/sections/PageHero";
 import Stats from "@/components/sections/Stats";
 import Team from "@/components/sections/Team";
+import { getTeam, getPage } from "@/lib/odoo-content";
 import Schools from "@/components/sections/Schools";
 import AboutBody from "@/components/sections/AboutBody";
+
+/** Pick up Odoo edits within 5 minutes. */
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "About Robonest",
   description: aboutPage.intro[0],
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const team = await getTeam();
+  // Editable in Odoo: Knowledge article titled "Website: About", Published.
+  // Falls back to the built-in copy when that article does not exist.
+  const page = await getPage("Website: About");
   return (
     <>
       <PageHero
@@ -21,9 +29,20 @@ export default function AboutPage() {
         body={aboutPage.intro[0]}
         image="/images/gallery/g5.jpeg"
       />
-      <AboutBody />
+      {page ? (
+        <section className="bg-sand">
+          <div className="mx-auto max-w-3xl px-6 py-20 lg:py-24">
+            <div
+              className="prose-robonest"
+              dangerouslySetInnerHTML={{ __html: page.html }}
+            />
+          </div>
+        </section>
+      ) : (
+        <AboutBody />
+      )}
       <Stats />
-      <Team />
+      <Team members={team} />
       <Schools />
 
       {/* Closing CTA */}

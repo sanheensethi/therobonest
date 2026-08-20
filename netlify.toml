@@ -1,6 +1,12 @@
+# The site runs on Netlify's Next.js runtime (ISR), so there is no `publish`
+# directory - the runtime serves and revalidates pages itself. Netlify detects
+# Next.js automatically; do not set publish = "out" here, that is only for a
+# static export.
 [build]
   command = "npm run build"
-  publish = "out"
+  # Serverless functions. enquiry.mjs forwards form submissions into Odoo CRM;
+  # it is the only place the Odoo API key exists.
+  functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "22"

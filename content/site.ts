@@ -21,17 +21,19 @@ export const contact = {
   mapQuery: "E-22, Sector 72, Noida, Uttar Pradesh, India",
 } as const;
 
-export const socials = [
-  { label: "Facebook", href: "https://www.facebook.com/" },
-  { label: "Instagram", href: "https://www.instagram.com/" },
-  { label: "LinkedIn", href: "https://www.linkedin.com/" },
-  { label: "Twitter", href: "https://twitter.com/" },
-] as const;
+/**
+ * Social links now come from Odoo (getSocials in lib/odoo-content.ts), so they
+ * are editable without a deploy and empty networks render no icon at all.
+ * The previous hardcoded list pointed at platform home pages - effectively
+ * dead links - so it was removed rather than kept as a fallback.
+ */
 
 export const nav = [
   { label: "Home", href: "/" },
   { label: "Labs", href: "/#labs" },
-  { label: "Team", href: "/#team" },
+  { label: "Events", href: "/events" },
+  { label: "Videos", href: "/videos" },
+  { label: "Blog", href: "/blog" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ] as const;
@@ -334,6 +336,65 @@ export const ctaForm = {
     "School Manager",
     "Trustee / Director",
     "Other",
+  ],
+} as const;
+
+/* ---------------- Videos ---------------- */
+
+/**
+ * YouTube videos for /videos.
+ *
+ * PLACEHOLDER IDS - replace `youtubeId` with the real ones from Robonest's
+ * channel (the value after `v=` in a YouTube URL). Thumbnails are pulled from
+ * YouTube automatically, so no images need uploading.
+ *
+ * These live here rather than in Odoo because Odoo has no native "video"
+ * model; if you want the team editing this list themselves, the eLearning app
+ * (slide.slide, video type) is the place and I can switch the source over.
+ */
+export const videosPage = {
+  eyebrow: "Watch",
+  title: "Robonest in Action",
+  body:
+    "Lab installations, student projects, exhibitions and teacher training - see what a Robonest classroom actually looks like.",
+  categories: ["All", "Lab Setup", "Student Projects", "Astronomy", "Events"],
+  items: [
+    {
+      youtubeId: "dQw4w9WgXcQ",
+      title: "Inside an Integrated Robotics Lab",
+      category: "Lab Setup",
+      duration: "3:24",
+    },
+    {
+      youtubeId: "dQw4w9WgXcQ",
+      title: "Students Build a Line-Following Robot",
+      category: "Student Projects",
+      duration: "5:10",
+    },
+    {
+      youtubeId: "dQw4w9WgXcQ",
+      title: "Stargazing Session with the Astronomy Lab",
+      category: "Astronomy",
+      duration: "4:02",
+    },
+    {
+      youtubeId: "dQw4w9WgXcQ",
+      title: "Robotics Exhibition Highlights",
+      category: "Events",
+      duration: "2:48",
+    },
+    {
+      youtubeId: "dQw4w9WgXcQ",
+      title: "Teacher Training Programme",
+      category: "Lab Setup",
+      duration: "6:15",
+    },
+    {
+      youtubeId: "dQw4w9WgXcQ",
+      title: "Tiny ML on a Microcontroller",
+      category: "Student Projects",
+      duration: "7:31",
+    },
   ],
 } as const;
 

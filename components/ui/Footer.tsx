@@ -1,11 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
-import { contact, nav, site, socials, labs } from "@/content/site";
+import { contact, nav, site, labs } from "@/content/site";
+import { getSocials } from "@/lib/odoo-content";
 import SocialIcon from "@/components/ui/SocialIcon";
 import { asset } from "@/lib/asset";
 
-export default function Footer() {
+export default async function Footer() {
   const year = 2026;
+  // Live from Odoo. Networks with no URL are omitted rather than rendered as
+  // dead icons - see getSocials().
+  const socials = await getSocials();
 
   return (
     <footer className="bg-night text-paper/70">
@@ -28,6 +32,7 @@ export default function Footer() {
             <p className="mt-5 max-w-sm text-sm leading-relaxed">
               {site.description}
             </p>
+            {socials.length > 0 && (
             <div className="mt-6 flex gap-3">
               {socials.map((s) => (
                 <a
@@ -42,6 +47,7 @@ export default function Footer() {
                 </a>
               ))}
             </div>
+            )}
           </div>
 
           {/* Links */}

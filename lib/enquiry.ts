@@ -27,9 +27,20 @@ export async function submitEnquiry(
     return { ok: false, error: "Please enter a valid 10-digit phone number." };
   }
 
-  const endpoint = process.env.NEXT_PUBLIC_FORM_ENDPOINT;
+  /**
+   * Default target is our own Netlify Function, which forwards the enquiry
+   * into Odoo CRM as a crm.lead. The Odoo API key has full write access to
+   * the database, so it lives ONLY in that function's environment - never in
+   * this browser bundle.
+   *
+   * NEXT_PUBLIC_FORM_ENDPOINT overrides it (Formspree, Web3Forms, etc.), and
+   * if the endpoint fails we fall back to a prefilled mailto rather than
+   * losing the lead.
+   */
+  const endpoint =
+    process.env.NEXT_PUBLIC_FORM_ENDPOINT || "/.netlify/functions/enquiry";
 
-  if (!endpoint) {
+  const mailtoFallback = () => {
     const body = Object.entries(data)
       .filter(([k, v]) => k !== "_trap" && v)
       .map(([k, v]) => `${k}: ${v}`)
@@ -49,13 +60,30 @@ export async function submitEnquiry(
       },
       body: JSON.stringify(data),
     });
-    if (!res.ok) throw new Error(`Request failed (${res.status})`);
+    if (!res.ok) {
+      // The function returns a readable reason for validation failures.
+      let reason = `Request failed (${res.status})`;
+      try {
+        const body = (await res.json()) as { error?: string };
+        if (body.error) reason = body.error;
+      } catch {
+        /* keep the status-code message */
+      }
+      throw new Error(reason);
+    }
     return { ok: true };
   } catch (err) {
     const detail = err instanceof Error ? err.message : "Something went wrong";
+
+    // Endpoint unreachable (e.g. running locally without `netlify dev`):
+    // hand off to email so the enquiry still reaches someone.
+    if (detail.includes("fetch") || detail.includes("Failed")) {
+      mailtoFallback();
+      return { ok: true };
+    }
     return {
       ok: false,
-      error: `${detail}. Please call ${contact.phones[0]} instead.`,
+      error: `${detail} Please call ${contact.phones[0]} if this persists.`,
     };
   }
 }
