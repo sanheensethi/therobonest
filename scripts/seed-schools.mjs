@@ -55,13 +55,21 @@ const uid = await rpc("common", "authenticate", [
 const call = (m, meth, a = [], k = {}) =>
   rpc("object", "execute_kw", [env.ODOO_DB, uid, env.ODOO_API_KEY, m, meth, a, k]);
 
-/** Logos are crests on white - keep them PNG so transparency survives. */
+/**
+ * Logos are small crests displayed at ~110px, so they are encoded for that.
+ *
+ * The first version resized to 512px and wrote PNG, which was a no-op on
+ * sources already under 512 - the stored image_512 came out identical to the
+ * original (up to 330KB). With eight of them requested at once by the marquee,
+ * each taking 2-3s through the image proxy, some simply never arrived and the
+ * card rendered blank. WebP at 320px brings each one under ~30KB.
+ */
 async function logoBase64(file) {
   const p = path.join("public/images/schools", file);
   if (!fs.existsSync(p)) return null;
   const buf = await sharp(p)
-    .resize({ width: 512, height: 512, fit: "inside", withoutEnlargement: true })
-    .png()
+    .resize({ width: 320, height: 320, fit: "inside", withoutEnlargement: true })
+    .webp({ quality: 88 })
     .toBuffer();
   return buf.toString("base64");
 }

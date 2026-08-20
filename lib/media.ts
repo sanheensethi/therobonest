@@ -59,11 +59,24 @@ export function extractMedia(html: string | false | null): ExtractedMedia {
     }
   );
 
-  // 2. bare YouTube links in the prose also count as videos
-  for (const m of out.matchAll(new RegExp(YT.source, "gi"))) {
-    const id = m[1];
+  // 2. Bare YouTube links in the prose also count as videos - and the link
+  //    itself is REMOVED. Collecting the id without stripping the text left
+  //    the raw "https://www.youtube.com/watch?v=..." visible in the middle of
+  //    the description, which is what an editor sees as "the video did not
+  //    work". Handles both a bare URL and one Odoo has auto-linked into an
+  //    <a> tag.
+  const YT_URL = new RegExp(
+    String.raw`<a[^>]*>\s*(?:https?:\/\/)?[^<]*` + YT.source + String.raw`[^<]*<\/a>` +
+      "|" +
+      String.raw`(?:https?:\/\/)?(?:www\.)?` + YT.source + String.raw`(?:[?&][\w=&%.-]*)?`,
+    "gi"
+  );
+
+  out = out.replace(YT_URL, (match) => {
+    const id = youtubeIdFrom(match);
     if (id && !videoIds.includes(id)) videoIds.push(id);
-  }
+    return "";
+  });
 
   // 3. <img> -> gallery. Skip tracking pixels and inline data URIs.
   out = out.replace(/<img\b[^>]*src=["']([^"']+)["'][^>]*\/?>/gi,
