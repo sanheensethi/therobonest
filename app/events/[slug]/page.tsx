@@ -35,11 +35,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 /** Human status, derived from what Odoo actually reports. */
 function statusOf(e: EventItem): { label: string; tone: string } {
+  if (e.isPast) return { label: "Completed", tone: "bg-ink/10 text-ink-700" };
+  // "Info Only" beats Odoo's computed open flag: the event is happening, it
+  // just is not taking sign-ups through the website.
+  if (e.infoOnly) return { label: "Announcement", tone: "bg-brand-100 text-brand" };
   if (e.registrationsOpen)
     return { label: "Registration open", tone: "bg-brand text-paper" };
-  if (!e.isPast)
-    return { label: "Upcoming", tone: "bg-brand-100 text-brand" };
-  return { label: "Completed", tone: "bg-ink/10 text-ink-700" };
+  return { label: "Upcoming", tone: "bg-brand-100 text-brand" };
 }
 
 function timeOf(value: string): string {
@@ -167,7 +169,7 @@ export default async function EventPage({ params }: Props) {
             </div>
 
             <aside className="lg:pt-1">
-              {e.registrationsOpen ? (
+              {e.registrationsOpen && !e.infoOnly ? (
                 <EventRegisterForm
                   eventId={e.id}
                   eventTitle={e.title}
@@ -177,12 +179,18 @@ export default async function EventPage({ params }: Props) {
               ) : (
                 <div className="rounded-[var(--radius-card)] border border-ink/10 bg-sand p-7">
                   <h3 className="font-display text-lg text-ink">
-                    {e.isPast ? "This event has finished" : "Registration not open"}
+                    {e.isPast
+                      ? "This event has finished"
+                      : e.infoOnly
+                        ? "No sign-up needed"
+                        : "Registration not open"}
                   </h3>
                   <p className="mt-2 text-sm leading-relaxed text-ink-700">
                     {e.isPast
                       ? "Take a look at the photos below, or get in touch about bringing something similar to your school."
-                      : "Registration for this event has not opened yet. Contact us to be notified."}
+                      : e.infoOnly
+                        ? "This is an announcement rather than a ticketed event. Get in touch if you would like to know more."
+                        : "Registration for this event has not opened yet. Contact us to be notified."}
                   </p>
                   <Link
                     href="/contact"

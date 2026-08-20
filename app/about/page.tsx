@@ -4,7 +4,7 @@ import { aboutPage } from "@/content/site";
 import PageHero from "@/components/sections/PageHero";
 import Stats from "@/components/sections/Stats";
 import Team from "@/components/sections/Team";
-import { getTeam, getPage } from "@/lib/odoo-content";
+import { getTeam, getPage, getSchools } from "@/lib/odoo-content";
 import Schools from "@/components/sections/Schools";
 import AboutBody from "@/components/sections/AboutBody";
 
@@ -18,6 +18,7 @@ export const metadata: Metadata = {
 
 export default async function AboutPage() {
   const team = await getTeam();
+  const schoolLogos = await getSchools();
   // Editable in Odoo: Knowledge article titled "Website: About", Published.
   // Falls back to the built-in copy when that article does not exist.
   const page = await getPage("Website: About");
@@ -43,7 +44,7 @@ export default async function AboutPage() {
       )}
       <Stats />
       <Team members={team} />
-      <Schools />
+      <Schools odooLogos={schoolLogos} />
 
       {/* Closing CTA */}
       <section className="bg-night">

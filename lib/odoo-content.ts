@@ -58,6 +58,10 @@ export type EventItem = {
   seatsMax: number;
   /** Cover image lifted out of Odoo's cover_properties blob. */
   cover: string | null;
+  /** Tag names on the event, e.g. Popup / Info Only / Workshop. */
+  tags: string[];
+  /** Tagged "Info Only": announce it, but show no registration form. */
+  infoOnly: boolean;
   /** Photos found in the description - Odoo has no event gallery field. */
   images: string[];
   /** YouTube ids found in the description. */
@@ -202,6 +206,7 @@ type RawEvent = {
   seats_available: number | false;
   seats_max: number | false;
   cover_properties: string | false;
+  tag_ids: number[];
 };
 
 /**
@@ -219,6 +224,12 @@ export const TAG = {
   ai: "AI & Robotics",
   /** Vertical 9:16 video - rendered in a portrait card, not a 16:9 one. */
   short: "Short",
+  /**
+   * Event that announces something but takes no sign-ups. Odoo computes
+   * `event_registrations_open` purely from dates and seats, with no way to
+   * express "information only" - this tag supplies that.
+   */
+  infoOnly: "Info Only",
 } as const;
 
 export async function getEvents(
@@ -235,17 +246,24 @@ export async function getEvents(
       [
         "name", "date_begin", "date_end", "address_id", "description",
         "stage_id", "event_registrations_open", "seats_limited",
-        "seats_available", "seats_max", "cover_properties",
+        "seats_available", "seats_max", "cover_properties", "tag_ids",
       ],
       { limit, order: "date_begin desc" }
     );
-    return rows.map(shapeEvent);
+    const tagNames = await resolveTagNames(
+      "event.tag",
+      rows.flatMap((r) => r.tag_ids ?? [])
+    );
+    return rows.map((r) => shapeEvent(r, tagNames));
   } catch {
     return [];
   }
 }
 
-function shapeEvent(r: RawEvent): EventItem {
+function shapeEvent(r: RawEvent, tagNames: Map<number, string>): EventItem {
+  const tags = (r.tag_ids ?? [])
+    .map((id) => tagNames.get(id))
+    .filter((n): n is string => Boolean(n));
   // Media is lifted OUT of the description so it can be rendered as a real
   // gallery and player, leaving the prose clean.
   const media = extractMedia(r.description);
@@ -268,6 +286,8 @@ function shapeEvent(r: RawEvent): EventItem {
     seatsAvailable: typeof r.seats_available === "number" ? r.seats_available : 0,
     seatsMax: typeof r.seats_max === "number" ? r.seats_max : 0,
     cover: coverImageFrom(r.cover_properties),
+    tags,
+    infoOnly: tags.includes(TAG.infoOnly),
     images: media.images,
     videoIds: media.videoIds,
   };
@@ -283,11 +303,13 @@ export async function getEvent(id: number): Promise<EventItem | null> {
       [
         "name", "date_begin", "date_end", "address_id", "description",
         "stage_id", "event_registrations_open", "seats_limited",
-        "seats_available", "seats_max", "cover_properties",
+        "seats_available", "seats_max", "cover_properties", "tag_ids",
       ],
       { limit: 1 }
     );
-    return rows[0] ? shapeEvent(rows[0]) : null;
+    if (!rows[0]) return null;
+    const tagNames = await resolveTagNames("event.tag", rows[0].tag_ids ?? []);
+    return shapeEvent(rows[0], tagNames);
   } catch {
     return null;
   }
@@ -311,6 +333,16 @@ export type TeamMember = {
   name: string;
   role: string;
   imageUrl: string | null;
+  /**
+   * Tier comes from the employee's Odoo Tag. hr.employee has no
+   * "is founder" field, so "Leadership" vs anything else is what decides
+   * whether a person renders as a large card with a quote or a circular
+   * portrait. Editable in the employee form, so the client can promote
+   * someone between tiers themselves.
+   */
+  isLeadership: boolean;
+  /** From `additional_note` - the line shown under a leadership card. */
+  quote: string;
 };
 
 /**
@@ -339,7 +371,16 @@ function parseBinSize(value: string | false | null): number {
  */
 const REAL_PHOTO_MIN_BYTES = 2048;
 
-export async function getTeam(limit = 30): Promise<TeamMember[]> {
+/**
+ * @param limit  hard cap on how many people are returned
+ * @param tag    optional employee Tag filter. The homepage passes "Homepage"
+ *               so the client can choose exactly who appears there, while the
+ *               About page passes nothing and shows everyone.
+ */
+export async function getTeam(
+  limit = 30,
+  tag?: string
+): Promise<TeamMember[]> {
   if (!odooConfigured()) return [];
   try {
     const rows = await odooSearchRead<{
@@ -347,20 +388,35 @@ export async function getTeam(limit = 30): Promise<TeamMember[]> {
       name: string;
       job_title: string | false;
       image_1920: string | false;
-    }>("hr.employee", [], ["name", "job_title", "image_1920"], {
+      category_ids: number[];
+      additional_note: string | false;
+    }>(
+      "hr.employee",
+      tag ? [["category_ids.name", "=", tag]] : [],
+      ["name", "job_title", "image_1920", "category_ids", "additional_note"],
+      {
       limit,
-      // hr.employee has no sequence field, so creation order is the only
-      // stable ordering available - seeded founders-first deliberately.
-      order: "id asc",
-      context: { bin_size: true },
-    });
+        // hr.employee has no sequence field, so creation order is the only
+        // stable ordering available - seeded founders-first deliberately.
+        order: "id asc",
+        context: { bin_size: true },
+      }
+    );
+
+    const tagNames = await resolveTagNames(
+      "hr.employee.category",
+      rows.flatMap((r) => r.category_ids ?? [])
+    );
 
     return rows.map((r) => {
       const hasRealPhoto = parseBinSize(r.image_1920) >= REAL_PHOTO_MIN_BYTES;
+      const tags = (r.category_ids ?? []).map((id) => tagNames.get(id));
       return {
         id: r.id,
         name: r.name,
         role: r.job_title || "",
+        isLeadership: tags.includes("Leadership"),
+        quote: (r.additional_note || "").trim(),
         // Routed through our own proxy, NOT Odoo's /web/image/.
         // hr.employee has no publish field, so Odoo answers unauthenticated
         // image requests with a 6KB grey placeholder (HTTP 200) instead of the
@@ -509,6 +565,59 @@ export async function getPage(title: string): Promise<CmsPage | null> {
     return { title: a.name.replace(/^Website:\s*/i, ""), html };
   } catch {
     return null;
+  }
+}
+
+/* ----------------------------------------------------------------- schools */
+
+export type SchoolLogo = {
+  id: number;
+  name: string;
+  logoUrl: string;
+  city: string;
+};
+
+/**
+ * Partner schools for the "Schools We Empower" strip.
+ *
+ * Held as Odoo COMPANY CONTACTS tagged "School" and published. Three reasons
+ * over a hardcoded list: the schools are real customers so one record serves
+ * sales and the website; res.partner supports is_published (hr.employee does
+ * not); and adding a school is something the team does in Contacts anyway.
+ *
+ * Removing the tag removes the logo from the site WITHOUT deleting the
+ * customer - which is the behaviour you want when a contract ends.
+ */
+export async function getSchools(limit = 24): Promise<SchoolLogo[]> {
+  if (!odooConfigured()) return [];
+  try {
+    const rows = await odooSearchRead<{
+      id: number;
+      name: string;
+      city: string | false;
+      image_1920: string | false;
+    }>(
+      "res.partner",
+      [
+        ["category_id.name", "=", "School"],
+        ["is_published", "=", true],
+      ],
+      ["name", "city", "image_1920"],
+      { limit, order: "name asc", context: { bin_size: true } }
+    );
+
+    return rows
+      // A school with no logo would render an empty card, so skip it.
+      .filter((r) => parseBinSize(r.image_1920) >= REAL_PHOTO_MIN_BYTES)
+      .map((r) => ({
+        id: r.id,
+        name: r.name,
+        city: r.city || "",
+        // Same proxy as team photos: served with the API key, cached a day.
+        logoUrl: `/api/odoo-image/res.partner/${r.id}/image_512/`,
+      }));
+  } catch {
+    return [];
   }
 }
 

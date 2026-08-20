@@ -30,10 +30,16 @@ function UpcomingCard({ e }: { e: EventItem }) {
         <span
           className={[
             "inline-flex w-fit items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wider",
-            e.registrationsOpen ? "bg-brand text-paper" : "bg-brand-100 text-brand",
+            e.registrationsOpen && !e.infoOnly
+              ? "bg-brand text-paper"
+              : "bg-brand-100 text-brand",
           ].join(" ")}
         >
-          {e.registrationsOpen ? "Registration open" : "Upcoming"}
+          {e.infoOnly
+            ? "Announcement"
+            : e.registrationsOpen
+              ? "Registration open"
+              : "Upcoming"}
         </span>
         {e.seatsLimited && e.seatsAvailable > 0 && (
           <span className="rounded-full border border-ink/12 px-2.5 py-1 text-[11px] text-ink-400">
@@ -74,7 +80,7 @@ function UpcomingCard({ e }: { e: EventItem }) {
         href={`/events/${e.slug}`}
         className="mt-5 text-sm font-semibold text-brand transition-colors hover:text-brand-600"
       >
-        {e.registrationsOpen ? "Register now" : "View details"} →
+        {e.registrationsOpen && !e.infoOnly ? "Register now" : "View details"} →
       </Link>
     </article>
   );

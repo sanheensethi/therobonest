@@ -1,0 +1,590 @@
+- generic [active] [ref=f4e1]:
+  - link "Skip to content" [ref=f4e2] [cursor=pointer]:
+    - /url: "#main"
+  - banner [ref=f4e3]:
+    - generic [ref=f4e4]:
+      - link "Robonest" [ref=f4e5] [cursor=pointer]:
+        - /url: /
+      - navigation [ref=f4e7]:
+        - link "Home" [ref=f4e8] [cursor=pointer]:
+          - /url: /
+        - link "Labs" [ref=f4e9] [cursor=pointer]:
+          - /url: /#labs
+        - link "Events" [ref=f4e10] [cursor=pointer]:
+          - /url: /events/
+        - link "Videos" [ref=f4e11] [cursor=pointer]:
+          - /url: /videos/
+        - link "Blog" [ref=f4e12] [cursor=pointer]:
+          - /url: /blog/
+        - link "About" [ref=f4e13] [cursor=pointer]:
+          - /url: /about/
+        - link "Contact" [ref=f4e14] [cursor=pointer]:
+          - /url: /contact/
+      - generic [ref=f4e15]:
+        - link "8860788886" [ref=f4e16] [cursor=pointer]:
+          - /url: tel:8860788886
+        - link "Book a Demo" [ref=f4e17] [cursor=pointer]:
+          - /url: /contact/
+  - main [ref=f4e18]:
+    - generic [ref=f4e19]:
+      - generic [ref=f4e22]:
+        - img "Students building a robot in a Robonest school lab" [ref=f4e24]
+        - generic: Robotics
+        - generic: AI
+        - generic: IoT
+        - generic: Coding
+      - generic [ref=f4e65]:
+        - generic [ref=f4e66]:
+          - paragraph [ref=f4e67]: India's trusted partner for
+          - heading "Future-Ready School Labs" [level=1] [ref=f4e68]:
+            - generic [ref=f4e69]: Future-Ready
+            - generic [ref=f4e71]: School Labs
+          - paragraph [ref=f4e73]: Complete Robotics, AI & IoT labs with curriculum, kits, software & teacher training — installed in just 10 days.
+          - generic [ref=f4e74]:
+            - generic [ref=f4e75]:
+              - term [ref=f4e76]
+              - definition [ref=f4e80]:
+                - generic [ref=f4e81]: 10,000+
+                - generic [ref=f4e82]: Students Reached
+            - generic [ref=f4e83]:
+              - term [ref=f4e84]
+              - definition [ref=f4e88]:
+                - generic [ref=f4e89]: Complete Setup
+                - generic [ref=f4e90]: in ~10 Days
+            - generic [ref=f4e91]:
+              - term [ref=f4e92]
+              - definition [ref=f4e96]:
+                - generic [ref=f4e97]: NEP Aligned
+                - generic [ref=f4e98]: Curriculum
+            - generic [ref=f4e99]:
+              - term [ref=f4e100]
+              - definition [ref=f4e105]:
+                - generic [ref=f4e106]: Teacher Training
+                - generic [ref=f4e107]: "& Support"
+          - generic [ref=f4e108]:
+            - paragraph [ref=f4e109]: Trusted by Leading Schools
+            - list [ref=f4e110]:
+              - listitem [ref=f4e111]:
+                - generic [ref=f4e113]: K.N. Modi
+              - listitem [ref=f4e114]:
+                - generic [ref=f4e116]: Wisdom World School
+              - listitem [ref=f4e117]:
+                - generic [ref=f4e119]: RSM Olympian
+              - listitem [ref=f4e120]:
+                - generic [ref=f4e122]: Bhagirath Public School
+          - button "Scroll to explore" [ref=f4e123]
+        - form [ref=f4e131]:
+          - generic [ref=f4e132]:
+            - heading "Bring Innovation to Your School" [level=2] [ref=f4e133]
+            - paragraph [ref=f4e134]: Enquire now for your school lab
+            - generic [ref=f4e135]:
+              - textbox "School Name" [ref=f4e137]
+              - combobox "State" [ref=f4e139]:
+                - option "State" [disabled] [selected]
+                - option "Andhra Pradesh"
+                - option "Arunachal Pradesh"
+                - option "Assam"
+                - option "Bihar"
+                - option "Chhattisgarh"
+                - option "Goa"
+                - option "Gujarat"
+                - option "Haryana"
+                - option "Himachal Pradesh"
+                - option "Jharkhand"
+                - option "Karnataka"
+                - option "Kerala"
+                - option "Madhya Pradesh"
+                - option "Maharashtra"
+                - option "Manipur"
+                - option "Meghalaya"
+                - option "Mizoram"
+                - option "Nagaland"
+                - option "Odisha"
+                - option "Punjab"
+                - option "Rajasthan"
+                - option "Sikkim"
+                - option "Tamil Nadu"
+                - option "Telangana"
+                - option "Tripura"
+                - option "Uttar Pradesh"
+                - option "Uttarakhand"
+                - option "West Bengal"
+                - option "Andaman & Nicobar Islands"
+                - option "Chandigarh"
+                - option "Dadra & Nagar Haveli and Daman & Diu"
+                - option "Delhi"
+                - option "Jammu & Kashmir"
+                - option "Ladakh"
+                - option "Lakshadweep"
+                - option "Puducherry"
+              - combobox "Your Designation" [ref=f4e141]:
+                - option "Your Designation" [disabled] [selected]
+                - option "Principal"
+                - option "Headmaster"
+                - option "Vice Principal"
+                - option "Director"
+                - option "Academic Coordinator"
+                - option "Senior Teacher"
+                - option "Administrative Head"
+                - option "Teacher / HOD"
+                - option "School Manager"
+                - option "Trustee / Director"
+                - option "Other"
+              - textbox "Your Name" [ref=f4e143]
+              - textbox "Mobile Number" [ref=f4e145]
+              - textbox "Email ID" [ref=f4e147]
+            - button "Submit Enquiry" [ref=f4e148]
+            - paragraph [ref=f4e151]: Our team will connect with you shortly!
+    - generic [ref=f4e155]:
+      - button "01 Integrated Lab Solution (Grades 1-12)" [ref=f4e156]:
+        - generic [ref=f4e160]: "01"
+        - generic [ref=f4e161]: Integrated Lab Solution
+        - generic [ref=f4e162]: (Grades 1-12)
+      - button "02 Curriculum Base (Grades 1-12)" [ref=f4e163]:
+        - generic [ref=f4e168]: "02"
+        - generic [ref=f4e169]: Curriculum Base
+        - generic [ref=f4e170]: (Grades 1-12)
+      - button "03 Arduino Inspiration Lab (Grades 6-12)" [ref=f4e171]:
+        - generic [ref=f4e176]: "03"
+        - generic [ref=f4e177]: Arduino Inspiration Lab
+        - generic [ref=f4e178]: (Grades 6-12)
+      - button "04 Electronics, IoT & Robotics Lab (Grades 6+)" [ref=f4e179]:
+        - generic [ref=f4e184]: "04"
+        - generic [ref=f4e185]: Electronics, IoT & Robotics Lab
+        - generic [ref=f4e186]: (Grades 6+)
+      - button "05 Artificial Intelligence (A.I.) Lab (Grades 6-12)" [ref=f4e187]:
+        - generic [ref=f4e192]: "05"
+        - generic [ref=f4e193]: Artificial Intelligence (A.I.) Lab
+        - generic [ref=f4e194]: (Grades 6-12)
+    - generic [ref=f4e197]:
+      - generic [ref=f4e198]:
+        - term [ref=f4e199]: Students Empowered
+        - definition [ref=f4e200]:
+          - generic [ref=f4e201]: 10,000+
+          - generic [ref=f4e202]: Students Empowered
+      - generic [ref=f4e203]:
+        - term [ref=f4e204]: Complete Lab Setup
+        - definition [ref=f4e205]:
+          - generic [ref=f4e206]: 10 Days
+          - generic [ref=f4e207]: Complete Lab Setup
+      - generic [ref=f4e208]:
+        - term [ref=f4e209]: Modular Lab Solutions
+        - definition [ref=f4e210]:
+          - generic [ref=f4e211]: "5"
+          - generic [ref=f4e212]: Modular Lab Solutions
+      - generic [ref=f4e213]:
+        - term [ref=f4e214]: Grades Covered (1-12)
+        - definition [ref=f4e215]:
+          - generic [ref=f4e216]: "12"
+          - generic [ref=f4e217]: Grades Covered (1-12)
+    - generic [ref=f4e220]:
+      - generic [ref=f4e221]:
+        - generic [ref=f4e222]:
+          - paragraph [ref=f4e223]: About Us
+          - heading "Redefining modern learning" [level=2] [ref=f4e224]:
+            - generic [ref=f4e225]: Redefining modern
+            - generic [ref=f4e226]: learning
+          - paragraph [ref=f4e227]: With engaging lessons and a curriculum that is both dynamic and innovative, we create an atmosphere that keeps students motivated from start to finish.
+        - paragraph [ref=f4e228]: At Robonest, we are revolutionizing the way we learn and train with cutting-edge AI technology. Our platform is designed to make learning more efficient, personalized and accessible than ever before.
+        - img "Students working in a Robonest robotics lab" [ref=f4e230]
+      - generic [ref=f4e231]:
+        - heading "Unlock the Power of AI-Driven Learning" [level=3] [ref=f4e232]
+        - list [ref=f4e233]:
+          - listitem [ref=f4e234]:
+            - generic [ref=f4e235]:
+              - generic [ref=f4e236]: "01"
+              - generic [ref=f4e237]:
+                - heading "Personalized Learning Paths" [level=4] [ref=f4e238]
+                - paragraph [ref=f4e239]: Our AI-powered system creates customized learning journeys tailored to your unique needs and goals.
+          - listitem [ref=f4e240]:
+            - generic [ref=f4e241]:
+              - generic [ref=f4e242]: "02"
+              - generic [ref=f4e243]:
+                - heading "Real-Time Feedback and Assessment" [level=4] [ref=f4e244]
+                - paragraph [ref=f4e245]: Get instant feedback and assessment on your progress, helping you stay on track and achieve your objectives.
+          - listitem [ref=f4e246]:
+            - generic [ref=f4e247]:
+              - generic [ref=f4e248]: "03"
+              - generic [ref=f4e249]:
+                - heading "Immersive Interactive Experiences" [level=4] [ref=f4e250]
+                - paragraph [ref=f4e251]: Engage with interactive simulations, virtual labs and gamification elements that make learning fun and effective.
+    - generic [ref=f4e252]:
+      - generic [ref=f4e253]:
+        - paragraph [ref=f4e254]: Modular Lab Solutions
+        - heading "Transform Learning with Our Future Leaders Lab Solutions" [level=2] [ref=f4e255]
+        - paragraph [ref=f4e256]: From foundational tinkering spaces to advanced Artificial Intelligence centres - we deliver modular, NEP-aligned ecosystems equipped with authentic LEGO® Education and Arduino technologies, and our signature RoboGenius kits.
+      - generic [ref=f4e258]:
+        - generic [ref=f4e262]:
+          - article [ref=f4e263]:
+            - generic [ref=f4e264]:
+              - generic [ref=f4e265]: Foundation
+              - generic [ref=f4e266]: Grades 1-12
+            - generic [ref=f4e267]: "01"
+            - heading "Integrated Lab Solution" [level=3] [ref=f4e268]
+            - paragraph [ref=f4e269]: Transforms traditional classrooms into innovation hubs where students learn through experimentation, coding, robotics and real-world applications.
+            - paragraph [ref=f4e270]: Key features
+            - list [ref=f4e271]:
+              - listitem [ref=f4e272]:
+                - generic [ref=f4e274]:
+                  - text: LEGO® Kits
+                  - generic [ref=f4e275]: — Robotics and coding fundamentals.
+              - listitem [ref=f4e276]:
+                - generic [ref=f4e278]:
+                  - text: Arduino Kits
+                  - generic [ref=f4e279]: — Advanced AI and IoT prototyping.
+              - listitem [ref=f4e280]:
+                - generic [ref=f4e282]:
+                  - text: RoboGenius Kits
+                  - generic [ref=f4e283]: — Core electronics and hands-on tinkering.
+              - listitem [ref=f4e284]:
+                - generic [ref=f4e286]:
+                  - text: Scalable Progression
+                  - generic [ref=f4e287]: — From block-based logic to Python.
+            - button "Enquire about this lab →" [ref=f4e288]
+          - article [ref=f4e289]:
+            - generic [ref=f4e290]:
+              - generic [ref=f4e291]: Curriculum
+              - generic [ref=f4e292]: Grades 1-12
+            - generic [ref=f4e293]: "02"
+            - heading "Curriculum Base" [level=3] [ref=f4e294]
+            - paragraph [ref=f4e295]: A well-designed curriculum that introduces students to AI, Robotics, Coding and Innovation through age-appropriate practical activities and projects.
+            - paragraph [ref=f4e296]: Key features
+            - list [ref=f4e297]:
+              - listitem [ref=f4e298]:
+                - generic [ref=f4e300]:
+                  - text: Curriculum-Based Learning
+                  - generic [ref=f4e301]: — AI & robotics mapped to grade level.
+              - listitem [ref=f4e302]:
+                - generic [ref=f4e304]:
+                  - text: Hands-on Training
+                  - generic [ref=f4e305]: — Project-based practical sessions.
+              - listitem [ref=f4e306]:
+                - generic [ref=f4e308]:
+                  - text: Teacher Support
+                  - generic [ref=f4e309]: — Expert mentorship and training.
+              - listitem [ref=f4e310]:
+                - generic [ref=f4e312]:
+                  - text: Future-Ready Skills
+                  - generic [ref=f4e313]: — Industry-oriented technology exposure.
+            - button "Enquire about this lab →" [ref=f4e314]
+          - article [ref=f4e315]:
+            - generic [ref=f4e316]:
+              - generic [ref=f4e317]: Industry Ready
+              - generic [ref=f4e318]: Grades 6-12
+            - generic [ref=f4e319]: "03"
+            - heading "Arduino Inspiration Lab" [level=3] [ref=f4e320]
+            - paragraph [ref=f4e321]: The engineering frontier focusing on the Internet of Things (IoT) and electronic circuits using the Arduino UNO R4 and Explore IoT Kit.
+            - paragraph [ref=f4e322]: Key features
+            - list [ref=f4e323]:
+              - listitem [ref=f4e324]:
+                - generic [ref=f4e326]:
+                  - text: Real-World IoT
+                  - generic [ref=f4e327]: — Design deployable IoT solutions.
+              - listitem [ref=f4e328]:
+                - generic [ref=f4e330]:
+                  - text: Cloud Connectivity
+                  - generic [ref=f4e331]: — Real-time data collection.
+              - listitem [ref=f4e332]:
+                - generic [ref=f4e334]:
+                  - text: Wireless Prototyping
+                  - generic [ref=f4e335]: — Wi-Fi & Bluetooth enabled builds.
+              - listitem [ref=f4e336]:
+                - generic [ref=f4e338]:
+                  - text: Circuit Design
+                  - generic [ref=f4e339]: — Electrical and electronic fundamentals.
+            - button "Enquire about this lab →" [ref=f4e340]
+          - article [ref=f4e341]:
+            - generic [ref=f4e342]:
+              - generic [ref=f4e343]: Industry Ready
+              - generic [ref=f4e344]: Grades 6+
+            - generic [ref=f4e345]: "04"
+            - heading "Electronics, IoT & Robotics Lab" [level=3] [ref=f4e346]
+            - paragraph [ref=f4e347]: Our core engineering setup focused heavily on real-world application, bridging core electronics with the Internet of Things and functional robotics.
+            - paragraph [ref=f4e348]: Key features
+            - list [ref=f4e349]:
+              - listitem [ref=f4e350]:
+                - generic [ref=f4e352]:
+                  - text: Extensive Curriculum
+                  - generic [ref=f4e353]: — 30+ comprehensive hands-on projects.
+              - listitem [ref=f4e354]:
+                - generic [ref=f4e356]:
+                  - text: Automation & Control
+                  - generic [ref=f4e357]: — Build and program mechanical systems.
+              - listitem [ref=f4e358]:
+                - generic [ref=f4e360]:
+                  - text: Robust Hardware
+                  - generic [ref=f4e361]: — 50+ diverse electronic components.
+              - listitem [ref=f4e362]:
+                - generic [ref=f4e364]:
+                  - text: Core Focus
+                  - generic [ref=f4e365]: — Deep dive into electronics and IoT.
+            - button "Enquire about this lab →" [ref=f4e366]
+          - article [ref=f4e367]:
+            - generic [ref=f4e368]:
+              - generic [ref=f4e369]: Advanced Tech
+              - generic [ref=f4e370]: Grades 6-12
+            - generic [ref=f4e371]: "05"
+            - heading "Artificial Intelligence (A.I.) Lab" [level=3] [ref=f4e372]
+            - paragraph [ref=f4e373]: A scalable AI ecosystem. While the Arduino Alvik introduces robotics to younger students, the Tiny ML Kit empowers seniors to deploy real ML models.
+            - paragraph [ref=f4e374]: Key features
+            - list [ref=f4e375]:
+              - listitem [ref=f4e376]:
+                - generic [ref=f4e378]:
+                  - text: Tiny Machine Learning
+                  - generic [ref=f4e379]: — Run ML on microcontrollers.
+              - listitem [ref=f4e380]:
+                - generic [ref=f4e382]:
+                  - text: Arduino Alvik
+                  - generic [ref=f4e383]: — Smart robotic companion.
+              - listitem [ref=f4e384]:
+                - generic [ref=f4e386]:
+                  - text: Python & TensorFlow Lite
+                  - generic [ref=f4e387]: — Real framework integration.
+              - listitem [ref=f4e388]:
+                - generic [ref=f4e390]:
+                  - text: Sensor-Based AI
+                  - generic [ref=f4e391]: — Environmental interaction models.
+            - button "Enquire about this lab →" [ref=f4e392]
+        - paragraph [ref=f4e393]: Keep scrolling to explore all 5 labs
+    - generic [ref=f4e395]:
+      - heading "The hardware students actually build with" [level=2] [ref=f4e396]
+      - generic [ref=f4e397]:
+        - article [ref=f4e398]:
+          - img "ARDUINO UNO" [ref=f4e400]
+          - generic [ref=f4e401]:
+            - heading "ARDUINO UNO" [level=3] [ref=f4e402]
+            - list [ref=f4e403]:
+              - listitem [ref=f4e404]: Arduino projects
+              - listitem [ref=f4e406]: Arduino programming
+              - listitem [ref=f4e408]: Board design & learning
+        - article [ref=f4e410]:
+          - img "Sensors" [ref=f4e412]
+          - generic [ref=f4e413]:
+            - heading "Sensors" [level=3] [ref=f4e414]
+            - list [ref=f4e415]:
+              - listitem [ref=f4e416]: How sensors work
+              - listitem [ref=f4e418]: Sensor applications
+              - listitem [ref=f4e420]: Sensor-based projects
+    - generic [ref=f4e423]:
+      - generic [ref=f4e424]:
+        - paragraph [ref=f4e425]: Leadership
+        - heading "Visionaries Behind Robonest" [level=2] [ref=f4e426]:
+          - generic [ref=f4e427]: Visionaries Behind
+          - generic [ref=f4e428]: Robonest
+      - generic [ref=f4e429]:
+        - article [ref=f4e430]:
+          - img "Achal Arya, Founder & CEO" [ref=f4e432]
+          - heading "Achal Arya" [level=3] [ref=f4e433]
+          - paragraph [ref=f4e434]: Founder & CEO
+        - article [ref=f4e435]:
+          - img "Tushar Arya, Co-Founder & Director" [ref=f4e437]
+          - heading "Tushar Arya" [level=3] [ref=f4e438]
+          - paragraph [ref=f4e439]: Co-Founder & Director
+        - article [ref=f4e440]:
+          - img "Siddharth Sharma, CFO" [ref=f4e442]
+          - heading "Siddharth Sharma" [level=3] [ref=f4e443]
+          - paragraph [ref=f4e444]: CFO
+        - article [ref=f4e445]:
+          - img "Manish Bhaskar, CRO" [ref=f4e447]
+          - heading "Manish Bhaskar" [level=3] [ref=f4e448]
+          - paragraph [ref=f4e449]: CRO
+        - article [ref=f4e450]:
+          - img "Vibhu Sharma, Chief Technical Officer" [ref=f4e452]
+          - heading "Vibhu Sharma" [level=3] [ref=f4e453]
+          - paragraph [ref=f4e454]: Chief Technical Officer
+        - article [ref=f4e455]:
+          - img "Suhani Sharma, Sr. Trainer - AI & Robotics" [ref=f4e457]
+          - heading "Suhani Sharma" [level=3] [ref=f4e458]
+          - paragraph [ref=f4e459]: Sr. Trainer - AI & Robotics
+        - article [ref=f4e460]:
+          - generic [ref=f4e461]: P
+          - heading "Prashant" [level=3] [ref=f4e464]
+          - paragraph [ref=f4e465]: Trainer - AI & Robotics
+        - article [ref=f4e466]:
+          - generic [ref=f4e467]: A
+          - heading "Ayushi" [level=3] [ref=f4e470]
+          - paragraph [ref=f4e471]: Trainer - AI & Robotics
+    - generic [ref=f4e472]:
+      - generic [ref=f4e474]:
+        - generic [ref=f4e475]:
+          - paragraph [ref=f4e476]: Watch
+          - heading "Robonest in action" [level=2] [ref=f4e477]
+        - link "All videos →" [ref=f4e478] [cursor=pointer]:
+          - /url: /videos/
+      - generic [ref=f4e481]:
+        - button "3:24 Lab Setup SAMPLE - Inside an Integrated Robotics Lab" [ref=f4e482]:
+          - generic [ref=f4e483]: 3:24
+          - generic [ref=f4e489]:
+            - text: Lab Setup
+            - generic [ref=f4e490]: SAMPLE - Inside an Integrated Robotics Lab
+        - button "5:12 Student Projects SAMPLE - Students Build a Line-Following Robot" [ref=f4e491]:
+          - generic [ref=f4e492]: 5:12
+          - generic [ref=f4e498]:
+            - text: Student Projects
+            - generic [ref=f4e499]: SAMPLE - Students Build a Line-Following Robot
+    - generic [ref=f4e501]:
+      - generic [ref=f4e502]:
+        - paragraph [ref=f4e503]: Photos
+        - heading "Institution Gallery" [level=2] [ref=f4e504]
+      - generic [ref=f4e505]:
+        - button "Open gallery image 1" [ref=f4e506]:
+          - img "Robonest lab session 1" [ref=f4e507]
+        - button "Open gallery image 2" [ref=f4e509]:
+          - img "Robonest lab session 2" [ref=f4e510]
+        - button "Open gallery image 3" [ref=f4e512]:
+          - img "Robonest lab session 3" [ref=f4e513]
+        - button "Open gallery image 4" [ref=f4e515]:
+          - img "Robonest lab session 4" [ref=f4e516]
+        - button "Open gallery image 5" [ref=f4e518]:
+          - img "Robonest lab session 5" [ref=f4e519]
+        - button "Open gallery image 6" [ref=f4e521]:
+          - img "Robonest lab session 6" [ref=f4e522]
+        - button "Open gallery image 7" [ref=f4e524]:
+          - img "Robonest lab session 7" [ref=f4e525]
+    - generic [ref=f4e529]:
+      - img "A Robonest training session in progress" [ref=f4e532]
+      - generic [ref=f4e533]:
+        - generic [ref=f4e534]:
+          - paragraph [ref=f4e535]: About Us
+          - heading "Our Journey" [level=2] [ref=f4e536]
+        - generic [ref=f4e537]:
+          - paragraph [ref=f4e538]: Our early days were spent offering small classes in community centres, where we rapidly gained a reputation for our engaging teaching methods and supportive environment. As we honed our curriculum, our student base grew, fuelled by word-of-mouth recommendations and our undeniable passion for education.
+          - paragraph [ref=f4e539]: With each new program, our institution has continued to evolve, experimenting with different teaching styles while staying true to our mission. Our relentless drive and commitment to fostering authentic, impactful learning experiences have brought us to where we are today - a school on the brink of educational excellence.
+    - generic [ref=f4e541]:
+      - heading "Schools We Empower" [level=2] [ref=f4e542]
+      - generic [ref=f4e545]:
+        - generic [ref=f4e546]:
+          - img "K.N. Modi"
+        - generic [ref=f4e547]:
+          - img "Wisdom World School"
+        - generic [ref=f4e548]:
+          - img "RSM Olympian"
+        - generic [ref=f4e549]:
+          - img "Bhagirath Public School"
+    - generic [ref=f4e557]:
+      - generic [ref=f4e558]:
+        - generic [ref=f4e559]:
+          - paragraph [ref=f4e560]: Contact us
+          - heading "Ready to Transform Your School?" [level=2] [ref=f4e561]
+          - paragraph [ref=f4e562]: Get a free consultation with our education experts. We will help you design the perfect robotics lab solution for your school's unique needs and budget.
+        - generic [ref=f4e563]:
+          - paragraph [ref=f4e564]:
+            - generic [ref=f4e565]: Branch Office
+            - text: E-22, Sector-72, Noida, Uttar Pradesh
+          - paragraph [ref=f4e566]:
+            - generic [ref=f4e567]: Call
+            - generic [ref=f4e568]:
+              - link "8860788886" [ref=f4e569] [cursor=pointer]:
+                - /url: tel:8860788886
+              - text: ","
+            - generic [ref=f4e570]:
+              - link "7217704018" [ref=f4e571] [cursor=pointer]:
+                - /url: tel:7217704018
+              - text: ","
+            - link "9953610316" [ref=f4e573] [cursor=pointer]:
+              - /url: tel:9953610316
+          - paragraph [ref=f4e574]:
+            - generic [ref=f4e575]: Email
+            - link "robonestacc@gmail.com" [ref=f4e576] [cursor=pointer]:
+              - /url: mailto:robonestacc@gmail.com
+      - generic [ref=f4e577]:
+        - generic [ref=f4e578]:
+          - generic [ref=f4e579]:
+            - generic [ref=f4e580]: Your Name *
+            - textbox "Your Name *" [ref=f4e581]
+          - generic [ref=f4e582]:
+            - generic [ref=f4e583]: Email Id *
+            - textbox "Email Id *" [ref=f4e584]
+          - generic [ref=f4e585]:
+            - generic [ref=f4e586]: Phone Number *
+            - textbox "Phone Number *" [ref=f4e587]
+          - generic [ref=f4e588]:
+            - generic [ref=f4e589]: School Name *
+            - textbox "School Name *" [ref=f4e590]
+          - generic [ref=f4e591]:
+            - generic [ref=f4e592]: State *
+            - textbox "State *" [ref=f4e593]
+          - generic [ref=f4e594]:
+            - generic [ref=f4e595]: Subject
+            - textbox "Subject" [ref=f4e596]
+          - generic [ref=f4e597]:
+            - generic [ref=f4e598]: Designation *
+            - combobox "Designation *" [ref=f4e599]:
+              - option "Select your role" [disabled] [selected]
+              - option "Principal"
+              - option "Headmaster"
+              - option "Vice Principal"
+              - option "Director"
+              - option "Academic Coordinator"
+              - option "Senior Teacher"
+              - option "Administrative Head"
+              - option "Teacher / HOD"
+              - option "School Manager"
+              - option "Trustee / Director"
+              - option "Other"
+          - generic [ref=f4e600]:
+            - generic [ref=f4e601]: Your Requirement
+            - textbox "Your Requirement" [ref=f4e602]:
+              - /placeholder: Which lab are you interested in? Any budget or timeline in mind?
+        - button "Submit enquiry" [ref=f4e603]
+        - paragraph [ref=f4e604]
+  - contentinfo [ref=f4e605]:
+    - generic [ref=f4e606]:
+      - generic [ref=f4e607]:
+        - generic [ref=f4e608]:
+          - generic [ref=f4e609]: Robonest
+          - paragraph [ref=f4e611]: Robonest transforms education through Robotics, Artificial Intelligence, Coding and STEM lab solutions for schools across India.
+        - generic [ref=f4e612]:
+          - heading "Explore" [level=3] [ref=f4e613]
+          - list [ref=f4e614]:
+            - listitem [ref=f4e615]:
+              - link "Home" [ref=f4e616] [cursor=pointer]:
+                - /url: /
+            - listitem [ref=f4e617]:
+              - link "Labs" [ref=f4e618] [cursor=pointer]:
+                - /url: /#labs
+            - listitem [ref=f4e619]:
+              - link "Events" [ref=f4e620] [cursor=pointer]:
+                - /url: /events/
+            - listitem [ref=f4e621]:
+              - link "Videos" [ref=f4e622] [cursor=pointer]:
+                - /url: /videos/
+            - listitem [ref=f4e623]:
+              - link "Blog" [ref=f4e624] [cursor=pointer]:
+                - /url: /blog/
+            - listitem [ref=f4e625]:
+              - link "About" [ref=f4e626] [cursor=pointer]:
+                - /url: /about/
+            - listitem [ref=f4e627]:
+              - link "Contact" [ref=f4e628] [cursor=pointer]:
+                - /url: /contact/
+        - generic [ref=f4e629]:
+          - heading "Get in touch" [level=3] [ref=f4e630]
+          - generic [ref=f4e631]:
+            - paragraph [ref=f4e632]: Branch Office — E-22, Sector-72, Noida, Uttar Pradesh
+            - paragraph [ref=f4e633]:
+              - generic [ref=f4e634]:
+                - link "8860788886" [ref=f4e635] [cursor=pointer]:
+                  - /url: tel:8860788886
+                - text: ","
+              - generic [ref=f4e636]:
+                - link "7217704018" [ref=f4e637] [cursor=pointer]:
+                  - /url: tel:7217704018
+                - text: ","
+              - link "9953610316" [ref=f4e639] [cursor=pointer]:
+                - /url: tel:9953610316
+            - paragraph [ref=f4e640]:
+              - link "robonestacc@gmail.com" [ref=f4e641] [cursor=pointer]:
+                - /url: mailto:robonestacc@gmail.com
+      - generic [ref=f4e642]:
+        - generic [ref=f4e643]: Integrated Lab Solution
+        - generic [ref=f4e644]: Curriculum Base
+        - generic [ref=f4e645]: Arduino Inspiration Lab
+        - generic [ref=f4e646]: Electronics, IoT & Robotics Lab
+        - generic [ref=f4e647]: Artificial Intelligence (A.I.) Lab
+      - generic [ref=f4e648]:
+        - paragraph [ref=f4e649]: Copyright © 2026 Robonest Private Limited. All rights reserved.
+        - paragraph [ref=f4e650]: Built for future-ready classrooms.
+  - button "Back to top" [ref=f4e651]
+  - button "Open Next.js Dev Tools" [ref=f4e659] [cursor=pointer]
+  - alert [ref=f4e663]

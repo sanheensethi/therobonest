@@ -339,6 +339,35 @@ export const ctaForm = {
   ],
 } as const;
 
+/**
+ * Floating WhatsApp button.
+ *
+ * `number` must include the country code with no spaces or symbols - wa.me
+ * silently fails on a local-format number. 91 = India.
+ * `message` is prefilled in the chat, so the enquiry arrives with context
+ * instead of a bare "hi".
+ */
+export const whatsapp = {
+  number: "918860788886",
+  label: "Chat with us",
+  message:
+    "Hi Robonest, I'm interested in setting up a lab at our school. Could you share the details?",
+} as const;
+
+/**
+ * HOMEPAGE TEAM RULES - the only place these are set.
+ *
+ * `tag`   which employees appear on the homepage. Tag someone "Homepage" in
+ *         Odoo (Employees -> the Tags field) and they show there. Set this to
+ *         null to fall back to showing everyone.
+ * `max`   hard cap, so the homepage can never grow into a wall of faces as
+ *         the company hires. The About page is uncapped.
+ */
+export const homeTeam = {
+  tag: "Homepage" as string | null,
+  max: 8,
+} as const;
+
 /* ---------------- Videos ---------------- */
 
 /**

@@ -13,11 +13,11 @@
 import fs from "node:fs";
 
 const LINKS = {
-  social_facebook: "",
-  social_instagram: "",
-  social_linkedin: "",
-  social_twitter: "",
-  social_youtube: "",
+  social_facebook: "https://www.facebook.com/",
+  social_instagram: "https://www.instagram.com/",
+  social_linkedin: "https://www.linkedin.com/",
+  social_twitter: "https://x.com/",
+  social_youtube: "https://www.youtube.com/",
 };
 
 /* ------------------------------------------------------------------ */

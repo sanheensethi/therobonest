@@ -4,8 +4,10 @@ import Image from "next/image";
 import { schools } from "@/content/site";
 import { useReveal } from "@/components/motion/useReveal";
 import { asset } from "@/lib/asset";
+import type { SchoolLogo } from "@/lib/odoo-content";
 
-type Logo = (typeof schools.logos)[number];
+/** Either an Odoo-driven logo or one of the bundled fallbacks. */
+type Logo = { name: string; image: string; fromOdoo?: boolean };
 
 /**
  * One marquee row. `reverse` sends it the other way.
@@ -44,6 +46,21 @@ function Row({
             ].join(" ")}
             aria-hidden={i >= logos.length}
           >
+            {s.fromOdoo ? (
+              /* Odoo image proxy URL - not a local file next/image can
+                 optimise, so a plain img is correct here. */
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={s.image}
+                alt={i < logos.length ? s.name : ""}
+                loading="lazy"
+                className={
+                  compact
+                    ? "max-h-16 w-auto object-contain"
+                    : "max-h-24 w-auto object-contain sm:max-h-28"
+                }
+              />
+            ) : (
             <Image
               src={asset(s.image)}
               alt={i < logos.length ? s.name : ""}
@@ -57,6 +74,7 @@ function Row({
                   : "max-h-24 w-auto object-contain sm:max-h-28"
               }
             />
+            )}
           </div>
         ))}
       </div>
@@ -64,14 +82,21 @@ function Row({
   );
 }
 
-export default function Schools() {
+export default function Schools({ odooLogos = [] }: { odooLogos?: SchoolLogo[] }) {
   const ref = useReveal<HTMLElement>();
+
+  // Prefer schools from Odoo Contacts (tagged "School", published). Falls back
+  // to the bundled logos so the strip is never empty.
+  const all: Logo[] =
+    odooLogos.length > 0
+      ? odooLogos.map((s) => ({ name: s.name, image: s.logoUrl, fromOdoo: true }))
+      : schools.logos.map((s) => ({ name: s.name, image: s.image }));
 
   // Mobile layout: two rows travelling in opposite directions, so two crests
   // are on screen at once instead of one large card creeping past.
-  const half = Math.ceil(schools.logos.length / 2);
-  const rowA = schools.logos.slice(0, half);
-  const rowB = schools.logos.slice(half);
+  const half = Math.ceil(all.length / 2);
+  const rowA = all.slice(0, half);
+  const rowB = all.slice(half);
 
   return (
     <section ref={ref} className="border-y border-ink/8 bg-sand">
@@ -91,7 +116,7 @@ export default function Schools() {
 
         {/* Desktop: a single wide row */}
         <div className="mt-10 hidden sm:block">
-          <Row logos={schools.logos} />
+          <Row logos={all} />
         </div>
       </div>
     </section>

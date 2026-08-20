@@ -1,22 +1,24 @@
 import Link from "next/link";
-import VideoGrid, { type Video } from "@/components/sections/VideoGrid";
+import VideoPlaylist from "@/components/sections/VideoPlaylist";
+import type { Video } from "@/components/sections/VideoGrid";
 import { getVideos, TAG } from "@/lib/odoo-content";
 
 /**
- * Homepage video block, driven entirely by the "Homepage" tag in Odoo.
+ * Homepage video block: one player with a selectable playlist beside it.
  *
- * Tag a video Homepage in eLearning and it appears here; untag it and it
- * disappears. Nothing about which videos are featured lives in the code -
- * that is the whole point of the tag vocabulary.
+ * Which videos appear is driven entirely by the "Homepage" tag in eLearning.
+ * If fewer than two are tagged the playlist looks thin, so it tops up from the
+ * full library rather than showing a lone video next to an empty list.
  *
- * Renders nothing at all when no video is tagged, so the homepage never shows
+ * Renders nothing when there are no videos at all, so the homepage never shows
  * an empty section.
  */
 export default async function FeaturedVideos() {
-  const tagged = await getVideos(2, TAG.home);
-  if (tagged.length === 0) return null;
+  const tagged = await getVideos(8, TAG.home);
+  const pool = tagged.length >= 2 ? tagged : await getVideos(8);
+  if (pool.length === 0) return null;
 
-  const videos: Video[] = tagged.map((v) => ({
+  const videos: Video[] = pool.map((v) => ({
     youtubeId: v.youtubeId,
     title: v.title,
     category: v.category,
@@ -26,8 +28,8 @@ export default async function FeaturedVideos() {
   }));
 
   return (
-    <div className="bg-sand">
-      <div className="mx-auto max-w-7xl px-6 pt-20 lg:pt-24">
+    <section className="bg-sand">
+      <div className="mx-auto max-w-7xl px-6 py-20 lg:py-24">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="font-display text-sm uppercase tracking-[0.2em] text-brand">
@@ -44,10 +46,9 @@ export default async function FeaturedVideos() {
             All videos →
           </Link>
         </div>
-      </div>
 
-      {/* The grid brings its own section padding and click-to-play modal. */}
-      <VideoGrid videos={videos} showFilter={false} columns={2} />
-    </div>
+        <VideoPlaylist videos={videos} />
+      </div>
+    </section>
   );
 }

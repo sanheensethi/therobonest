@@ -4,6 +4,7 @@ import Image from "next/image";
 import { founders, execTeam } from "@/content/site";
 import type { TeamMember } from "@/lib/odoo-content";
 import SectionHeading from "@/components/ui/SectionHeading";
+import { useState } from "react";
 import { useReveal } from "@/components/motion/useReveal";
 import { asset } from "@/lib/asset";
 
@@ -56,10 +57,44 @@ function InitialAvatar({ name }: { name: string }) {
  * content/site.ts (which carry the founders' quotes, something hr.employee has
  * no field for) while Odoo is still empty.
  */
-export default function Team({ members = [] }: { members?: TeamMember[] }) {
+export default function Team({
+  members = [],
+  /**
+   * One tier instead of two. The homepage uses this: with only a handful of
+   * people tagged, the second tier was a lone circle followed by a large empty
+   * gap. Rendering everyone as cards keeps the CTO visible and removes the
+   * orphaned row and its whitespace. The About page keeps both tiers.
+   */
+  singleTier = false,
+}: {
+  members?: TeamMember[];
+  singleTier?: boolean;
+}) {
   const ref = useReveal<HTMLElement>({ stagger: 0.1 });
+  // A photo that fails to load left an EMPTY circle, which looks worse than
+  // having no photo at all. Tracking the failures lets us fall back to the
+  // initials avatar instead.
+  const [failed, setFailed] = useState<Set<number>>(new Set());
+  const markFailed = (id: number) =>
+    setFailed((prev) => (prev.has(id) ? prev : new Set(prev).add(id)));
 
   if (members.length > 0) {
+    // Two tiers, from the Odoo employee Tag: leadership as large cards with a
+    // quote, everyone else as circular portraits underneath.
+    const leadership = members.filter((m) => m.isLeadership);
+    const rest = members.filter((m) => !m.isLeadership);
+
+    // singleTier: everyone becomes a card, nothing goes in the second row.
+    // Otherwise: leadership as cards, the rest as circles. If nobody is tagged
+    // Leadership, everyone falls to circles - a missing tag should degrade,
+    // not blank the section.
+    const tier1 = singleTier
+      ? members
+      : leadership.length > 0
+        ? leadership
+        : [];
+    const tier2 = singleTier ? [] : leadership.length > 0 ? rest : members;
+
     return (
       <section ref={ref} id="team" className="bg-sand">
         <div className="mx-auto max-w-7xl px-6 py-20 lg:py-28">
@@ -68,40 +103,90 @@ export default function Team({ members = [] }: { members?: TeamMember[] }) {
             lines={founders.titleLines}
           />
 
-          {/* Circular portrait, name beneath, role beneath that. Chosen over
-              a large photo card because these are staff headshots of varying
-              crop and quality - a circle normalises them, where a big
-              rectangle exposes every difference in framing. */}
-          <div className="mt-14 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
-            {members.map((p) => (
-              <article key={p.id} data-reveal="up" className="group text-center">
-                <div className="relative mx-auto aspect-square w-32 overflow-hidden rounded-full border-2 border-paper shadow-md sm:w-36">
-                  {p.imageUrl ? (
-                    /* Plain img: the src is our own Odoo image proxy route,
-                       not a file next/image can optimise. */
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img
-                      src={p.imageUrl}
-                      alt={`${p.name}, ${p.role || "Robonest team"}`}
-                      loading="lazy"
-                      className="h-full w-full object-cover object-top transition-transform duration-700 ease-[var(--ease-brand)] group-hover:scale-[1.07]"
-                    />
-                  ) : (
-                    <InitialAvatar name={p.name} />
+          {tier1.length > 0 && (
+            <div className="mt-14 grid gap-7 sm:grid-cols-2 lg:grid-cols-4">
+              {tier1.map((p) => (
+                <article
+                  key={p.id}
+                  data-reveal="up"
+                  className="group flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-ink/8 bg-paper"
+                >
+                  <div className="relative aspect-[4/5] overflow-hidden">
+                    {p.imageUrl && !failed.has(p.id) ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img
+                        src={p.imageUrl}
+                        alt={`${p.name}, ${p.role || "Robonest team"}`}
+                        loading="lazy"
+                        onError={() => markFailed(p.id)}
+                        className="h-full w-full object-cover object-top transition-transform duration-700 ease-[var(--ease-brand)] group-hover:scale-[1.05]"
+                      />
+                    ) : (
+                      <InitialAvatar name={p.name} />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-night/85 via-transparent to-transparent opacity-70" />
+                    <div className="absolute inset-x-0 bottom-0 p-5">
+                      <h3 className="text-lg leading-tight text-paper">
+                        {p.name}
+                      </h3>
+                      {p.role && (
+                        <p className="mt-0.5 text-xs font-semibold uppercase tracking-wider text-brand-300">
+                          {p.role}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  {p.quote && (
+                    <p className="p-5 text-sm italic leading-relaxed text-ink-400">
+                      {p.quote}
+                    </p>
                   )}
-                </div>
+                </article>
+              ))}
+            </div>
+          )}
 
-                <h3 className="mt-5 font-display text-lg leading-tight text-ink">
-                  {p.name}
+          {tier2.length > 0 && (
+            <>
+              {tier1.length > 0 && (
+                <h3
+                  data-reveal="clip"
+                  className="mt-20 text-2xl leading-tight text-ink lg:text-3xl"
+                >
+                  {execTeam.title}
                 </h3>
-                {p.role && (
-                  <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-brand">
-                    {p.role}
-                  </p>
-                )}
-              </article>
-            ))}
-          </div>
+              )}
+
+              <div className="mt-10 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
+                {tier2.map((p) => (
+                  <article key={p.id} data-reveal="scale" className="group text-center">
+                    <div className="relative mx-auto aspect-square w-32 overflow-hidden rounded-full border-2 border-paper shadow-md sm:w-36">
+                      {p.imageUrl && !failed.has(p.id) ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
+                          src={p.imageUrl}
+                          alt={`${p.name}, ${p.role || "Robonest team"}`}
+                          loading="lazy"
+                          onError={() => markFailed(p.id)}
+                          className="h-full w-full object-cover object-top transition-transform duration-700 ease-[var(--ease-brand)] group-hover:scale-[1.07]"
+                        />
+                      ) : (
+                        <InitialAvatar name={p.name} />
+                      )}
+                    </div>
+                    <h4 className="mt-5 font-display text-lg leading-tight text-ink">
+                      {p.name}
+                    </h4>
+                    {p.role && (
+                      <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-brand">
+                        {p.role}
+                      </p>
+                    )}
+                  </article>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </section>
     );

@@ -405,6 +405,15 @@ html.lenis body {
   background-size: 22px 22px;
 }
 
+/* Two-line truncation for playlist titles. Declared manually rather than
+   pulling in a plugin for a single utility. */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 /* Hide scrollbar on horizontal rails while keeping keyboard access */
 .no-scrollbar {
   scrollbar-width: none;

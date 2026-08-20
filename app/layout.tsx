@@ -6,6 +6,9 @@ import { asset } from "@/lib/asset";
 import Header from "@/components/ui/Header";
 import Footer from "@/components/ui/Footer";
 import ScrollToTop from "@/components/ui/ScrollToTop";
+import EventPopup from "@/components/ui/EventPopup";
+import WhatsAppButton from "@/components/ui/WhatsAppButton";
+import { getPopupEvent, formatEventDate } from "@/lib/odoo-content";
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -25,11 +28,15 @@ export const metadata: Metadata = {
   icons: { icon: asset("/images/brand/logo.png") },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // The event tagged "Popup" in Odoo, if any. Fetched in the layout so the
+  // promo appears on every page, not just the homepage.
+  const popup = await getPopupEvent();
+
   return (
     <html lang="en">
       <head>
@@ -56,6 +63,20 @@ export default function RootLayout({
           <main id="main">{children}</main>
           <Footer />
           <ScrollToTop />
+          <WhatsAppButton />
+          {popup && (
+            <EventPopup
+              event={{
+                id: popup.id,
+                slug: popup.slug,
+                title: popup.title,
+                dateLabel: formatEventDate(popup.start),
+                location: popup.location,
+                cover: popup.cover,
+                registrationsOpen: popup.registrationsOpen,
+              }}
+            />
+          )}
         </SmoothScroll>
       </body>
     </html>
