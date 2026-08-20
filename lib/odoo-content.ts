@@ -1,5 +1,6 @@
 import { odooSearchRead, odooConfigured } from "@/lib/odoo";
 import { sanitizeOdooHtml, htmlToText } from "@/lib/sanitize";
+import { extractMedia } from "@/lib/media";
 
 /**
  * Typed content fetchers over Odoo. SERVER-SIDE ONLY.
@@ -285,6 +286,9 @@ export async function getTeam(limit = 30): Promise<TeamMember[]> {
       image_1920: string | false;
     }>("hr.employee", [], ["name", "job_title", "image_1920"], {
       limit,
+      // hr.employee has no sequence field, so creation order is the only
+      // stable ordering available - seeded founders-first deliberately.
+      order: "id asc",
       context: { bin_size: true },
     });
 
@@ -432,6 +436,96 @@ export async function getPage(title: string): Promise<CmsPage | null> {
   } catch {
     return null;
   }
+}
+
+/* ---------------------------------------------------------------- sections */
+
+export type SectionCard = { title: string; body: string };
+
+export type CmsSection = {
+  /** Article title with the "Website: " prefix removed. */
+  title: string;
+  /** Prose, with media lifted out. */
+  html: string;
+  /** Paragraph text only - for places that need plain strings. */
+  paragraphs: string[];
+  /** Public Odoo URLs of every image in the body. */
+  images: string[];
+  /** YouTube ids found in the body. */
+  videoIds: string[];
+  /** Each <h3> (or <h4>) plus the paragraph under it becomes a card. */
+  cards: SectionCard[];
+};
+
+/**
+ * A page SECTION held as an Odoo Knowledge article.
+ *
+ * One mechanism covers what used to be three hardcoded things:
+ *   - prose blocks  -> the paragraphs
+ *   - card grids    -> each heading + the paragraph beneath it
+ *   - photo galleries -> every image dropped into the body
+ *
+ * Images uploaded in Odoo's editor get public /web/image/... URLs, so a
+ * gallery is literally "drag the photos into the article". No custom model,
+ * no extra app, and the editor is the one the team already uses.
+ *
+ * Convention: article titled "Website: <Section>", Published ticked.
+ */
+export async function getSection(title: string): Promise<CmsSection | null> {
+  if (!odooConfigured()) return null;
+  try {
+    const rows = await odooSearchRead<{
+      id: number;
+      name: string;
+      body: string | false;
+    }>(
+      "knowledge.article",
+      [["name", "=", title], ["is_published", "=", true]],
+      ["name", "body"],
+      { limit: 1 }
+    );
+    const a = rows[0];
+    if (!a || !a.body) return null;
+
+    // Pull media out FIRST, then sanitise what is left as prose.
+    const media = extractMedia(a.body);
+    const html = sanitizeOdooHtml(media.html);
+    if (!html && media.images.length === 0) return null;
+
+    return {
+      title: a.name.replace(/^Website:\s*/i, ""),
+      html,
+      paragraphs: extractParagraphs(html),
+      images: media.images,
+      videoIds: media.videoIds,
+      cards: extractCards(html),
+    };
+  } catch {
+    return null;
+  }
+}
+
+/** Plain-text paragraphs, in order. */
+function extractParagraphs(html: string): string[] {
+  return Array.from(html.matchAll(/<p>([\s\S]*?)<\/p>/gi))
+    .map((m) => htmlToText(m[1], 2000))
+    .filter(Boolean);
+}
+
+/**
+ * Heading + following paragraph -> a card. This is what lets an editor add a
+ * fourth feature card by typing a fourth heading, with no code change.
+ */
+function extractCards(html: string): SectionCard[] {
+  const cards: SectionCard[] = [];
+  const re = /<h([34])>([\s\S]*?)<\/h>\s*(?:<p>([\s\S]*?)<\/p>)?/gi;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(html))) {
+    const title = htmlToText(m[2], 200);
+    if (!title) continue;
+    cards.push({ title, body: htmlToText(m[3] ?? "", 400) });
+  }
+  return cards;
 }
 
 /* ------------------------------------------------------------------ social */

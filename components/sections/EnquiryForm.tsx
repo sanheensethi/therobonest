@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ctaForm, contact } from "@/content/site";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { useReveal } from "@/components/motion/useReveal";
+import { submitEnquiry } from "@/lib/enquiry";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
@@ -17,19 +18,18 @@ const FIELDS = [
 ] as const;
 
 /**
- * School enquiry form.
+ * School enquiry form (contact page + homepage footer CTA).
  *
- * Posts JSON to NEXT_PUBLIC_FORM_ENDPOINT (Formspree, Web3Forms, a Netlify
- * function, your own mailer - anything that accepts a POST). If that variable
- * is not set, it degrades to a prefilled mailto: so enquiries still reach
- * the inbox instead of silently vanishing.
+ * Submission goes through the SHARED submitEnquiry() in lib/enquiry.ts, the
+ * same path the hero form uses. This form previously carried its own copy of
+ * the logic, which checked NEXT_PUBLIC_FORM_ENDPOINT and fell straight to
+ * mailto when it was unset - so it emailed instead of creating a CRM lead even
+ * though the Netlify function was working. One shared path, one behaviour.
  */
 export default function EnquiryForm() {
   const ref = useReveal<HTMLElement>();
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
-
-  const endpoint = process.env.NEXT_PUBLIC_FORM_ENDPOINT;
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -39,53 +39,16 @@ export default function EnquiryForm() {
       string
     >;
 
-    // Honeypot: bots fill hidden fields, humans never see them.
-    if (data._trap) return;
-
-    if (!/^\S+@\S+\.\S+$/.test(data.email ?? "")) {
-      setStatus("error");
-      setError("Please enter a valid email address.");
-      return;
-    }
-    if ((data.phone ?? "").replace(/\D/g, "").length < 10) {
-      setStatus("error");
-      setError("Please enter a valid 10-digit phone number.");
-      return;
-    }
-
     setStatus("submitting");
     setError(null);
 
-    if (!endpoint) {
-      // No backend configured - hand off to the user's mail client.
-      const body = Object.entries(data)
-        .filter(([k]) => k !== "_trap")
-        .map(([k, v]) => `${k}: ${v}`)
-        .join("\n");
-      window.location.href = `mailto:${contact.email}?subject=${encodeURIComponent(
-        `Lab enquiry — ${data.school || data.name}`
-      )}&body=${encodeURIComponent(body)}`;
+    const result = await submitEnquiry(data);
+    if (result.ok) {
       setStatus("success");
       form.reset();
-      return;
-    }
-
-    try {
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) throw new Error(`Request failed (${res.status})`);
-      setStatus("success");
-      form.reset();
-    } catch (err) {
+    } else {
       setStatus("error");
-      setError(
-        err instanceof Error
-          ? `${err.message}. Please call ${contact.phones[0]} instead.`
-          : "Something went wrong."
-      );
+      setError(result.error);
     }
   }
 
