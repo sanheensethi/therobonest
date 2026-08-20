@@ -22,6 +22,7 @@ export default async function FeaturedVideos() {
     category: v.category,
     duration: v.duration,
     tags: v.tags,
+    isShort: v.isShort,
   }));
 
   return (

@@ -12,6 +12,8 @@ export type Video = {
   duration: string;
   /** Placement tags from Odoo, e.g. Homepage / Astronomy. */
   tags?: string[];
+  /** Vertical 9:16 video - gets a portrait card and a portrait player. */
+  isShort?: boolean;
 };
 
 /**
@@ -118,10 +120,17 @@ export default function VideoGrid({
               onClick={() => setPlaying(v)}
               className="group overflow-hidden rounded-[var(--radius-card)] border border-ink/8 bg-paper text-left transition-all duration-500 hover:-translate-y-1.5 hover:border-brand/40 hover:shadow-xl hover:shadow-ink/5"
             >
-              <span className="relative block aspect-video overflow-hidden bg-night">
+              <span
+                className={[
+                  "relative block overflow-hidden bg-night",
+                  // A vertical video in a 16:9 box shows thick black bars down
+                  // both sides, so Shorts get a portrait frame instead.
+                  v.isShort ? "aspect-[9/16]" : "aspect-video",
+                ].join(" ")}
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={`https://i.ytimg.com/vi/${v.youtubeId}/hqdefault.jpg`}
+                  src={`https://i.ytimg.com/vi/${v.youtubeId}/${v.isShort ? "oardefault" : "hqdefault"}.jpg`}
                   alt=""
                   loading="lazy"
                   className="h-full w-full object-cover transition-transform duration-700 ease-[var(--ease-brand)] group-hover:scale-[1.06]"
@@ -141,6 +150,12 @@ export default function VideoGrid({
                     <path d="M8 5v14l11-7z" />
                   </svg>
                 </span>
+
+                {v.isShort && (
+                  <span className="absolute left-2.5 top-2.5 rounded bg-brand px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-paper">
+                    Short
+                  </span>
+                )}
 
                 <span className="absolute bottom-2.5 right-2.5 rounded bg-night/85 px-1.5 py-0.5 text-[11px] font-medium text-paper">
                   {v.duration}
@@ -185,10 +200,18 @@ export default function VideoGrid({
           </button>
 
           <div
-            className="w-full max-w-5xl"
+            className={[
+              "w-full",
+              playing.isShort ? "max-w-sm" : "max-w-5xl",
+            ].join(" ")}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="aspect-video overflow-hidden rounded-2xl bg-black shadow-2xl">
+            <div
+              className={[
+                "overflow-hidden rounded-2xl bg-black shadow-2xl",
+                playing.isShort ? "aspect-[9/16] max-h-[80vh]" : "aspect-video",
+              ].join(" ")}
+            >
               <iframe
                 src={`https://www.youtube-nocookie.com/embed/${playing.youtubeId}?autoplay=1&rel=0`}
                 title={playing.title}

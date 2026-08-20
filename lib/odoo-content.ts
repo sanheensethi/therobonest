@@ -194,6 +194,8 @@ export const TAG = {
   popup: "Popup",
   astronomy: "Astronomy",
   ai: "AI & Robotics",
+  /** Vertical 9:16 video - rendered in a portrait card, not a 16:9 one. */
+  short: "Short",
 } as const;
 
 export async function getEvents(
@@ -298,10 +300,12 @@ export async function getTeam(limit = 30): Promise<TeamMember[]> {
         id: r.id,
         name: r.name,
         role: r.job_title || "",
-        // Odoo serves photos from a public web route, so no blob travels
-        // through the API - we only ever send the URL to the browser.
+        // Routed through our own proxy, NOT Odoo's /web/image/.
+        // hr.employee has no publish field, so Odoo answers unauthenticated
+        // image requests with a 6KB grey placeholder (HTTP 200) instead of the
+        // real photo. The proxy reads the bytes over RPC with the API key.
         imageUrl: hasRealPhoto
-          ? `${process.env.ODOO_URL ?? ""}/web/image/hr.employee/${r.id}/image_512`
+          ? `/api/odoo-image/hr.employee/${r.id}/image_512/`
           : null,
       };
     });
@@ -322,6 +326,12 @@ export type VideoItem = {
   description: string;
   /** Placement tags, e.g. Homepage / Astronomy. */
   tags: string[];
+  /**
+   * Vertical video. Odoo exposes no aspect ratio, and a Shorts URL is
+   * indistinguishable from a normal one once parsed to an id - so this comes
+   * from the "Short" tag OR from the /shorts/ path in the original URL.
+   */
+  isShort: boolean;
 };
 
 /**
@@ -376,6 +386,9 @@ export async function getVideos(
         tags: (r.tag_ids ?? [])
           .map((id) => tagNames.get(id))
           .filter((n): n is string => Boolean(n)),
+        isShort:
+          /\/shorts\//i.test(r.url || "") ||
+          (r.tag_ids ?? []).some((id) => tagNames.get(id) === TAG.short),
       }))
       .filter((v) => v.youtubeId);
   } catch {

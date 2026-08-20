@@ -68,49 +68,37 @@ export default function Team({ members = [] }: { members?: TeamMember[] }) {
             lines={founders.titleLines}
           />
 
-          <div className="mt-14 grid gap-7 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Circular portrait, name beneath, role beneath that. Chosen over
+              a large photo card because these are staff headshots of varying
+              crop and quality - a circle normalises them, where a big
+              rectangle exposes every difference in framing. */}
+          <div className="mt-14 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
             {members.map((p) => (
-              <article
-                key={p.id}
-                data-reveal="up"
-                className="group overflow-hidden rounded-[var(--radius-card)] border border-ink/8 bg-paper"
-              >
-                <div className="relative aspect-[4/5] overflow-hidden">
+              <article key={p.id} data-reveal="up" className="group text-center">
+                <div className="relative mx-auto aspect-square w-32 overflow-hidden rounded-full border-2 border-paper shadow-md sm:w-36">
                   {p.imageUrl ? (
-                    <>
-                      {/* Plain img: an external Odoo URL, served from
-                          /web/image and already correctly sized. */}
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={p.imageUrl}
-                        alt={p.name}
-                        loading="lazy"
-                        className="h-full w-full object-cover transition-transform duration-700 ease-[var(--ease-brand)] group-hover:scale-[1.05]"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-night/85 via-transparent to-transparent opacity-70" />
-                    </>
+                    /* Plain img: the src is our own Odoo image proxy route,
+                       not a file next/image can optimise. */
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      src={p.imageUrl}
+                      alt={`${p.name}, ${p.role || "Robonest team"}`}
+                      loading="lazy"
+                      className="h-full w-full object-cover object-top transition-transform duration-700 ease-[var(--ease-brand)] group-hover:scale-[1.07]"
+                    />
                   ) : (
                     <InitialAvatar name={p.name} />
                   )}
-
-                  {/* Caption sits on the photo, but needs its own readable
-                      ground on the light initials tile. */}
-                  <div
-                    className={[
-                      "absolute inset-x-0 bottom-0 p-5",
-                      p.imageUrl ? "" : "bg-gradient-to-t from-night/85 to-transparent pt-10",
-                    ].join(" ")}
-                  >
-                    <h3 className="text-lg leading-tight text-paper">
-                      {p.name}
-                    </h3>
-                    {p.role && (
-                      <p className="mt-0.5 text-xs font-semibold uppercase tracking-wider text-brand-300">
-                        {p.role}
-                      </p>
-                    )}
-                  </div>
                 </div>
+
+                <h3 className="mt-5 font-display text-lg leading-tight text-ink">
+                  {p.name}
+                </h3>
+                {p.role && (
+                  <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-brand">
+                    {p.role}
+                  </p>
+                )}
               </article>
             ))}
           </div>

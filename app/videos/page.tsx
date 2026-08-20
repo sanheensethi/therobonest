@@ -24,6 +24,7 @@ export default async function VideosPage() {
           category: v.category,
           duration: v.duration,
           tags: v.tags,
+          isShort: v.isShort,
         }))
       : videosPage.items.map((v) => ({
           youtubeId: v.youtubeId,
