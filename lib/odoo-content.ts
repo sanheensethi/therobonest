@@ -1,6 +1,6 @@
 import { odooSearchRead, odooConfigured } from "@/lib/odoo";
 import { sanitizeOdooHtml, htmlToText } from "@/lib/sanitize";
-import { extractMedia } from "@/lib/media";
+import { extractMedia, coverImageFrom } from "@/lib/media";
 
 /**
  * Typed content fetchers over Odoo. SERVER-SIDE ONLY.
@@ -45,6 +45,23 @@ export type EventItem = {
   descriptionHtml: string;
   teaser: string;
   isPast: boolean;
+  /** Odoo pipeline stage: New / Booked / Announced / Ended. */
+  stage: string;
+  /**
+   * Odoo computes this from the dates and remaining seats, so it is the single
+   * honest answer to "can someone still sign up" - better than re-deriving it
+   * from dates on our side and drifting from what staff see in Odoo.
+   */
+  registrationsOpen: boolean;
+  seatsLimited: boolean;
+  seatsAvailable: number;
+  seatsMax: number;
+  /** Cover image lifted out of Odoo's cover_properties blob. */
+  cover: string | null;
+  /** Photos found in the description - Odoo has no event gallery field. */
+  images: string[];
+  /** YouTube ids found in the description. */
+  videoIds: string[];
 };
 
 /** URL-safe slug with the record id appended, mirroring Odoo's own scheme. */
@@ -179,6 +196,12 @@ type RawEvent = {
   date_end: string | false;
   address_id: Many2One;
   description: string | false;
+  stage_id: Many2One;
+  event_registrations_open: boolean;
+  seats_limited: boolean;
+  seats_available: number | false;
+  seats_max: number | false;
+  cover_properties: string | false;
 };
 
 /**
@@ -209,26 +232,64 @@ export async function getEvents(
     const rows = await odooSearchRead<RawEvent>(
       "event.event",
       domain,
-      ["name", "date_begin", "date_end", "address_id", "description"],
+      [
+        "name", "date_begin", "date_end", "address_id", "description",
+        "stage_id", "event_registrations_open", "seats_limited",
+        "seats_available", "seats_max", "cover_properties",
+      ],
       { limit, order: "date_begin desc" }
     );
-    const now = Date.now();
-    return rows.map((r) => ({
-      id: r.id,
-      slug: toSlug(r.name, r.id),
-      title: r.name,
-      start: r.date_begin,
-      end: r.date_end || null,
-      location: name(r.address_id),
-      descriptionHtml: sanitizeOdooHtml(r.description),
-      teaser: htmlToText(r.description, 150),
-      // An event counts as past once its END has gone by (or its start, if
-      // no end was set) - otherwise a multi-day event in progress would be
-      // filed under "past" on its second morning.
-      isPast: new Date(r.date_end || r.date_begin).getTime() < now,
-    }));
+    return rows.map(shapeEvent);
   } catch {
     return [];
+  }
+}
+
+function shapeEvent(r: RawEvent): EventItem {
+  // Media is lifted OUT of the description so it can be rendered as a real
+  // gallery and player, leaving the prose clean.
+  const media = extractMedia(r.description);
+  return {
+    id: r.id,
+    slug: toSlug(r.name, r.id),
+    title: r.name,
+    start: r.date_begin,
+    end: r.date_end || null,
+    location: name(r.address_id),
+    descriptionHtml: sanitizeOdooHtml(media.html),
+    teaser: htmlToText(r.description, 150),
+    // An event counts as past once its END has gone by (or its start, if no
+    // end was set) - otherwise a multi-day event in progress would be filed
+    // under "past" on its second morning.
+    isPast: new Date(r.date_end || r.date_begin).getTime() < Date.now(),
+    stage: name(r.stage_id),
+    registrationsOpen: Boolean(r.event_registrations_open),
+    seatsLimited: Boolean(r.seats_limited),
+    seatsAvailable: typeof r.seats_available === "number" ? r.seats_available : 0,
+    seatsMax: typeof r.seats_max === "number" ? r.seats_max : 0,
+    cover: coverImageFrom(r.cover_properties),
+    images: media.images,
+    videoIds: media.videoIds,
+  };
+}
+
+/** Single event by id, for the detail page. */
+export async function getEvent(id: number): Promise<EventItem | null> {
+  if (!odooConfigured()) return null;
+  try {
+    const rows = await odooSearchRead<RawEvent>(
+      "event.event",
+      [["id", "=", id], ["is_published", "=", true]],
+      [
+        "name", "date_begin", "date_end", "address_id", "description",
+        "stage_id", "event_registrations_open", "seats_limited",
+        "seats_available", "seats_max", "cover_properties",
+      ],
+      { limit: 1 }
+    );
+    return rows[0] ? shapeEvent(rows[0]) : null;
+  } catch {
+    return null;
   }
 }
 

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import PageHero from "@/components/sections/PageHero";
 import RevealList from "@/components/ui/RevealList";
+import EventTimeline from "@/components/sections/EventTimeline";
+import Link from "next/link";
 import Icon from "@/components/ui/Icon";
 import {
   getEvents,
@@ -24,12 +26,26 @@ function UpcomingCard({ e }: { e: EventItem }) {
       data-reveal="up"
       className="group flex flex-col rounded-[var(--radius-card)] border border-ink/8 bg-paper p-7 transition-all duration-500 hover:-translate-y-1.5 hover:border-brand/40 hover:shadow-xl hover:shadow-ink/5"
     >
-      <span className="inline-flex w-fit items-center gap-2 rounded-full bg-brand px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-paper">
-        Upcoming
-      </span>
+      <div className="flex flex-wrap items-center gap-2">
+        <span
+          className={[
+            "inline-flex w-fit items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wider",
+            e.registrationsOpen ? "bg-brand text-paper" : "bg-brand-100 text-brand",
+          ].join(" ")}
+        >
+          {e.registrationsOpen ? "Registration open" : "Upcoming"}
+        </span>
+        {e.seatsLimited && e.seatsAvailable > 0 && (
+          <span className="rounded-full border border-ink/12 px-2.5 py-1 text-[11px] text-ink-400">
+            {e.seatsAvailable} seats left
+          </span>
+        )}
+      </div>
 
       <h3 className="mt-5 font-display text-xl leading-snug text-ink">
-        {e.title}
+        <Link href={`/events/${e.slug}`} className="transition-colors hover:text-brand">
+          {e.title}
+        </Link>
       </h3>
 
       <dl className="mt-4 space-y-2 text-sm text-ink-700">
@@ -53,6 +69,13 @@ function UpcomingCard({ e }: { e: EventItem }) {
       {e.teaser && (
         <p className="mt-4 text-sm leading-relaxed text-ink-400">{e.teaser}</p>
       )}
+
+      <Link
+        href={`/events/${e.slug}`}
+        className="mt-5 text-sm font-semibold text-brand transition-colors hover:text-brand-600"
+      >
+        {e.registrationsOpen ? "Register now" : "View details"} →
+      </Link>
     </article>
   );
 }
@@ -99,48 +122,7 @@ export default async function EventsPage() {
               Every exhibition, workshop and school programme we&apos;ve run.
             </p>
 
-            {/* Vertical rail; each entry hangs off it with a node marker. */}
-            <RevealList className="relative mt-14" stagger={0.1}>
-              <span
-                aria-hidden
-                className="absolute left-[7px] top-2 bottom-2 w-px bg-gradient-to-b from-brand via-brand/40 to-transparent sm:left-[9px]"
-              />
-
-              <ol className="space-y-10">
-                {past.map((e) => (
-                  <li
-                    key={e.id}
-                    data-reveal="up"
-                    className="relative pl-9 sm:pl-12"
-                  >
-                    <span
-                      aria-hidden
-                      className="absolute left-0 top-1.5 flex h-4 w-4 items-center justify-center rounded-full border-2 border-brand bg-night sm:h-5 sm:w-5"
-                    >
-                      <span className="h-1.5 w-1.5 rounded-full bg-brand" />
-                    </span>
-
-                    <time className="text-xs font-semibold uppercase tracking-wider text-brand-300">
-                      {formatEventDate(e.start)}
-                    </time>
-
-                    <h3 className="mt-1.5 font-display text-xl leading-snug text-paper">
-                      {e.title}
-                    </h3>
-
-                    {e.location && (
-                      <p className="mt-1 text-sm text-paper/50">{e.location}</p>
-                    )}
-
-                    {e.teaser && (
-                      <p className="mt-3 text-sm leading-relaxed text-paper/70">
-                        {e.teaser}
-                      </p>
-                    )}
-                  </li>
-                ))}
-              </ol>
-            </RevealList>
+            <EventTimeline events={past} />
           </div>
         </section>
       )}
