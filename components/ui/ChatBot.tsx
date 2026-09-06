@@ -118,12 +118,19 @@ export default function ChatBot({ event }: { event?: ChatEvent | null }) {
     const yTo = gsap.quickTo(el, "y", { duration: dur, ease: "power3.out" });
     let docked: boolean | null = null;
     let placed = false;
+    // Cached per route: the dock slot and the header height do not change
+    // between frames, so they must not be looked up between frames.
+    let dock: HTMLElement | null = document.querySelector<HTMLElement>("[data-mascot-dock]");
+    const navH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--nav-h")) || 76;
+    const rescan = window.setInterval(() => {
+      dock = document.querySelector<HTMLElement>("[data-mascot-dock]");
+    }, 1000);
+    let frame = 0;
 
     const tick = () => {
       // While it is off running a victory lap, leave its position alone.
       if (el.dataset.lap) return;
-      const dock = document.querySelector<HTMLElement>("[data-mascot-dock]");
-      const navH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--nav-h")) || 76;
+      if (++frame % 2) return;
       const vw = window.innerWidth;
       const vh = window.innerHeight;
       let x: number, y: number, isDocked = false;
@@ -203,7 +210,10 @@ export default function ChatBot({ event }: { event?: ChatEvent | null }) {
       }
     };
     gsap.ticker.add(tick);
-    return () => gsap.ticker.remove(tick);
+    return () => {
+      gsap.ticker.remove(tick);
+      window.clearInterval(rescan);
+    };
   }, [open]);
 
   /**

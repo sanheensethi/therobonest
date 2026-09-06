@@ -405,7 +405,28 @@ const Mascot = forwardRef<MascotHandle, Props>(function Mascot(
     walk,
   }));
 
-  /* ---- eye tracking: pure geometry on every frame ---- */
+  /* ---- on-screen gate: nothing ticks or tweens for a robot nobody can see ---- */
+  const visible = useRef(true);
+  useEffect(() => {
+    const svg = root.current;
+    if (!svg) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        visible.current = e.isIntersecting;
+        svg.dataset.offscreen = e.isIntersecting ? "" : "1";
+      },
+      { rootMargin: "80px" }
+    );
+    io.observe(svg);
+    return () => io.disconnect();
+  }, []);
+
+  /* ---- eye tracking ----
+     Cheap by design: the svg's box is measured only on scroll/resize (not per
+     frame), the pupil/head tweens are quickTo (reused, never re-created), the
+     loop skips frames and skips entirely while the robot is off screen. The
+     first version measured layout and created two tweens per robot per frame
+     - with a dozen robots on a page that was the scroll jank. */
   useEffect(() => {
     const svg = root.current;
     if (!svg) return;
@@ -418,11 +439,49 @@ const Mascot = forwardRef<MascotHandle, Props>(function Mascot(
     };
     if (trackCursor) window.addEventListener("pointermove", onMove, { passive: true });
 
+    let rect: DOMRect | null = null;
+    let dirty = true;
+    const invalidate = () => {
+      dirty = true;
+    };
+    window.addEventListener("scroll", invalidate, { passive: true });
+    window.addEventListener("resize", invalidate);
+    // Lenis moves the page without a native scroll event on every frame;
+    // refresh the box on its own cadence too.
+    const refresh = window.setInterval(invalidate, 400);
+
+    const pupilTweens: Array<{ x: (v: number) => void; y: (v: number) => void }> = [];
+    let headTo: ((v: number) => void) | null = head
+      ? gsap.quickTo(head, "rotation", { duration: 0.6, ease: "power2.out" })
+      : null;
+    if (head) gsap.set(head, { transformOrigin: "50% 100%" });
+    let lastPupils = "";
+    let frame = 0;
+
     const tick = () => {
-      const pupils = svg.querySelectorAll<SVGElement>("[data-pupil]");
-      const rect = svg.getBoundingClientRect();
+      if (!visible.current) return;
+      if (++frame % 3) return; // 20fps is plenty for eyes
+      if (dirty || !rect) {
+        rect = svg.getBoundingClientRect();
+        dirty = false;
+      }
       if (rect.width === 0) return;
       const scale = rect.width / VIEW_W;
+
+      // Pupils are re-rendered when the expression changes; re-bind quickTo
+      // only when the set of pupil nodes actually changed.
+      const pupils = svg.querySelectorAll<SVGElement>("[data-pupil]");
+      const key = pupils.length ? Array.from(pupils, (p) => p.getAttribute("cx")).join(",") + pupils.length : "";
+      if (key !== lastPupils) {
+        lastPupils = key;
+        pupilTweens.length = 0;
+        pupils.forEach((p) =>
+          pupilTweens.push({
+            x: gsap.quickTo(p, "x", { duration: 0.35, ease: "power2.out" }),
+            y: gsap.quickTo(p, "y", { duration: 0.35, ease: "power2.out" }),
+          })
+        );
+      }
 
       let pt: { x: number; y: number } | null = null;
       const t = target.current;
@@ -437,7 +496,6 @@ const Mascot = forwardRef<MascotHandle, Props>(function Mascot(
 
       const cx = rect.left + 60 * scale;
       const cy = rect.top + 53 * scale;
-      // Reading: eyes rest on the book unless something else grabs them.
       if (!pt && holding === "book") pt = { x: cx, y: rect.bottom + 30 * scale };
 
       let dx = 0;
@@ -450,14 +508,21 @@ const Mascot = forwardRef<MascotHandle, Props>(function Mascot(
         dx = (vx / len) * mag;
         dy = (vy / len) * mag;
       }
-      if (pupils.length) gsap.to(pupils, { x: dx, y: dy, duration: 0.35, ease: "power2.out", overwrite: "auto" });
-      if (head) gsap.to(head, { rotation: dx * 0.9, transformOrigin: "50% 100%", duration: 0.6, overwrite: "auto" });
+      pupilTweens.forEach((q) => {
+        q.x(dx);
+        q.y(dy);
+      });
+      headTo?.(dx * 0.9);
     };
 
     gsap.ticker.add(tick);
     return () => {
       gsap.ticker.remove(tick);
       window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("scroll", invalidate);
+      window.removeEventListener("resize", invalidate);
+      window.clearInterval(refresh);
+      headTo = null;
     };
   }, [trackCursor, holding]);
 
@@ -609,7 +674,17 @@ const Mascot = forwardRef<MascotHandle, Props>(function Mascot(
       gsap.delayedCall(1.2, blink);
     }, svg);
 
-    return () => ctx.revert();
+    // Pause the whole idle set while off screen; resume when it scrolls back.
+    const poll = window.setInterval(() => {
+      const off = svg.dataset.offscreen === "1";
+      // gsap.context has no pause; toggle its tweens directly
+      (ctx.getTweens?.() ?? []).forEach((t: gsap.core.Tween) => (off ? t.pause() : t.resume()));
+    }, 500);
+
+    return () => {
+      window.clearInterval(poll);
+      ctx.revert();
+    };
   }, [shrug, holding]);
 
   function celebrate() {
