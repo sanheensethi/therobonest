@@ -28,8 +28,8 @@ export default function Stats() {
   return (
     <section data-nesty="stats" ref={ref} className="relative z-10 bg-paper">
       <div className="mx-auto max-w-7xl px-6 py-16 lg:py-20">
-        <div className="flex items-center gap-8">
-        <div data-reveal="left" className="hidden shrink-0 lg:block">
+        <div className="flex flex-col items-center gap-6 lg:flex-row lg:gap-8">
+        <div data-reveal="left" className="shrink-0">
           <Mascot ref={bot} size={120} variant="drone" />
         </div>
         <dl className="grid flex-1 grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-4">

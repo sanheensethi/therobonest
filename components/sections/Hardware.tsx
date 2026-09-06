@@ -12,7 +12,7 @@ export default function Hardware() {
   return (
     <section data-nesty="hardware" ref={ref} className="relative bg-paper">
       <div className="relative mx-auto max-w-7xl px-6 py-20 lg:py-24">
-        <div className="absolute right-6 top-10 hidden lg:block">
+        <div className="absolute right-4 top-3 origin-top-right scale-[0.55] lg:right-6 lg:top-10 lg:scale-100">
           <Mascot size={110} variant="rover" />
         </div>
         <h2

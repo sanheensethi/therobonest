@@ -116,7 +116,7 @@ export default function LabsRail() {
     <section data-nesty="labs" id="labs" className="relative overflow-hidden bg-night text-paper">
       {/* Intro - scrolls normally, deliberately OUTSIDE the pinned wrapper */}
       <div className="relative mx-auto w-full max-w-7xl px-6 pt-20 pb-4 railpin:pt-28">
-        <div className="absolute right-6 top-16 hidden lg:block railpin:top-24">
+        <div className="absolute right-4 top-4 origin-top-right scale-[0.55] lg:right-6 lg:top-16 lg:scale-100 railpin:lg:top-24">
           <Mascot size={120} variant="crane" />
         </div>
         <p className="font-display text-sm uppercase tracking-[0.2em] text-brand-300">

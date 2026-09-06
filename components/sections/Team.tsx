@@ -99,7 +99,7 @@ export default function Team({
     return (
       <section ref={ref} data-nesty="team" id="team" className="relative bg-sand">
         <div className="relative mx-auto max-w-7xl px-6 py-20 lg:py-28">
-          <div className="absolute right-6 top-12 hidden lg:block">
+          <div className="absolute right-4 top-3 origin-top-right scale-[0.55] lg:right-6 lg:top-12 lg:scale-100">
             <Mascot size={110} variant="bolt" />
           </div>
           <SectionHeading
@@ -199,7 +199,7 @@ export default function Team({
   return (
     <section ref={ref} data-nesty="team" id="team" className="relative bg-sand">
       <div className="relative mx-auto max-w-7xl px-6 py-20 lg:py-28">
-        <div className="absolute right-6 top-12 hidden lg:block">
+        <div className="absolute right-4 top-3 origin-top-right scale-[0.55] lg:right-6 lg:top-12 lg:scale-100">
           <Mascot size={110} variant="bolt" />
         </div>
         <SectionHeading

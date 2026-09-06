@@ -111,7 +111,7 @@ export default function EnquiryForm() {
             className="relative rounded-[var(--radius-card)] border border-paper/12 bg-paper/[0.04] p-7 backdrop-blur-sm sm:p-9"
           >
             {/* Perched on the card's top edge, same as the hero form */}
-            <div className="absolute -top-[96px] right-6 hidden sm:block">
+            <div className="absolute -top-[72px] right-4 origin-bottom-right scale-[0.75] sm:-top-[96px] sm:right-6 sm:scale-100">
               <Mascot ref={bot} size={100} />
             </div>
             {/* Honeypot */}
