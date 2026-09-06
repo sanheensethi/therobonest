@@ -6,6 +6,7 @@ import { submitEnquiry, INDIAN_STATES } from "@/lib/enquiry";
 import Icon from "@/components/ui/Icon";
 import { tellNesty } from "@/components/ui/ChatBot";
 import Magnetic from "@/components/motion/Magnetic";
+import Select from "@/components/ui/Select";
 
 type Status = "idle" | "submitting" | "success" | "error";
 type Step = 1 | 2;
@@ -31,7 +32,7 @@ function Field({
 }) {
   return (
     <div className="relative">
-      <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-azure">
+      <span className="pointer-events-none absolute left-3.5 top-1/2 z-10 -translate-y-1/2 text-azure">
         <Icon name={icon} className="h-[18px] w-[18px]" />
       </span>
       {children}
@@ -226,45 +227,31 @@ export default function HeroForm() {
             </Field>
 
             <Field icon="briefcase">
-              <select
+              <Select
                 name="designation"
                 required
-                aria-label="Your Designation"
+                ariaLabel="Your Designation"
+                placeholder="Your Designation"
                 value={values.designation}
-                onChange={set("designation")}
-                className={`${inputCls} appearance-none pr-9`}
+                onChange={(v) => setValues((s) => ({ ...s, designation: v }))}
+                options={ctaForm.designations}
+                className="pl-11"
                 {...focusProps}
-              >
-                <option value="" disabled>
-                  Your Designation
-                </option>
-                {ctaForm.designations.map((d) => (
-                  <option key={d} value={d}>
-                    {d}
-                  </option>
-                ))}
-              </select>
+              />
             </Field>
 
             <Field icon="pin">
-              <select
+              <Select
                 name="state"
                 required
-                aria-label="State"
+                ariaLabel="State"
+                placeholder="State"
                 value={values.state}
-                onChange={set("state")}
-                className={`${inputCls} appearance-none pr-9`}
+                onChange={(v) => setValues((s) => ({ ...s, state: v }))}
+                options={INDIAN_STATES}
+                className="pl-11"
                 {...focusProps}
-              >
-                <option value="" disabled>
-                  State
-                </option>
-                {INDIAN_STATES.map((st) => (
-                  <option key={st} value={st}>
-                    {st}
-                  </option>
-                ))}
-              </select>
+              />
             </Field>
 
             <Field icon="mail">

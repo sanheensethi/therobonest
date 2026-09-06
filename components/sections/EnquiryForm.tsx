@@ -6,6 +6,7 @@ import SectionHeading from "@/components/ui/SectionHeading";
 import { useReveal } from "@/components/motion/useReveal";
 import { useRef } from "react";
 import Mascot, { type MascotHandle } from "@/components/ui/Mascot";
+import Select from "@/components/ui/Select";
 import { submitEnquiry } from "@/lib/enquiry";
 
 type Status = "idle" | "submitting" | "success" | "error";
@@ -33,6 +34,7 @@ export default function EnquiryForm() {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
   const bot = useRef<MascotHandle | null>(null);
+  const [designation, setDesignation] = useState("");
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -49,6 +51,7 @@ export default function EnquiryForm() {
     if (result.ok) {
       setStatus("success");
       form.reset();
+      setDesignation("");
       bot.current?.celebrate();
     } else {
       setStatus("error");
@@ -145,21 +148,17 @@ export default function EnquiryForm() {
                 <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-paper/60">
                   Designation<span className="text-brand"> *</span>
                 </span>
-                <select
+                <Select
                   name="designation"
                   required
-                  defaultValue=""
-                  className="w-full rounded-xl border border-paper/15 bg-night/60 px-4 py-3 text-sm text-paper outline-none transition-colors focus:border-brand"
-                >
-                  <option value="" disabled>
-                    Select your role
-                  </option>
-                  {ctaForm.designations.map((d) => (
-                    <option key={d} value={d} className="text-ink">
-                      {d}
-                    </option>
-                  ))}
-                </select>
+                  tone="dark"
+                  placeholder="Select your role"
+                  ariaLabel="Your designation"
+                  value={designation}
+                  onChange={setDesignation}
+                  options={ctaForm.designations}
+                  className="pl-4"
+                />
               </label>
 
               <label className="block sm:col-span-2">
