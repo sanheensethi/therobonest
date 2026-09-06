@@ -70,9 +70,14 @@ export const hero = {
  */
 export const heroMedia = {
   image: "/images/gallery/g5.jpeg",
-  // e.g. { mp4: "/images/bg/hero.mp4", webm: "/images/bg/hero.webm" }
-  // Keep it <= 2.5MB, <= 15s, silent. The poster carries LCP, not the video.
-  video: null as { mp4: string; webm?: string } | null,
+  // Silent, forward-then-reverse so it loops without a seam. `poster` is the
+  // clip's own first frame so there is no visual jump when playback starts;
+  // `image` above stays the real-school photo used on phones (no video there).
+  video: {
+    mp4: "/images/bg/hero.mp4",
+    webm: "/images/bg/hero.webm",
+    poster: "/images/bg/hero-poster.jpg",
+  } as { mp4: string; webm?: string; poster?: string } | null,
   alt: "Students building a robot in a Robonest school lab",
 } as const;
 

@@ -77,7 +77,7 @@ function Hexagon({
  * connection. `preload="none"` + poster means the video costs nothing until
  * the visitor is actually looking at the hero; the poster image carries LCP.
  */
-function HeroVideo({ mp4, webm }: { mp4: string; webm?: string }) {
+function HeroVideo({ mp4, webm, poster }: { mp4: string; webm?: string; poster?: string }) {
   const ref = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
@@ -105,7 +105,7 @@ function HeroVideo({ mp4, webm }: { mp4: string; webm?: string }) {
     <video
       ref={ref}
       className="h-full w-full object-cover object-center"
-      poster={asset(heroMedia.image)}
+      poster={asset(poster ?? heroMedia.image)}
       muted
       loop
       playsInline
