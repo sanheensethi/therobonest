@@ -70,6 +70,8 @@ export default async function BlogPostPage({ params }: Props) {
       />
 
       <PageHero
+        mascotExpression="thinking"
+        mascotHolding="book"
         eyebrow={post.category || "Blog"}
         title={post.title}
         body={post.subtitle || undefined}

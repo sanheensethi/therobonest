@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { labs, labsIntro } from "@/content/site";
 import { registerGsap, prefersReducedMotion } from "@/lib/motion";
 import { scrollToTarget } from "@/components/motion/SmoothScroll";
+import Mascot from "@/components/ui/Mascot";
 
 /**
  * Pinned horizontal scroll rail - the signature motion of this site, and it
@@ -112,9 +113,12 @@ export default function LabsRail() {
   }, []);
 
   return (
-    <section id="labs" className="relative overflow-hidden bg-night text-paper">
+    <section data-nesty="labs" id="labs" className="relative overflow-hidden bg-night text-paper">
       {/* Intro - scrolls normally, deliberately OUTSIDE the pinned wrapper */}
-      <div className="mx-auto w-full max-w-7xl px-6 pt-20 pb-4 railpin:pt-28">
+      <div className="relative mx-auto w-full max-w-7xl px-6 pt-20 pb-4 railpin:pt-28">
+        <div className="absolute right-6 top-16 hidden lg:block railpin:top-24">
+          <Mascot size={120} variant="crane" />
+        </div>
         <p className="font-display text-sm uppercase tracking-[0.2em] text-brand-300">
           {labsIntro.eyebrow}
         </p>

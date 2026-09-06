@@ -16,7 +16,7 @@ export default function AboutShowcase() {
   const ref = useReveal<HTMLElement>();
 
   return (
-    <section ref={ref} id="about" className="relative overflow-hidden bg-sand">
+    <section data-nesty="about" ref={ref} id="about" className="relative overflow-hidden bg-sand">
       {/* Decorative offset panel */}
       <Parallax
         speed={16}

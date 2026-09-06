@@ -64,7 +64,8 @@ export default async (req) => {
   const phone = String(body.phone || "").trim();
 
   if (!name) return json(400, { error: "Please enter your name." });
-  if (!/^\S+@\S+\.\S+$/.test(email))
+  // Email is optional; validate only when supplied.
+  if (email && !/^\S+@\S+\.\S+$/.test(email))
     return json(400, { error: "Please enter a valid email address." });
   if (phone.replace(/\D/g, "").length < 10)
     return json(400, { error: "Please enter a valid 10-digit phone number." });
@@ -110,7 +111,7 @@ export default async (req) => {
           // sales team recognises a lead.
           name: school ? `Lab enquiry - ${school}` : `Lab enquiry - ${name}`,
           contact_name: name,
-          email_from: email,
+          ...(email ? { email_from: email } : {}),
           phone,
           function: designation,
           city: state,

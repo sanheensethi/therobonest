@@ -4,6 +4,7 @@ import { labs } from "@/content/site";
 import { useReveal } from "@/components/motion/useReveal";
 import { scrollToTarget } from "@/components/motion/SmoothScroll";
 import Icon from "@/components/ui/Icon";
+import Tilt from "@/components/motion/Tilt";
 
 /**
  * Compact index of the five lab tiers, directly under the hero. Gives the
@@ -22,18 +23,18 @@ export default function LabIndex() {
   const ref = useReveal<HTMLElement>({ stagger: 0.08, start: "top 92%" });
 
   return (
-    <section ref={ref} className="bg-sand">
+    <section data-nesty="lab-index" ref={ref} className="bg-sand">
       <div className="mx-auto max-w-7xl px-6 pb-16 pt-4 lg:pb-20">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {labs.map((lab, i) => {
             const tint = TINTS[lab.tint] ?? TINTS.blue;
             return (
+              <Tilt key={lab.id} className="h-full" >
               <button
-                key={lab.id}
                 type="button"
                 data-reveal="up"
                 onClick={() => scrollToTarget("#labs")}
-                className="group flex flex-col items-start gap-3 rounded-2xl border border-ink/8 bg-paper p-5 text-left shadow-sm transition-all duration-500 hover:-translate-y-1.5 hover:border-brand/40 hover:shadow-xl hover:shadow-ink/5"
+                className="group flex h-full w-full flex-col items-start gap-3 rounded-2xl border border-ink/8 bg-paper p-5 text-left shadow-sm transition-[border-color,box-shadow] duration-500 hover:border-brand/40 hover:shadow-xl hover:shadow-ink/5"
               >
                 <span
                   className={`flex h-11 w-11 items-center justify-center rounded-xl ${tint.tile} ${tint.text}`}
@@ -51,6 +52,7 @@ export default function LabIndex() {
 
                 <span className="text-xs text-ink-400">({lab.grades})</span>
               </button>
+              </Tilt>
             );
           })}
         </div>

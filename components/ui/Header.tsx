@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { nav, contact } from "@/content/site";
 import { scrollToTarget } from "@/components/motion/SmoothScroll";
 import { asset } from "@/lib/asset";
+import Magnetic from "@/components/motion/Magnetic";
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -104,12 +105,14 @@ export default function Header() {
             >
               {contact.phones[0]}
             </a>
-            <Link
-              href="/contact"
-              className="hidden rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-paper shadow-sm transition-all hover:bg-brand-600 hover:shadow-md sm:block"
-            >
-              Book a Demo
-            </Link>
+            <Magnetic className="hidden sm:block">
+              <Link
+                href="/contact"
+                className="block rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-paper shadow-sm transition-all hover:bg-brand-600 hover:shadow-md"
+              >
+                Book a Demo
+              </Link>
+            </Magnetic>
 
             <button
               type="button"

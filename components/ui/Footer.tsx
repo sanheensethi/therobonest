@@ -4,6 +4,7 @@ import { contact, nav, site, labs } from "@/content/site";
 import { getSocials } from "@/lib/odoo-content";
 import SocialIcon from "@/components/ui/SocialIcon";
 import { asset } from "@/lib/asset";
+import Mascot from "@/components/ui/Mascot";
 
 export default async function Footer() {
   const year = 2026;
@@ -29,9 +30,14 @@ export default async function Footer() {
                 {site.name}
               </span>
             </div>
-            <p className="mt-5 max-w-sm text-sm leading-relaxed">
-              {site.description}
-            </p>
+            <div className="mt-5 flex items-start gap-4">
+              <div className="flex shrink-0 items-end -space-x-3">
+                <Mascot size={56} />
+                <Mascot size={48} variant="puppy" />
+                <Mascot size={48} variant="rover" />
+              </div>
+              <p className="max-w-sm text-sm leading-relaxed">{site.description}</p>
+            </div>
             {socials.length > 0 && (
             <div className="mt-6 flex gap-3">
               {socials.map((s) => (

@@ -3,14 +3,18 @@
 import Image from "next/image";
 import { hardware } from "@/content/site";
 import { useReveal } from "@/components/motion/useReveal";
+import Mascot from "@/components/ui/Mascot";
 import { asset } from "@/lib/asset";
 
 export default function Hardware() {
   const ref = useReveal<HTMLElement>({ stagger: 0.14 });
 
   return (
-    <section ref={ref} className="bg-paper">
-      <div className="mx-auto max-w-7xl px-6 py-20 lg:py-24">
+    <section data-nesty="hardware" ref={ref} className="relative bg-paper">
+      <div className="relative mx-auto max-w-7xl px-6 py-20 lg:py-24">
+        <div className="absolute right-6 top-10 hidden lg:block">
+          <Mascot size={110} variant="rover" />
+        </div>
         <h2
           data-reveal="clip"
           className="max-w-2xl text-balance text-3xl leading-tight text-ink sm:text-4xl"

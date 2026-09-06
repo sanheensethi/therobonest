@@ -27,7 +27,7 @@ export default function ContactPage() {
 
       {/* Real location — the previous site shipped San Francisco transit
           directions here as unedited template content. */}
-      <section className="bg-paper">
+      <section data-nesty="contact" className="bg-paper">
         <div className="mx-auto max-w-7xl px-6 py-20 lg:py-24">
           <div className="grid gap-12 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
             <div>

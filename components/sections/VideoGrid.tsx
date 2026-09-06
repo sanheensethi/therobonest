@@ -74,7 +74,7 @@ export default function VideoGrid({
         );
 
   return (
-    <section ref={ref} className="bg-sand">
+    <section data-nesty="video-grid" ref={ref} className="bg-sand">
       <div className="mx-auto max-w-7xl px-6 py-20 lg:py-24">
         {/* Filter */}
         {showFilter && (

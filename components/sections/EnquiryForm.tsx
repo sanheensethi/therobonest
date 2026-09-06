@@ -4,6 +4,8 @@ import { useState } from "react";
 import { ctaForm, contact } from "@/content/site";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { useReveal } from "@/components/motion/useReveal";
+import { useRef } from "react";
+import Mascot, { type MascotHandle } from "@/components/ui/Mascot";
 import { submitEnquiry } from "@/lib/enquiry";
 
 type Status = "idle" | "submitting" | "success" | "error";
@@ -30,6 +32,7 @@ export default function EnquiryForm() {
   const ref = useReveal<HTMLElement>();
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
+  const bot = useRef<MascotHandle | null>(null);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -46,6 +49,7 @@ export default function EnquiryForm() {
     if (result.ok) {
       setStatus("success");
       form.reset();
+      bot.current?.celebrate();
     } else {
       setStatus("error");
       setError(result.error);
@@ -53,7 +57,7 @@ export default function EnquiryForm() {
   }
 
   return (
-    <section ref={ref} id="enquiry" className="relative overflow-hidden bg-night">
+    <section data-nesty="enquiry" ref={ref} id="enquiry" className="relative overflow-hidden bg-night">
       <div className="absolute -left-32 top-1/3 h-96 w-96 rounded-full bg-brand/18 blur-3xl" />
 
       <div className="relative mx-auto max-w-7xl px-6 py-20 lg:py-28">
@@ -104,8 +108,12 @@ export default function EnquiryForm() {
             data-reveal="up"
             onSubmit={onSubmit}
             noValidate
-            className="rounded-[var(--radius-card)] border border-paper/12 bg-paper/[0.04] p-7 backdrop-blur-sm sm:p-9"
+            className="relative rounded-[var(--radius-card)] border border-paper/12 bg-paper/[0.04] p-7 backdrop-blur-sm sm:p-9"
           >
+            {/* Perched on the card's top edge, same as the hero form */}
+            <div className="absolute -top-[96px] right-6 hidden sm:block">
+              <Mascot ref={bot} size={100} />
+            </div>
             {/* Honeypot */}
             <input
               type="text"

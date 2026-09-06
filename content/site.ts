@@ -70,7 +70,9 @@ export const hero = {
  */
 export const heroMedia = {
   image: "/images/gallery/g5.jpeg",
-  video: null as string | null, // e.g. "/images/bg/hero.mp4"
+  // e.g. { mp4: "/images/bg/hero.mp4", webm: "/images/bg/hero.webm" }
+  // Keep it <= 2.5MB, <= 15s, silent. The poster carries LCP, not the video.
+  video: null as { mp4: string; webm?: string } | null,
   alt: "Students building a robot in a Robonest school lab",
 } as const;
 
@@ -530,4 +532,97 @@ export const contactPage = {
       a: "Yes. We provide continued technical and academic support, replacement assistance for consumables and components, and periodic curriculum updates.",
     },
   ],
+} as const;
+
+/**
+ * The robot mascot. Appears in the hero form, page heroes, stats, the labs
+ * rail, the footer, the 404 page and as the face of the chat assistant.
+ * Everything the assistant SAYS lives here so the team can change it without
+ * touching a component. It is scripted, not an LLM: it cannot invent prices
+ * or promises, and every path ends at a human (WhatsApp or the enquiry form).
+ */
+export const mascot = {
+  name: "Nesty",
+  greeting:
+    "Hi! I'm Nesty, Robonest's lab robot. Ask me about our labs, or tap a question below.",
+  placeholder: "Ask Nesty…",
+  fallback:
+    "Good question - that one's for a human. Tap WhatsApp and the team will answer directly, or leave your details and we'll call you.",
+  quickReplies: [
+    "What labs do you offer?",
+    "How long does setup take?",
+    "Which grades is it for?",
+    "Do you train our teachers?",
+    "How do I get pricing?",
+  ],
+  /** Keyword-matched answers. First match wins; keep keywords lowercase. */
+  faq: [
+    {
+      keywords: ["lab", "labs", "offer", "solution", "product"],
+      answer:
+        "We set up five modular labs: Integrated Lab (grades 1-12), Curriculum Base, Arduino Inspiration Lab (6-12), AI & Robotics Lab and the Astronomy Lab. Each comes with kits, curriculum, software and teacher training. Scroll to the Labs section for details.",
+    },
+    {
+      keywords: ["long", "time", "setup", "install", "days", "fast", "quick"],
+      answer:
+        "A complete lab - hardware, furniture, curriculum and trained teachers - is installed in about 10 working days from sign-off.",
+    },
+    {
+      keywords: ["grade", "grades", "class", "age", "standard", "nep"],
+      answer:
+        "Grades 1 to 12. The curriculum is NEP-2020 aligned and progresses from block coding with LEGO® Education in the junior classes to Python, Arduino and AI projects in the senior classes.",
+    },
+    {
+      keywords: ["teacher", "train", "training", "staff", "support"],
+      answer:
+        "Yes. Every lab includes hands-on teacher training and ongoing support from our education team, so your own staff can run the sessions confidently.",
+    },
+    {
+      keywords: ["price", "pricing", "cost", "quote", "budget", "fee", "rate", "demo"],
+      answer:
+        "Pricing depends on the lab type, the number of students and the room. Leave your school name and mobile in the form and our team will call with a tailored quote - or tap WhatsApp to talk right now.",
+    },
+    {
+      keywords: ["where", "location", "noida", "delhi", "city", "office", "address"],
+      answer:
+        "We're based in Noida (Sector 72) and install labs across India. Travel is included in the setup.",
+    },
+    {
+      keywords: ["event", "exhibition", "workshop", "showcase"],
+      answer:
+        "We run exhibitions, teacher workshops and school showcases. Upcoming ones - and photos from past events - are on the Events page.",
+    },
+    {
+      keywords: ["hello", "hi", "hey", "namaste"],
+      answer: "Hello! What would you like to know about setting up a lab at your school?",
+    },
+  ],
+  handoff: {
+    whatsapp: "Chat on WhatsApp",
+    enquiry: "Request a call back",
+  },
+  /**
+   * What the mascot says when a section scrolls into view. Keys match the
+   * `data-nesty` attribute on that section. Each shows once per visit. Keep
+   * them to one short sentence - it is a speech bubble, not a paragraph.
+   */
+  sectionTips: {
+    "lab-index": "These are our five labs. Tap any card to jump to the details.",
+    stats: "Real numbers - 10,000+ students have built with us so far.",
+    about: "Who we are, and why we do this.",
+    labs: "Swipe through the labs. Each one comes with kits, curriculum and teacher training.",
+    hardware: "The actual hardware your students will work with - Arduino, sensors and more.",
+    team: "The people who will set up and support your lab.",
+    videos: "See a real lab in action - pick any video.",
+    gallery: "Photos from labs and events we've run.",
+    journey: "How Robonest grew, year by year.",
+    schools: "Some of the schools already running our labs.",
+    enquiry: "Leave your school name and number - the team calls back within a day.",
+    "events-upcoming": "Upcoming events - tap one to register.",
+    "events-past": "Our past events, with photos from each. Tap 'See photos'.",
+    "blog-list": "Articles from the team - filter by topic.",
+    "video-grid": "Our full video library. Shorts are marked.",
+    contact: "Call, WhatsApp or drop a note - whichever is easiest for you.",
+    "about-body": "Our story, mission and the team behind Robonest.",
+  } as Record<string, string>,
 } as const;

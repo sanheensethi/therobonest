@@ -10,7 +10,7 @@ export default function AboutBody() {
   return (
     <>
       {/* Narrative + focus list */}
-      <section ref={ref} className="bg-sand">
+      <section ref={ref} data-nesty="about-body" className="bg-sand">
         <div className="mx-auto max-w-7xl px-6 py-20 lg:py-28">
           <div className="grid gap-14 lg:grid-cols-[1.3fr_1fr] lg:gap-20">
             <div className="space-y-5">

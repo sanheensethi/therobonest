@@ -145,7 +145,7 @@ export default function Gallery() {
   }, [active]);
 
   return (
-    <section ref={ref} id="gallery" className="bg-paper">
+    <section data-nesty="gallery" ref={ref} id="gallery" className="bg-paper">
       <div className="mx-auto max-w-7xl px-6 py-20 lg:py-28">
         <SectionHeading eyebrow={gallery.eyebrow} title={gallery.title} />
 

@@ -4,6 +4,7 @@ import Image from "next/image";
 import { founders, execTeam } from "@/content/site";
 import type { TeamMember } from "@/lib/odoo-content";
 import SectionHeading from "@/components/ui/SectionHeading";
+import Mascot from "@/components/ui/Mascot";
 import { useState } from "react";
 import { useReveal } from "@/components/motion/useReveal";
 import { asset } from "@/lib/asset";
@@ -96,8 +97,11 @@ export default function Team({
     const tier2 = singleTier ? [] : leadership.length > 0 ? rest : members;
 
     return (
-      <section ref={ref} id="team" className="bg-sand">
-        <div className="mx-auto max-w-7xl px-6 py-20 lg:py-28">
+      <section ref={ref} data-nesty="team" id="team" className="relative bg-sand">
+        <div className="relative mx-auto max-w-7xl px-6 py-20 lg:py-28">
+          <div className="absolute right-6 top-12 hidden lg:block">
+            <Mascot size={110} variant="bolt" />
+          </div>
           <SectionHeading
             eyebrow={founders.eyebrow}
             lines={founders.titleLines}
@@ -193,8 +197,11 @@ export default function Team({
   }
 
   return (
-    <section ref={ref} id="team" className="bg-sand">
-      <div className="mx-auto max-w-7xl px-6 py-20 lg:py-28">
+    <section ref={ref} data-nesty="team" id="team" className="relative bg-sand">
+      <div className="relative mx-auto max-w-7xl px-6 py-20 lg:py-28">
+        <div className="absolute right-6 top-12 hidden lg:block">
+          <Mascot size={110} variant="bolt" />
+        </div>
         <SectionHeading
           eyebrow={founders.eyebrow}
           lines={founders.titleLines}

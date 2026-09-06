@@ -99,7 +99,7 @@ export default function Schools({ odooLogos = [] }: { odooLogos?: SchoolLogo[] }
   const rowB = all.slice(half);
 
   return (
-    <section ref={ref} className="border-y border-ink/8 bg-sand">
+    <section data-nesty="schools" ref={ref} className="border-y border-ink/8 bg-sand">
       <div className="py-16 lg:py-20">
         <h2
           data-reveal="fade"

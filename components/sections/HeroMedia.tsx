@@ -1,9 +1,11 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { hero, heroMedia } from "@/content/site";
 import Icon from "@/components/ui/Icon";
 import { asset } from "@/lib/asset";
+import { prefersReducedMotion } from "@/lib/motion";
 
 /**
  * Hero visual: still image or looping video, with hexagonal tech badges
@@ -14,16 +16,16 @@ import { asset } from "@/lib/asset";
  * hexagons they join. The SVG uses a 0-100 viewBox with
  * preserveAspectRatio="none" so its coordinates ARE the percentage positions.
  */
-/* X is constrained to 19-39 deliberately. On desktop this container sits
-   under BOTH the headline column (which ends at ~15% of this box) and the
-   form card (which starts at ~44%), so that window is the only place a badge
-   can float without landing on top of live text or a form input.
-   Measured, not guessed - see the safe-band check in the Hero notes. */
+/* X is constrained to 19-39: on desktop this box sits under BOTH the
+   headline column (ends ~15%) and the form card (starts ~44%). Y is pushed
+   to the top and bottom bands. The first layout only avoided TEXT and put
+   two hexagons squarely on students' faces in the photo; the people are in
+   the middle band (y ~30-65), so the badges now stay out of it. */
 const BADGE_POS = [
-  { x: 21, y: 32 }, // Robotics
-  { x: 30, y: 11 }, // AI
-  { x: 38, y: 35 }, // IoT
-  { x: 26, y: 60 }, // Coding
+  { x: 22, y: 88 }, // Robotics
+  { x: 23, y: 9 }, // AI
+  { x: 37, y: 14 }, // IoT
+  { x: 37, y: 84 }, // Coding
 ];
 
 function Hexagon({
@@ -70,6 +72,52 @@ function Hexagon({
   );
 }
 
+/**
+ * Background video that only plays while on screen and never on a metered
+ * connection. `preload="none"` + poster means the video costs nothing until
+ * the visitor is actually looking at the hero; the poster image carries LCP.
+ */
+function HeroVideo({ mp4, webm }: { mp4: string; webm?: string }) {
+  const ref = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+
+    const conn = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    if (prefersReducedMotion() || conn?.saveData) {
+      v.removeAttribute("autoplay");
+      return;
+    }
+
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) v.play().catch(() => {});
+        else v.pause();
+      },
+      { threshold: 0.15 }
+    );
+    io.observe(v);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <video
+      ref={ref}
+      className="h-full w-full object-cover object-center"
+      poster={asset(heroMedia.image)}
+      muted
+      loop
+      playsInline
+      preload="none"
+      aria-label={heroMedia.alt}
+    >
+      {webm && <source src={asset(webm)} type="video/webm" />}
+      <source src={asset(mp4)} type="video/mp4" />
+    </video>
+  );
+}
+
 export default function HeroMedia({
   /**
    * The hero mounts this twice (an absolutely-positioned desktop copy and an
@@ -93,17 +141,7 @@ export default function HeroMedia({
       {/* Media */}
       <div className="media-feather relative h-full w-full overflow-hidden">
         {heroMedia.video && allowVideo ? (
-          <video
-            className="h-full w-full object-cover object-center"
-            src={asset(heroMedia.video)}
-            poster={asset(heroMedia.image)}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            aria-label={heroMedia.alt}
-          />
+          <HeroVideo {...heroMedia.video} />
         ) : (
           <Image
             src={asset(heroMedia.image)}
@@ -111,7 +149,12 @@ export default function HeroMedia({
             fill
             priority
             sizes="(min-width: 1024px) 60vw, 100vw"
-            className="object-cover object-center"
+            /* The box matches the photo's proportions so nothing is cut off
+               by object-fit; the zoom is a deliberate recrop instead. The
+               students sit centre-left, the right third of the frame is a
+               tree and a wall. Scaling from a point near the students keeps
+               them where they are and pushes the dead space out of the box. */
+            className="scale-[1.16] object-cover object-center origin-[38%_55%]"
           />
         )}
 
@@ -138,7 +181,7 @@ export default function HeroMedia({
           points={BADGE_POS.map((p) => `${p.x},${p.y}`).join(" ")}
           fill="none"
           stroke="#38bdf8"
-          strokeOpacity="0.45"
+          strokeOpacity="0.35"
           strokeWidth="0.3"
           vectorEffect="non-scaling-stroke"
         />

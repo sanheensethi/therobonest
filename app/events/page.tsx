@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Mascot from "@/components/ui/Mascot";
 import PageHero from "@/components/sections/PageHero";
 import RevealList from "@/components/ui/RevealList";
 import EventTimeline from "@/components/sections/EventTimeline";
@@ -100,15 +101,18 @@ export default async function EventsPage() {
       />
 
       {/* -------------------------------- Upcoming -------------------------------- */}
-      <section className="bg-sand">
+      <section data-nesty="events-upcoming" className="bg-sand">
         <div className="mx-auto max-w-7xl px-6 py-20 lg:py-24">
           <h2 className="font-display text-3xl text-ink">Upcoming events</h2>
 
           {upcoming.length === 0 ? (
-            <p className="mt-6 max-w-lg rounded-[var(--radius-card)] border border-ink/10 bg-paper p-7 text-sm leading-relaxed text-ink-700">
-              Nothing scheduled right now. New events published in Odoo appear
-              here automatically.
-            </p>
+            <div className="mt-6 flex max-w-lg items-center gap-5 rounded-[var(--radius-card)] border border-ink/10 bg-paper p-6">
+              <Mascot size={72} expression="sad" shrug trackCursor={false} />
+              <p className="text-sm leading-relaxed text-ink-700">
+                Nothing scheduled right now. New events published in Odoo
+                appear here automatically.
+              </p>
+            </div>
           ) : (
             <RevealList className="mt-10 grid gap-7 md:grid-cols-2 lg:grid-cols-3">
               {upcoming.map((e) => (
@@ -121,7 +125,7 @@ export default async function EventsPage() {
 
       {/* --------------------------------- Timeline -------------------------------- */}
       {past.length > 0 && (
-        <section className="bg-night">
+        <section data-nesty="events-past" className="bg-night">
           <div className="mx-auto max-w-4xl px-6 py-20 lg:py-28">
             <h2 className="font-display text-3xl text-paper">Our journey so far</h2>
             <p className="mt-3 max-w-xl text-sm leading-relaxed text-paper/60">

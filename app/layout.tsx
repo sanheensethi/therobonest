@@ -8,6 +8,9 @@ import Footer from "@/components/ui/Footer";
 import ScrollToTop from "@/components/ui/ScrollToTop";
 import EventPopup from "@/components/ui/EventPopup";
 import WhatsAppButton from "@/components/ui/WhatsAppButton";
+import ChatBot from "@/components/ui/ChatBot";
+import Wanderer from "@/components/ui/Wanderer";
+import Preloader from "@/components/ui/Preloader";
 import { getPopupEvent, formatEventDate } from "@/lib/odoo-content";
 
 export const metadata: Metadata = {
@@ -64,6 +67,20 @@ export default async function RootLayout({
           <Footer />
           <ScrollToTop />
           <WhatsAppButton />
+          <Wanderer />
+          <Preloader />
+          <ChatBot
+            event={
+              popup
+                ? {
+                    title: popup.title,
+                    dateLabel: formatEventDate(popup.start),
+                    slug: popup.slug,
+                    registrationsOpen: popup.registrationsOpen,
+                  }
+                : null
+            }
+          />
           {popup && (
             <EventPopup
               event={{

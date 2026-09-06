@@ -28,7 +28,7 @@ export default async function FeaturedVideos() {
   }));
 
   return (
-    <section className="bg-sand">
+    <section data-nesty="videos" className="bg-sand">
       <div className="mx-auto max-w-7xl px-6 py-20 lg:py-24">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>

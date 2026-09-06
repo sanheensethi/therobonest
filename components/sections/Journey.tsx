@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { journey } from "@/content/site";
 import SectionHeading from "@/components/ui/SectionHeading";
+import Mascot from "@/components/ui/Mascot";
 import { useReveal } from "@/components/motion/useReveal";
 import { asset } from "@/lib/asset";
 
@@ -10,8 +11,11 @@ export default function Journey() {
   const ref = useReveal<HTMLElement>();
 
   return (
-    <section ref={ref} className="bg-paper">
-      <div className="mx-auto max-w-7xl px-6 py-20 lg:py-28">
+    <section data-nesty="journey" ref={ref} className="relative bg-paper">
+      <div className="relative mx-auto max-w-7xl px-6 py-20 lg:py-28">
+        <div className="absolute right-6 top-10 hidden lg:block">
+          <Mascot size={110} variant="ufo" />
+        </div>
         <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
           <div data-reveal="left" className="order-2 lg:order-1">
             <div className="relative overflow-hidden rounded-[var(--radius-card)] border border-ink/8">

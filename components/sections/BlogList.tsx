@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import TagFilter from "@/components/ui/TagFilter";
 import { useReveal } from "@/components/motion/useReveal";
 import type { BlogPost } from "@/lib/odoo-content";
+import { tellNesty } from "@/components/ui/ChatBot";
 
 const ALL = "All";
 
@@ -22,6 +23,24 @@ function formatDate(value: string | null): string {
 export default function BlogList({ posts }: { posts: BlogPost[] }) {
   const ref = useReveal<HTMLDivElement>({ stagger: 0.07, start: "top 92%" });
   const [active, setActive] = useState(ALL);
+
+  // A few seconds in, the mascot points the visitor at one post it "likes".
+  useEffect(() => {
+    if (posts.length === 0) return;
+    const pick = posts[Math.floor(Math.random() * posts.length)];
+    const openers = ["Have you read this one?", "My pick for today:", "Start here if you're new:", "Worth five minutes:"];
+    const t = window.setTimeout(() => {
+      tellNesty({
+        action: "say",
+        id: `blog-pick-${pick.slug}`,
+        text: `${openers[Math.floor(Math.random() * openers.length)]} "${pick.title}"`,
+        href: `/blog/${pick.slug}/`,
+        label: "Read it →",
+        ms: 11000,
+      });
+    }, 5000);
+    return () => window.clearTimeout(t);
+  }, [posts]);
 
   // Tags come from the posts themselves, so a new tag applied in Odoo shows up
   // as a new chip with no code change. Category (the Odoo blog it belongs to)

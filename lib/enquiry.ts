@@ -20,7 +20,9 @@ export async function submitEnquiry(
   if (!data.name?.trim()) {
     return { ok: false, error: "Please enter your name." };
   }
-  if (!/^\S+@\S+\.\S+$/.test(data.email ?? "")) {
+  // Email is optional - a principal on a phone types a number, not an
+  // address - but if one is given it has to look like one.
+  if (data.email?.trim() && !/^\S+@\S+\.\S+$/.test(data.email.trim())) {
     return { ok: false, error: "Please enter a valid email address." };
   }
   if ((data.phone ?? "").replace(/\D/g, "").length < 10) {
