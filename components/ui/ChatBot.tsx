@@ -431,10 +431,10 @@ export default function ChatBot({ event }: { event?: ChatEvent | null }) {
         className={[
           "fixed z-[57] flex flex-col overflow-hidden bg-paper shadow-2xl shadow-night/40 ring-1 ring-ink/10 transition-all duration-300",
           // phone: a full-height sheet under the header; desktop: a card bottom-right
-          "inset-x-0 bottom-0 top-[var(--nav-h)] rounded-t-3xl sm:inset-auto sm:bottom-5 sm:right-6 sm:w-[calc(100vw-2.5rem)] sm:max-w-sm sm:rounded-3xl",
+          "inset-x-0 bottom-0 top-[var(--nav-h)] rounded-t-3xl sm:inset-auto sm:bottom-5 sm:right-6 sm:w-[calc(100vw-2.5rem)] sm:max-w-sm sm:rounded-3xl sm:max-h-[min(600px,calc(100vh-6rem))]",
           open ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0",
         ].join(" ")}
-        style={{ maxHeight: typeof window !== "undefined" && window.innerWidth < 640 ? undefined : "min(600px, calc(100vh - 6rem))" }}
+
       >
         <div className="flex items-center gap-3 bg-gradient-to-r from-indigo to-violet px-4 py-3 pr-24 text-paper sm:pr-4">
           <div className="min-w-0 flex-1">

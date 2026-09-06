@@ -28,7 +28,7 @@ import { registerGsap, prefersReducedMotion } from "@/lib/motion";
  * "celebrate", "make a face for a second" are one-off events, not state a
  * parent should have to hold and reset.
  */
-export type Variant = "nesty" | "sparky" | "bolt" | "pixel" | "puppy" | "crane" | "rover" | "ufo";
+export type Variant = "nesty" | "sparky" | "bolt" | "pixel" | "puppy" | "crane" | "rover" | "ufo" | "drone";
 
 export type Expression =
   | "neutral"
@@ -121,7 +121,7 @@ const VARIANTS: Record<
     /** chest ornament */
     chest: "lights" | "screen" | "bolt" | "heart";
     /** Body plan. Biped is the default rig; the others swap torso + limbs. */
-    body?: "biped" | "puppy" | "crane" | "rover" | "ufo";
+    body?: "biped" | "puppy" | "crane" | "rover" | "ufo" | "drone";
   }
 > = {
   nesty: {
@@ -173,6 +173,14 @@ const VARIANTS: Record<
   },
   // A flying saucer: the head is the dome, a lit disc underneath, no legs -
   // it hovers, tilts when it "walks", and its ring lights chase.
+  // A quadcopter: the head is the fuselage, four arms with spinning rotors,
+  // a camera gimbal underneath. Hovers; never touches the ground.
+  drone: {
+    from: "#fb7185", to: "#f97316", accent: "#fff1f2",
+    head: { x: 28, y: 34, w: 64, h: 46, r: 16 },
+    face: { x: 35, y: 41, w: 50, h: 32, r: 12 },
+    earR: 3, antenna: "none", torsoR: 8, chest: "lights", body: "drone",
+  },
   ufo: {
     from: "#a78bfa", to: "#22d3ee", accent: "#e9d5ff",
     head: { x: 30, y: 30, w: 60, h: 50, r: 26 },
@@ -533,6 +541,7 @@ const Mascot = forwardRef<MascotHandle, Props>(function Mascot(
       gsap.to($("[data-ufo-light]"), {
         opacity: 0.25, duration: 0.35, stagger: { each: 0.12, repeat: -1, yoyo: true }, ease: "sine.inOut",
       });
+      gsap.to($("[data-rotor] ellipse"), { scaleX: 0.15, transformOrigin: "50% 50%", duration: 0.08, yoyo: true, repeat: -1, ease: "sine.inOut" });
       gsap.to($("[data-beam]"), { opacity: 0.28, scaleX: 1.08, transformOrigin: "50% 0%", duration: 1.4, yoyo: true, repeat: -1, ease: "sine.inOut" });
       // Poses: arm angles measured on the rig (left arm UP = positive).
       if (holding === "telescope") {
@@ -908,6 +917,24 @@ const Mascot = forwardRef<MascotHandle, Props>(function Mascot(
             )}
           </>
         )}
+        {v.body === "drone" && (
+          <>
+            {/* rotor arms */}
+            <path d="M34 44 L12 24 M86 44 L108 24 M34 70 L12 86 M86 70 L108 86" stroke="#1f2937" strokeWidth="4" strokeLinecap="round" />
+            {/* rotors - spin in idle */}
+            {[[12, 24], [108, 24], [12, 86], [108, 86]].map(([cx, cy], i) => (
+              <g key={i} data-rotor>
+                <ellipse cx={cx} cy={cy} rx="16" ry="3.5" fill={v.to} opacity="0.75" />
+                <circle cx={cx} cy={cy} r="3" fill="#1f2937" />
+              </g>
+            ))}
+            {/* landing skids + camera gimbal */}
+            <path d="M40 82 L40 92 L52 92 M80 82 L80 92 L68 92" stroke="#1f2937" strokeWidth="3" fill="none" strokeLinecap="round" />
+            <circle cx="60" cy="88" r="7" fill="#1f2937" />
+            <circle cx="60" cy="88" r="3.5" fill="#38bdf8" />
+            <circle data-headlight cx="60" cy="88" r="1.5" fill="#fff" />
+          </>
+        )}
         {v.body === "ufo" && (
           <>
             {/* tractor beam, faint, pulses in idle */}
@@ -1006,7 +1033,7 @@ const Mascot = forwardRef<MascotHandle, Props>(function Mascot(
             </>
           ) : v.body === "crane" ? (
             <rect x="46" y="18" width="28" height="10" rx="2" fill="#1f2937" />
-          ) : (
+          ) : v.body === "drone" ? null : (
             <>
               <rect x={v.head.x - 6} y="46" width="8" height="20" rx={v.earR} fill={v.to} />
               <rect x={v.head.x + v.head.w - 2} y="46" width="8" height="20" rx={v.earR} fill={v.from} />
@@ -1156,6 +1183,16 @@ const Mascot = forwardRef<MascotHandle, Props>(function Mascot(
         {/* limbs - pivot at the shoulder. Drawn AFTER the head so a raised arm
             (celebrate, wave) crosses in front of the face instead of vanishing
             behind it. Each body plan supplies its own pair. */}
+        {v.body === "drone" && (
+          <>
+            <g data-arm-l>
+              <rect x="18" y="56" width="12" height="6" rx="3" fill={v.to} />
+            </g>
+            <g data-arm-r>
+              <rect x="90" y="56" width="12" height="6" rx="3" fill={v.from} />
+            </g>
+          </>
+        )}
         {v.body === "ufo" && (
           <>
             <g data-arm-l>

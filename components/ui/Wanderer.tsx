@@ -16,7 +16,10 @@ import { registerGsap, prefersReducedMotion } from "@/lib/motion";
  *
  * Nesty (the mascot) is ONE character. These are its lab-mates.
  */
-const OTHERS: Variant[] = ["puppy", "crane", "rover", "ufo", "sparky", "bolt", "pixel"];
+const OTHERS: Variant[] = ["drone", "crane", "rover", "ufo", "sparky", "bolt", "pixel"];
+/** These never touch the floor: they cross at a random height on a wavy path. */
+const FLIERS: Variant[] = ["drone", "ufo"];
+const GROUND = OTHERS.filter((v) => !FLIERS.includes(v));
 const FACES: Expression[] = ["neutral", "happy", "thinking", "surprised", "cool", "cheeky"];
 const MAX_VISITS = 8;
 
@@ -46,7 +49,8 @@ export default function Wanderer() {
         const list: Bot[] = [];
         for (let i = 0; i < n; i++) {
           list.push({
-            variant: pick(OTHERS, list[0]?.variant),
+            // groups squabble on the floor, so groups are ground robots only
+            variant: pick(n === 1 ? OTHERS : GROUND, list[0]?.variant),
             face: pick(FACES),
             // groups arrive from both sides so they can meet
             fromLeft: n === 1 ? Math.random() > 0.5 : i % 2 === 0,
@@ -85,13 +89,24 @@ export default function Wanderer() {
         },
       });
 
-      // walk in
+      // walk (or fly) in
+      const vh = window.innerHeight;
       visit.bots.forEach((b, i) => {
         const el = els[i]!;
+        const fly = FLIERS.includes(b.variant);
         const startX = b.fromLeft ? -size * 1.5 : vw + size * 0.5;
-        gsap.set(el, { x: startX, scaleX: b.fromLeft ? 1 : -1, opacity: 1 });
-        gsap.to(el.querySelector("[data-body]"), { y: -6, duration: 0.28, yoyo: true, repeat: -1, ease: "sine.inOut" });
-        bots.current[i]?.walk(true);
+        // fliers cross somewhere between a quarter and three quarters up the screen
+        const alt = fly ? -vh * (0.25 + Math.random() * 0.5) : 0;
+        gsap.set(el, { x: startX, y: alt, scaleX: b.fromLeft ? 1 : -1, opacity: 1 });
+        if (fly) {
+          // slow wave + tilt, and a random drift up or down across the trip
+          gsap.to(el.querySelector("[data-body]"), { y: -14, duration: 1.4, yoyo: true, repeat: -1, ease: "sine.inOut" });
+          gsap.to(el.querySelector("[data-body]"), { rotation: b.fromLeft ? 6 : -6, transformOrigin: "50% 50%", duration: 1.1, yoyo: true, repeat: -1, ease: "sine.inOut" });
+          master.to(el, { y: alt + (Math.random() - 0.5) * vh * 0.3, duration: 4 + Math.random() * 1.5, ease: "sine.inOut" }, 0);
+        } else {
+          gsap.to(el.querySelector("[data-body]"), { y: -6, duration: 0.28, yoyo: true, repeat: -1, ease: "sine.inOut" });
+          bots.current[i]?.walk(true);
+        }
         master.to(el, { x: slots[i] - size / 2, duration: 4 + Math.random() * 1.5, ease: "none" }, 0);
       });
 

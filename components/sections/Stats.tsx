@@ -30,7 +30,7 @@ export default function Stats() {
       <div className="mx-auto max-w-7xl px-6 py-16 lg:py-20">
         <div className="flex items-center gap-8">
         <div data-reveal="left" className="hidden shrink-0 lg:block">
-          <Mascot ref={bot} size={120} variant="puppy" />
+          <Mascot ref={bot} size={120} variant="drone" />
         </div>
         <dl className="grid flex-1 grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-4">
           {stats.map((s) => (

@@ -33,7 +33,7 @@ export default async function Footer() {
             <div className="mt-5 flex items-start gap-4">
               <div className="flex shrink-0 items-end -space-x-3">
                 <Mascot size={56} />
-                <Mascot size={48} variant="puppy" />
+                <Mascot size={48} variant="drone" />
                 <Mascot size={48} variant="rover" />
               </div>
               <p className="max-w-sm text-sm leading-relaxed">{site.description}</p>

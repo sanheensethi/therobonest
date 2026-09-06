@@ -50,9 +50,9 @@ export default function PageHero({
       <div className="absolute inset-0 bg-night/70" />
       <div className="absolute inset-0 bg-gradient-to-b from-night/45 via-transparent to-night/55" />
 
-      <div className="relative mx-auto max-w-7xl px-6 pb-16 pt-24 lg:pb-24 lg:pt-32">
+      <div className="relative mx-auto max-w-7xl px-6 pb-16 pt-24 pr-24 md:pr-6 lg:pb-24 lg:pt-32">
         {/* Mascot keeps the interior pages in the same family as the home hero */}
-        <div data-reveal="right" className="absolute bottom-4 right-4 scale-[0.6] origin-bottom-right md:scale-100 md:bottom-6 md:right-6 lg:right-10">
+        <div data-reveal="right" className="absolute bottom-3 right-3 scale-[0.5] origin-bottom-right md:scale-100 md:bottom-6 md:right-6 lg:right-10">
           <Mascot size={130} expression={face} holding={mascotHolding} />
         </div>
         <p
