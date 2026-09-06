@@ -7,7 +7,6 @@ import Header from "@/components/ui/Header";
 import Footer from "@/components/ui/Footer";
 import ScrollToTop from "@/components/ui/ScrollToTop";
 import EventPopup from "@/components/ui/EventPopup";
-import WhatsAppButton from "@/components/ui/WhatsAppButton";
 import ChatBot from "@/components/ui/ChatBot";
 import Wanderer from "@/components/ui/Wanderer";
 import Preloader from "@/components/ui/Preloader";
@@ -66,7 +65,6 @@ export default async function RootLayout({
           <main id="main">{children}</main>
           <Footer />
           <ScrollToTop />
-          <WhatsAppButton />
           <Wanderer />
           <Preloader />
           <ChatBot

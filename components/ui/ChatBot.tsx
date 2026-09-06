@@ -175,8 +175,8 @@ export default function ChatBot({ event }: { event?: ChatEvent | null }) {
         }
       }
       if (!isDocked) {
-        // stacked above the WhatsApp button
-        const bottom = vw >= 640 ? 156 : 140;
+        // above the back-to-top button (WhatsApp is inside the chat panel now)
+        const bottom = vw >= 640 ? 96 : 80;
         x = vw - (vw >= 640 ? 24 : 20) - LAUNCHER;
         y = vh - bottom - LAUNCHER;
       }
@@ -373,7 +373,8 @@ export default function ChatBot({ event }: { event?: ChatEvent | null }) {
 
   return (
     <>
-      {/* Launcher: the ONE mascot. It starts perched on the hero form (the
+      {/* Launcher: the ONE mascot. WhatsApp moved inside the panel, so this is the
+          only floating contact point. It starts perched on the hero form (the
           element carrying data-mascot-dock) and, once that scrolls away,
           detaches and travels with the visitor in the bottom-right corner. */}
       <div
