@@ -143,6 +143,25 @@ export default function Wanderer() {
     return () => ctx.revert();
   }, [flight]);
 
+  // A stray missile from the dogfight can land on a ground robot.
+  useEffect(() => {
+    const onHit = (e: Event) => {
+      const i = (e as CustomEvent<{ index: number }>).detail?.index;
+      const m = bots.current[i];
+      const el = wraps.current[i];
+      if (!m || !el) return;
+      m.walk(false);
+      m.express("dizzy", 1600);
+      const { gsap } = registerGsap();
+      gsap.timeline()
+        .to(el.querySelector("[data-body]"), { rotation: 360, transformOrigin: "50% 60%", duration: 0.8, ease: "power2.out" })
+        .set(el.querySelector("[data-body]"), { rotation: 0 })
+        .call(() => m.walk(true));
+    };
+    window.addEventListener("robot:hit", onHit);
+    return () => window.removeEventListener("robot:hit", onHit);
+  }, []);
+
   // The scene.
   useEffect(() => {
     if (!visit) return;
@@ -290,6 +309,7 @@ export default function Wanderer() {
             wraps.current[i] = el;
           }}
           aria-hidden
+          data-wanderer={i}
           className="fixed bottom-0 left-0 z-30 opacity-0"
           style={{ transformOrigin: "50% 100%" }}
         >

@@ -57,7 +57,11 @@ export default function Dogfight() {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     const start = performance.now();
-    const missiles: { x: number; y: number; vx: number; vy: number; life: number }[] = [];
+    // a missile homes on the saucer, or - now and then - on whichever ground
+    // robot happens to be walking past (target = element to chase)
+    const missiles: { x: number; y: number; vx: number; vy: number; life: number; target: HTMLElement | null; wanderer: number }[] = [];
+    // who gives up this time: 0 = saucer flees (rocket chases), 1 = rocket gives up
+    const ending = Math.random() < 0.5 ? 0 : 1;
     const zaps: { x1: number; y1: number; x2: number; y2: number; a: number }[] = [];
     const bombs: { x: number; y: number; vx: number; vy: number; life: number }[] = [];
     let lastBomb = 0;
@@ -126,12 +130,19 @@ export default function Dogfight() {
       if (!leaving && now - lastShot > 2600) {
         lastShot = now;
         const p = nose();
-        missiles.push({ x: p.x, y: p.y, vx: Math.sin(R.heading) * 5, vy: -Math.cos(R.heading) * 5, life: 200 });
-        botR.current?.express("angry", 800);
+        const walkers = Array.from(document.querySelectorAll<HTMLElement>("[data-wanderer]"));
+        const stray = walkers.length > 0 && Math.random() < 0.35;
+        const w = stray ? walkers[Math.floor(Math.random() * walkers.length)] : null;
+        missiles.push({
+          x: p.x, y: p.y, vx: Math.sin(R.heading) * 5, vy: -Math.cos(R.heading) * 5, life: 200,
+          target: w, wanderer: w ? Number(w.dataset.wanderer) : -1,
+        });
+        botR.current?.express(stray ? "cheeky" : "angry", 800);
       }
       for (let i = missiles.length - 1; i >= 0; i--) {
         const m = missiles[i];
-        const dx = uc.x - m.x, dy = uc.y - m.y;
+        const tc = m.target && m.target.isConnected ? centre(m.target) : uc;
+        const dx = tc.x - m.x, dy = tc.y - m.y;
         const d = Math.hypot(dx, dy) || 1;
         m.vx += (dx / d) * 0.4; m.vy += (dy / d) * 0.4;
         const sp = Math.hypot(m.vx, m.vy);
@@ -144,10 +155,15 @@ export default function Dogfight() {
         if (d < 36 || m.life <= 0) {
           missiles.splice(i, 1);
           if (d < 36) {
-            waves.push({ x: uc.x, y: uc.y, r: 8, a: 1 });
-            botU.current?.express("dizzy", 1500);
-            gsap.to(u, { rotation: "+=360", duration: 0.9, ease: "power2.out" });
-            botR.current?.express("cheeky", 1000);
+            waves.push({ x: tc.x, y: tc.y, r: 8, a: 1 });
+            if (m.target) {
+              window.dispatchEvent(new CustomEvent("robot:hit", { detail: { index: m.wanderer } }));
+              botR.current?.express("laugh", 1000);
+            } else {
+              botU.current?.express("dizzy", 1500);
+              gsap.to(u, { rotation: "+=360", duration: 0.9, ease: "power2.out" });
+              botR.current?.express("cheeky", 1000);
+            }
           }
         }
       }
@@ -225,18 +241,29 @@ export default function Dogfight() {
       }
       ctx.globalAlpha = 1;
 
-      // ---- time's up: both leave ----
+      // ---- time's up: somebody gives up ----
       if (!leaving && t > DURATION) {
         leaving = true;
         gsap.killTweensOf(u);
-        botU.current?.express("scared", 1500);
-        botR.current?.express("laugh", 1500);
-        gsap.to(u, { x: W + 200, y: -200, duration: 1.4, ease: "power2.in" });
-        gsap.to(r, { x: W + 200, y: -120, rotation: 45, duration: 1.7, ease: "power2.in", delay: 0.3,
-          onComplete: () => {
-            setOn(false);
-            window.dispatchEvent(new Event("dogfight:done"));
-          } });
+        const done = () => {
+          setOn(false);
+          window.dispatchEvent(new Event("dogfight:done"));
+        };
+        if (ending === 0) {
+          // saucer flees, rocket chases it off
+          botU.current?.express("scared", 1500);
+          botR.current?.express("laugh", 1500);
+          gsap.to(u, { x: W + 200, y: -200, duration: 1.4, ease: "power2.in" });
+          gsap.to(r, { x: W + 200, y: -120, rotation: 45, duration: 1.7, ease: "power2.in", delay: 0.3, onComplete: done });
+        } else {
+          // rocket gives up: sputters, droops, drifts off the bottom; saucer does a victory spin and zips away
+          botR.current?.express("sad", 2000);
+          botU.current?.express("smug", 2000);
+          gsap.to(r, { rotation: 180, y: H + 200, x: R.x - 120, duration: 2.2, ease: "power2.in" });
+          gsap.timeline({ delay: 0.4 })
+            .to(u, { rotation: "+=360", duration: 0.8, ease: "power1.inOut" })
+            .to(u, { x: -200, y: H * 0.15, duration: 1.3, ease: "power2.in", onComplete: done });
+        }
       }
     };
 
