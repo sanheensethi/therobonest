@@ -26,11 +26,14 @@ export default function HeroReel({
   poster,
   label,
   className = "",
+  anchor = "object-center",
 }: {
   clips: string[];
   poster?: string;
   label?: string;
   className?: string;
+  /** object-position class for the crop */
+  anchor?: string;
 }) {
   const a = useRef<HTMLVideoElement | null>(null);
   const b = useRef<HTMLVideoElement | null>(null);
@@ -130,7 +133,7 @@ export default function HeroReel({
     };
   }, [clips]);
 
-  const common = "absolute inset-0 h-full w-full object-cover object-center";
+  const common = `absolute inset-0 h-full w-full object-cover ${anchor}`;
   return (
     <div className={`relative h-full w-full ${className}`} aria-label={label} role={label ? "img" : undefined}>
       <video ref={a} className={common} poster={poster ? asset(poster) : undefined} muted playsInline preload="auto" style={{ opacity: 0 }} />

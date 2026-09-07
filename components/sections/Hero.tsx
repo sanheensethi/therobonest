@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { hero, heroForm, schools } from "@/content/site";
 import { registerGsap, prefersReducedMotion } from "@/lib/motion";
 import Icon from "@/components/ui/Icon";
@@ -51,25 +50,25 @@ export default function Hero() {
 
   return (
     <section ref={sectionRef} className="relative overflow-hidden bg-night pt-[var(--nav-h)]">
-      {/* Ambient wash on the copy side */}
+      {/* Ambient wash, far left only - it must fade out before the video edge */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_80%_at_10%_20%,rgba(59,130,246,0.22),transparent_60%),radial-gradient(60%_60%_at_20%_100%,rgba(139,92,246,0.16),transparent_60%)]"
+        className="pointer-events-none absolute inset-y-0 left-0 w-[34%] bg-[radial-gradient(90%_80%_at_0%_25%,rgba(59,130,246,0.2),transparent_70%),radial-gradient(70%_60%_at_5%_100%,rgba(139,92,246,0.14),transparent_70%)]"
       />
 
       {/* ---------- Desktop media: right 58%, full height ---------- */}
-      <div data-hero-media className="absolute inset-y-0 right-0 hidden w-[58%] lg:block">
+      <div data-hero-media className="absolute inset-y-0 right-0 hidden w-[60%] lg:block">
         <HeroMedia allowVideo={isDesktop === true} blend="left" />
       </div>
 
-      <div className="relative z-10 mx-auto grid max-w-7xl gap-8 px-6 pb-16 pt-6 lg:min-h-[640px] lg:grid-cols-[44%_56%] lg:items-center lg:pb-20 lg:pt-6">
+      <div className="relative z-10 grid gap-8 px-6 pb-16 pt-0 lg:min-h-[640px] lg:grid-cols-[38%_62%] lg:items-center lg:px-10 lg:pb-20 lg:pt-6 xl:px-14">
         {/* ---------- Mobile media (first on phones) ---------- */}
         <div data-hero-media className="relative -mx-6 aspect-video overflow-hidden lg:hidden">
           <HeroMedia allowVideo={isDesktop === false} blend="bottom" />
         </div>
 
         {/* ---------- Copy ---------- */}
-        <div className="max-w-xl lg:pr-6">
+        <div className="max-w-xl lg:pr-4">
           <p data-hero-eyebrow className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-300 sm:text-xs">
             {hero.eyebrow}
           </p>
@@ -98,13 +97,6 @@ export default function Hero() {
                 <Icon name="arrow" className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
               </button>
             </Magnetic>
-            <Link
-              href={hero.secondaryCta.href}
-              className="group inline-flex items-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-semibold text-white transition-all hover:border-brand-300 hover:text-brand-300"
-            >
-              {hero.secondaryCta.label}
-              <Icon name="arrow" className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-            </Link>
           </div>
 
           {/* Proof points */}

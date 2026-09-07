@@ -16,7 +16,7 @@ import HeroReel from "@/components/sections/HeroReel";
  * connection. `preload="none"` + poster means the video costs nothing until
  * the visitor is actually looking at the hero; the poster image carries LCP.
  */
-function HeroVideo({ mp4, webm, poster }: { mp4: string; webm?: string; poster?: string }) {
+function HeroVideo({ mp4, webm, poster, anchor = "object-center" }: { mp4: string; webm?: string; poster?: string; anchor?: string }) {
   const ref = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ function HeroVideo({ mp4, webm, poster }: { mp4: string; webm?: string; poster?:
   return (
     <video
       ref={ref}
-      className="h-full w-full object-cover object-center"
+      className={`h-full w-full object-cover ${anchor}`}
       poster={asset(poster ?? heroMedia.image)}
       muted
       playsInline
@@ -71,14 +71,18 @@ export default function HeroMedia({
   /** Which edge dissolves into the navy: the left (split hero) or the bottom (stacked). */
   blend?: "left" | "bottom" | "none";
 } = {}) {
+  // The clips are composed with the robot on the LEFT. The split hero's box
+  // is far narrower than 16:9, so anchor the crop to the left edge or the
+  // robot is the first thing to be cut off.
+  const anchor = blend === "left" ? "object-left" : "object-center";
   return (
     <div className="relative h-full w-full">
       {/* Media */}
       <div className="relative h-full w-full overflow-hidden">
         {heroMedia.video && allowVideo && heroMedia.video.clips && heroMedia.video.clips.length > 1 ? (
-          <HeroReel clips={heroMedia.video.clips} poster={heroMedia.video.poster} label={heroMedia.alt} />
+          <HeroReel clips={heroMedia.video.clips} poster={heroMedia.video.poster} label={heroMedia.alt} anchor={anchor} />
         ) : heroMedia.video && allowVideo ? (
-          <HeroVideo mp4={heroMedia.video.mp4} webm={heroMedia.video.webm} poster={heroMedia.video.poster} />
+          <HeroVideo mp4={heroMedia.video.mp4} webm={heroMedia.video.webm} poster={heroMedia.video.poster} anchor={anchor} />
         ) : (
           <Image
             src={asset(heroMedia.video?.poster ?? heroMedia.image)}
@@ -91,7 +95,7 @@ export default function HeroMedia({
                students sit centre-left, the right third of the frame is a
                tree and a wall. Scaling from a point near the students keeps
                them where they are and pushes the dead space out of the box. */
-            className="object-cover object-center"
+            className={`object-cover ${anchor}`}
           />
         )}
 
@@ -100,7 +104,7 @@ export default function HeroMedia({
         {/* No uniform scrim: the copy no longer sits on the video. Only the
             edge that meets the navy panel dissolves. */}
         {blend === "left" && (
-          <div aria-hidden className="absolute inset-y-0 left-0 w-[38%] bg-gradient-to-r from-night via-night/55 to-transparent" />
+          <div aria-hidden className="absolute inset-y-0 left-0 w-[22%] bg-gradient-to-r from-night via-night/45 to-transparent" />
         )}
         {blend === "bottom" && (
           <div aria-hidden className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-night to-transparent" />
