@@ -76,7 +76,7 @@ export default function LabsRail() {
                         <span className="font-semibold text-paper">
                           {f.label}
                         </span>
-                        <span className="text-paper/65"> — {f.detail}</span>
+                        <span className="text-paper/65"> - {f.detail}</span>
                       </span>
                     </li>
                   ))}

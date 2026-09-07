@@ -108,7 +108,7 @@ export default function Hero() {
             data-hero-fade
             className="mt-4 text-base leading-relaxed text-white/75 sm:text-lg"
           >
-            {hero.body} —{" "}
+            {hero.body} - {" "}
             <span className="font-semibold text-brand-300">
               {hero.bodyHighlight}
             </span>

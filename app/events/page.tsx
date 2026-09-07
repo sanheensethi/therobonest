@@ -61,7 +61,7 @@ function UpcomingCard({ e }: { e: EventItem }) {
           <dd>
             {formatEventDate(e.start)}
             {e.end && e.end.slice(0, 10) !== e.start.slice(0, 10) && (
-              <> – {formatEventDate(e.end)}</>
+              <> - {formatEventDate(e.end)}</>
             )}
           </dd>
         </div>
@@ -96,7 +96,7 @@ export default async function EventsPage() {
       <PageHero
         eyebrow="What's on"
         title="Events & Exhibitions"
-        body="Robotics exhibitions, teacher workshops and school showcases — what's coming up, and everything we've run so far."
+        body="Robotics exhibitions, teacher workshops and school showcases - what's coming up, and everything we've run so far."
         image="/images/gallery/g1.jpeg"
       />
 

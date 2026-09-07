@@ -300,7 +300,7 @@ export default function HeroForm() {
         >
           {status === "success" ? (
             <span className="font-semibold text-white">
-              Thanks — we&apos;ve received your enquiry. We&apos;ll call you shortly.
+              Thanks - we&apos;ve received your enquiry. We&apos;ll call you shortly.
             </span>
           ) : error ? (
             <span className="text-amber-200">{error}</span>

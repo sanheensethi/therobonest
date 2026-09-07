@@ -25,7 +25,7 @@ export default function ContactPage() {
 
       <EnquiryForm />
 
-      {/* Real location — the previous site shipped San Francisco transit
+      {/* Real location - the previous site shipped San Francisco transit
           directions here as unedited template content. */}
       <section data-nesty="contact" className="bg-paper">
         <div className="mx-auto max-w-7xl px-6 py-20 lg:py-24">

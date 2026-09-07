@@ -129,7 +129,7 @@ export default async function EventPage({ params }: Props) {
               <dd>
                 {formatEventDate(e.start)}
                 {e.end && e.end.slice(0, 10) !== e.start.slice(0, 10)
-                  ? ` – ${formatEventDate(e.end)}`
+                  ? ` - ${formatEventDate(e.end)}`
                   : `, ${timeOf(e.start)}`}
               </dd>
             </div>

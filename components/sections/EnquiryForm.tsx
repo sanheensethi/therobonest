@@ -185,8 +185,8 @@ export default function EnquiryForm() {
             <p aria-live="polite" className="mt-4 min-h-5 text-sm">
               {status === "success" && (
                 <span className="text-sky">
-                  Thanks — we&apos;ve received your enquiry and will respond
-                  within 1–2 business days.
+                  Thanks - we&apos;ve received your enquiry and will respond
+                  within 1-2 business days.
                 </span>
               )}
               {status === "error" && error && (

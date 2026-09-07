@@ -82,7 +82,7 @@ export default async function Footer() {
             </h3>
             <address className="mt-5 space-y-3 text-sm not-italic">
               <p>
-                {contact.addressLabel} — {contact.address}
+                {contact.addressLabel} - {contact.address}
               </p>
               <p className="space-x-1">
                 {contact.phones.map((p, i) => (
