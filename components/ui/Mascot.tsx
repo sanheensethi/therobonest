@@ -614,7 +614,7 @@ const Mascot = forwardRef<MascotHandle, Props>(function Mascot(
       gsap.to($("[data-ufo-light]"), {
         opacity: 0.25, duration: 0.35, stagger: { each: 0.12, repeat: -1, yoyo: true }, ease: "sine.inOut",
       });
-      gsap.to($("[data-flame]"), { scaleY: 1.4, scaleX: 0.8, duration: 0.08, yoyo: true, repeat: -1, ease: "sine.inOut" });
+      gsap.to($("[data-flame]"), { scaleY: 1.12, scaleX: 0.94, duration: 0.42, yoyo: true, repeat: -1, ease: "sine.inOut" });
       gsap.to($("[data-rotor] ellipse"), { scaleX: 0.15, transformOrigin: "50% 50%", duration: 0.08, yoyo: true, repeat: -1, ease: "sine.inOut" });
       gsap.to($("[data-beam]"), { opacity: 0.28, scaleX: 1.08, transformOrigin: "50% 0%", duration: 1.4, yoyo: true, repeat: -1, ease: "sine.inOut" });
       // Poses: arm angles measured on the rig (left arm UP = positive).
