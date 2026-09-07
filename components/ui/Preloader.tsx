@@ -22,7 +22,11 @@ const word = (v: Variant) =>
   v === "drone" ? "WHIRR!" : v === "rover" ? "BEEP!" : v === "ufo" ? "BZZT!" : v === "crane" ? "CLANK!" : v === "nesty" ? "HI!" : "HEY!";
 
 export default function Preloader() {
-  const [show, setShow] = useState(false);
+  // Rendered on the server as visible, so the curtain is in the very first
+  // paint and no page content flashes before it. The robot mounts on the
+  // client (random pick) so server and client markup match.
+  const [show, setShow] = useState(true);
+  const [mounted, setMounted] = useState(false);
   const [ready, setReady] = useState(false);
   const [introDone, setIntroDone] = useState(false);
   const root = useRef<HTMLDivElement | null>(null);
@@ -30,8 +34,11 @@ export default function Preloader() {
   const [variant] = useState<Variant>(() => ALL[Math.floor(Math.random() * ALL.length)]);
 
   useEffect(() => {
-    if (prefersReducedMotion()) return;
-    setShow(true);
+    setMounted(true);
+    if (prefersReducedMotion()) {
+      setShow(false);
+      return;
+    }
     let done = false;
     const finish = () => {
       if (done) return;
@@ -54,7 +61,7 @@ export default function Preloader() {
   // The routine: walk in, greet, perform, idle.
   useEffect(() => {
     const el = root.current;
-    if (!show || !el) return;
+    if (!show || !el || !mounted) return;
     const { gsap } = registerGsap();
     document.documentElement.classList.add("lenis-stopped");
 
@@ -87,7 +94,7 @@ export default function Preloader() {
       ctx.revert();
       document.documentElement.classList.remove("lenis-stopped");
     };
-  }, [show]);
+  }, [show, mounted]);
 
   // Curtain lifts once both the routine and the page are done.
   useEffect(() => {
@@ -118,12 +125,14 @@ export default function Preloader() {
     >
       <div className="relative flex h-44 w-72 items-end justify-center">
         <div data-bot className="relative">
-          <Mascot ref={bot} variant={variant} size={140} trackCursor={false} antics={false} interactive={false} />
+          {mounted && (
+            <Mascot ref={bot} variant={variant} size={140} trackCursor={false} antics={false} interactive={false} />
+          )}
           <span
             data-word
             className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-2xl rounded-bl-sm bg-paper px-3 py-1 font-display text-sm text-ink opacity-0"
           >
-            {word(variant)}
+            {mounted ? word(variant) : ""}
           </span>
         </div>
         {Array.from({ length: 8 }).map((_, i) => (

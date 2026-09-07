@@ -37,6 +37,8 @@ export default function SpaceWarp({
   const canvas = useRef<HTMLCanvasElement | null>(null);
   const rocket = useRef<HTMLDivElement | null>(null);
   const rocketBot = useRef<MascotHandle | null>(null);
+  const ufo = useRef<HTMLDivElement | null>(null);
+  const ufoBot = useRef<MascotHandle | null>(null);
 
   useEffect(() => {
     const el = section.current;
@@ -51,6 +53,9 @@ export default function SpaceWarp({
     const pointer = { x: -9999, y: -9999, down: 0 };
     const waves: { x: number; y: number; r: number; a: number }[] = [];
     const embers: { x: number; y: number; a: number; r: number }[] = [];
+    // missiles the rocket fires at the saucer; the saucer gets dizzy on a hit
+    const missiles: { x: number; y: number; vx: number; vy: number; life: number }[] = [];
+    let lastShot = 0;
     const state = { p: 0, t: 0 };
 
     const build = () => {
@@ -73,15 +78,23 @@ export default function SpaceWarp({
       oc.font = "700 96px DynaPuff, Inter, system-ui, sans-serif";
       oc.fillText("ROBONEST", ow / 2, oh / 2 + 4);
       const data = oc.getImageData(0, 0, ow, oh).data;
+      const on = (x: number, y: number) => x >= 0 && y >= 0 && x < ow && y < oh && data[(y * ow + x) * 4 + 3] > 128;
+      // Edge pixels (opaque with a transparent neighbour) light the letter
+      // outlines; interior pixels fill them. Outlines get the bright particles.
       const pts: [number, number][] = [];
+      const edge: [number, number][] = [];
       for (let y = 0; y < oh; y += 1) for (let x = 0; x < ow; x += 1) {
-        if (data[(y * ow + x) * 4 + 3] > 128) pts.push([x / ow, y / oh]);
+        if (!on(x, y)) continue;
+        const isEdge = !on(x - 1, y) || !on(x + 1, y) || !on(x, y - 1) || !on(x, y + 1);
+        (isEdge ? edge : pts).push([x / ow, y / oh]);
       }
       // scale the word to ~70% of the viewport width, centred
       const scaleW = 0.78, scaleH = scaleW * (oh / ow) * (W / H);
-      const textPoint = (i: number): [number, number] => {
-        const [px, py] = pts[(i * 7919) % pts.length]; // spread picks across the glyphs
-        return [0.5 + (px - 0.5) * scaleW + (Math.random() - 0.5) * 0.004, 0.5 + (py - 0.5) * scaleH + (Math.random() - 0.5) * 0.006];
+      const textPoint = (i: number, big: boolean): [number, number] => {
+        const pool = big && edge.length ? edge : pts;
+        const [px, py] = pool[(i * 7919) % pool.length]; // spread picks across the glyphs
+        const j = big ? 0.0015 : 0.004;
+        return [0.5 + (px - 0.5) * scaleW + (Math.random() - 0.5) * j, 0.5 + (py - 0.5) * scaleH + (Math.random() - 0.5) * j * 1.5];
       };
       ps = [];
       for (let i = 0; i < n; i++) {
@@ -94,11 +107,12 @@ export default function SpaceWarp({
         const gx = 0.5 + (core ? (Math.random() - 0.5) * 0.06 : Math.cos(ang) * rad) * (W > H ? H / W : 1);
         const gy = 0.5 + (core ? (Math.random() - 0.5) * 0.06 : Math.sin(ang) * rad * 0.62);
         const sx = Math.random(), sy = Math.random();
-        const [tx, ty] = pts.length ? textPoint(i) : [sx, sy];
-        const big = Math.random() < 0.025;
+        // a third of the particles are "bright": bigger, and they draw the letter edges
+        const big = Math.random() < 0.33;
+        const [tx, ty] = pts.length ? textPoint(i, big) : [sx, sy];
         ps.push({
           sx, sy, gx, gy, tx, ty, x: sx * W, y: sy * H, vx: 0, vy: 0,
-          r: big ? 1.3 + Math.random() * 0.7 : 0.35 + Math.random() * 0.75,
+          r: big ? 1.1 + Math.random() * 0.6 : 0.35 + Math.random() * 0.6,
           c: COLOURS[Math.floor(Math.random() * COLOURS.length)],
           tw: Math.random() * Math.PI * 2,
         });
@@ -164,16 +178,17 @@ export default function SpaceWarp({
         p.vx *= 0.82; p.vy *= 0.82;
         p.x += p.vx; p.y += p.vy;
 
-        const a = Math.min(1, 0.55 + 0.45 * Math.sin(state.t * 2 + p.tw) + w * 0.25);
+        const bright = p.r > 1.05;
+        const a = Math.min(1, 0.5 + 0.45 * Math.sin(state.t * 2 + p.tw) + w * (bright ? 0.5 : 0.3));
         ctx.globalAlpha = a;
-        ctx.fillStyle = p.c;
+        ctx.fillStyle = bright && w > 0.4 ? "#fff" : p.c;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r * (1 - w * 0.45), 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, p.r * (bright ? 1 + w * 0.4 : 1 - w * 0.3), 0, Math.PI * 2);
         ctx.fill();
-        if (p.r > 1.3 && w < 0.5) {
-          ctx.globalAlpha = a * 0.12;
+        if (bright && (w < 0.4 || w > 0.7)) {
+          ctx.globalAlpha = a * (w > 0.7 ? 0.22 : 0.12);
           ctx.beginPath();
-          ctx.arc(p.x, p.y, p.r * 2.2, 0, Math.PI * 2);
+          ctx.arc(p.x, p.y, p.r * 2.4, 0, Math.PI * 2);
           ctx.fill();
         }
       }
@@ -187,6 +202,35 @@ export default function SpaceWarp({
         ctx.lineWidth = 1.5;
         ctx.beginPath(); ctx.arc(w.x, w.y, w.r, 0, Math.PI * 2); ctx.stroke();
         if (w.a < 0.03) waves.splice(i, 1);
+      }
+
+      // missiles: yellow streaks that home loosely on the saucer
+      const ur = ufo.current?.getBoundingClientRect();
+      const cr = cv.getBoundingClientRect();
+      const ux = ur ? ur.left + ur.width / 2 - cr.left : -999;
+      const uy = ur ? ur.top + ur.height / 2 - cr.top : -999;
+      for (let i = missiles.length - 1; i >= 0; i--) {
+        const m = missiles[i];
+        // gentle homing
+        const dx = ux - m.x, dy = uy - m.y;
+        const d = Math.hypot(dx, dy) || 1;
+        m.vx += (dx / d) * 0.35; m.vy += (dy / d) * 0.35;
+        const sp = Math.hypot(m.vx, m.vy);
+        if (sp > 9) { m.vx = (m.vx / sp) * 9; m.vy = (m.vy / sp) * 9; }
+        m.x += m.vx; m.y += m.vy; m.life -= 1;
+        ctx.strokeStyle = "#fde68a"; ctx.lineWidth = 3; ctx.lineCap = "round";
+        ctx.beginPath(); ctx.moveTo(m.x - m.vx * 2.2, m.y - m.vy * 2.2); ctx.lineTo(m.x, m.y); ctx.stroke();
+        ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(m.x, m.y, 2.2, 0, Math.PI * 2); ctx.fill();
+        embers.push({ x: m.x - m.vx, y: m.y - m.vy, a: 0.7, r: 1.5 + Math.random() * 1.5 });
+        if (d < 34 || m.life <= 0) {
+          missiles.splice(i, 1);
+          if (d < 34) {
+            waves.push({ x: ux, y: uy, r: 8, a: 1 });
+            ufoBot.current?.express("dizzy", 1600);
+            rocketBot.current?.express("cheeky", 1200);
+            if (ufo.current) gsap.to(ufo.current, { rotation: "+=360", duration: 0.9, ease: "power2.out" });
+          }
+        }
       }
 
       // rocket ember trail
@@ -227,6 +271,7 @@ export default function SpaceWarp({
       const to = { x: W * (0.08 + Math.random() * 0.84), y: H * (0.1 + Math.random() * 0.7) };
       const mid = { x: (from.x + to.x) / 2 + (Math.random() - 0.5) * W * 0.4, y: (from.y + to.y) / 2 + (Math.random() - 0.5) * H * 0.5 };
       const ang = (Math.atan2(to.y - from.y, to.x - from.x) * 180) / Math.PI;
+      const rad = ((ang + 90) * Math.PI) / 180;
       gsap.to(r, { rotation: ang + 90, duration: 0.6, ease: "power2.out" });
       gsap.to(r, {
         duration: 3 + Math.random() * 2,
@@ -239,12 +284,43 @@ export default function SpaceWarp({
           const x = (1 - t) * (1 - t) * from.x + 2 * (1 - t) * t * mid.x + t * t * to.x;
           const y = (1 - t) * (1 - t) * from.y + 2 * (1 - t) * t * mid.y + t * t * to.y;
           gsap.set(r, { x, y });
-          if (Math.random() < 0.6) embers.push({ x: x + 30 + (Math.random() - 0.5) * 8, y: y + 70, a: 0.9, r: 2 + Math.random() * 2.5 });
+          // nozzle sits ~55px below the sprite's centre in its own frame; rotate that offset
+          if (Math.random() < 0.8) {
+            const ox = 38, oy = 55;
+            const nx = x + ox + (-Math.sin(rad) * oy);
+            const ny = y + 40 + (Math.cos(rad) * oy);
+            embers.push({ x: nx + (Math.random() - 0.5) * 8, y: ny + (Math.random() - 0.5) * 8, a: 0.95, r: 2.5 + Math.random() * 3 });
+          }
         },
         onComplete: () => {
           if (Math.random() < 0.3) rocketBot.current?.express("cool", 1200);
           flyNext();
         },
+        onStart: () => {
+          // fire one missile per leg, at most every 4s, from the nozzle
+          const now = performance.now();
+          if (now - lastShot > 4000 && ufo.current) {
+            lastShot = now;
+            const nx = from.x + 38 + -Math.sin(rad) * 55;
+            const ny = from.y + 40 + Math.cos(rad) * 55;
+            missiles.push({ x: nx, y: ny, vx: Math.cos(rad - Math.PI / 2) * 4, vy: Math.sin(rad - Math.PI / 2) * 4, life: 220 });
+            rocketBot.current?.express("angry", 900);
+          }
+        },
+      });
+    };
+
+    // the saucer drifts around the upper half, dodging lazily
+    let drifting = false;
+    const driftNext = () => {
+      const u = ufo.current;
+      if (!u || !drifting) return;
+      gsap.to(u, {
+        x: W * (0.15 + Math.random() * 0.7),
+        y: H * (0.08 + Math.random() * 0.4),
+        duration: 3.5 + Math.random() * 2.5,
+        ease: "sine.inOut",
+        onComplete: driftNext,
       });
     };
 
@@ -256,12 +332,17 @@ export default function SpaceWarp({
       flying = true;
       if (rocket.current) gsap.set(rocket.current, { x: -80, y: H * 0.5 });
       flyNext();
+      drifting = true;
+      if (ufo.current) gsap.set(ufo.current, { x: W * 0.7, y: H * 0.2 });
+      driftNext();
     };
     const stop = () => {
       if (!ticking) return;
       ticking = false; gsap.ticker.remove(tick);
       flying = false;
+      drifting = false;
       if (rocket.current) gsap.killTweensOf(rocket.current);
+      if (ufo.current) gsap.killTweensOf(ufo.current);
     };
 
     const st = ScrollTrigger.create({
@@ -299,6 +380,10 @@ export default function SpaceWarp({
     <section ref={section} data-nesty="space" className="relative h-[100svh] cursor-crosshair overflow-hidden bg-[#04091a] text-paper">
       <canvas ref={canvas} className="absolute inset-0 h-full w-full" />
 
+      {/* the saucer the rocket keeps taking pot-shots at */}
+      <div ref={ufo} className="pointer-events-none absolute left-0 top-0 z-10 -ml-10 -mt-12 hidden lg:block">
+        <Mascot ref={ufoBot} variant="ufo" size={92} trackCursor={false} antics={false} />
+      </div>
       {/* rocket robot - flames are part of the variant */}
       <div ref={rocket} className="pointer-events-none absolute left-0 top-0 z-10 -ml-8 -mt-10 hidden lg:block">
         <Mascot ref={rocketBot} variant="rocket" size={76} trackCursor={false} antics={false} />
@@ -309,10 +394,6 @@ export default function SpaceWarp({
           <p className="font-display text-sm uppercase tracking-[0.22em] text-brand-300">{eyebrow}</p>
           <h2 className="text-on-photo mt-3 text-balance font-display text-4xl leading-tight sm:text-5xl lg:text-6xl">{title}</h2>
           <p className="mt-5 max-w-lg text-base leading-relaxed text-paper/80 sm:text-lg">{body}</p>
-          <p className="mt-8 flex items-center gap-3 text-xs text-paper/55">
-            <span className="scroll-cue inline-block h-6 w-px bg-paper/60" />
-            scroll: stars → galaxy → our name · move to stir · click for a shockwave
-          </p>
         </div>
 
         <div data-cta className="absolute inset-x-6 bottom-20 flex flex-col items-start gap-4 opacity-0 lg:bottom-28">

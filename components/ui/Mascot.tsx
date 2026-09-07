@@ -184,7 +184,7 @@ const VARIANTS: Record<
   // Nesty in a rocket: the head looks out of the nose section, fins for
   // arms, a live flame underneath (flickers in idle). Flies in space scenes.
   rocket: {
-    from: "#38bdf8", to: "#8b5cf6", accent: "#38bdf8",
+    from: "#ef4444", to: "#b91c1c", accent: "#fde68a",
     head: { x: 30, y: 26, w: 60, h: 50, r: 26 },
     face: { x: 36, y: 33, w: 48, h: 36, r: 18 },
     earR: 4, antenna: "single", torsoR: 12, chest: "lights", body: "rocket",
@@ -614,7 +614,7 @@ const Mascot = forwardRef<MascotHandle, Props>(function Mascot(
       gsap.to($("[data-ufo-light]"), {
         opacity: 0.25, duration: 0.35, stagger: { each: 0.12, repeat: -1, yoyo: true }, ease: "sine.inOut",
       });
-      gsap.to($("[data-flame]"), { scaleY: 1.35, scaleX: 0.85, duration: 0.09, yoyo: true, repeat: -1, ease: "sine.inOut" });
+      gsap.to($("[data-flame]"), { scaleY: 1.4, scaleX: 0.8, duration: 0.08, yoyo: true, repeat: -1, ease: "sine.inOut" });
       gsap.to($("[data-rotor] ellipse"), { scaleX: 0.15, transformOrigin: "50% 50%", duration: 0.08, yoyo: true, repeat: -1, ease: "sine.inOut" });
       gsap.to($("[data-beam]"), { opacity: 0.28, scaleX: 1.08, transformOrigin: "50% 0%", duration: 1.4, yoyo: true, repeat: -1, ease: "sine.inOut" });
       // Poses: arm angles measured on the rig (left arm UP = positive).
@@ -1004,16 +1004,18 @@ const Mascot = forwardRef<MascotHandle, Props>(function Mascot(
         {v.body === "rocket" && (
           <>
             {/* flame: three tongues, animated in idle */}
+            {/* big flame out of the nozzle, flickers in idle */}
             <g data-flame style={{ transformBox: "fill-box", transformOrigin: "50% 0%" }}>
-              <path d="M46 126 q14 30 28 0 q-6 6 -14 4 q-8 2 -14 -4z" fill="#fb923c" />
-              <path d="M51 126 q9 20 18 0 q-4 4 -9 3 q-5 1 -9 -3z" fill="#fde68a" />
-              <path d="M55 126 q5 11 10 0 q-3 2 -5 2 q-2 0 -5 -2z" fill="#fff" />
+              <path d="M40 126 q20 48 40 0 q-8 8 -20 6 q-12 2 -20 -6z" fill="#f97316" />
+              <path d="M46 126 q14 34 28 0 q-6 6 -14 4 q-8 2 -14 -4z" fill="#facc15" />
+              <path d="M52 126 q8 18 16 0 q-4 4 -8 3 q-4 1 -8 -3z" fill="#fff7ed" />
             </g>
-            {/* rocket body */}
+            {/* rocket body: red with a white band and a yellow nozzle */}
             <path d="M38 78 q22 -30 44 0 v44 q0 6 -6 6 h-32 q-6 0 -6 -6z" fill={`url(#${gid}-body)`} />
-            <rect x="52" y="96" width="16" height="16" rx="8" fill="#0a1326" opacity="0.55" />
-            <circle cx="60" cy="104" r="4" fill="#38bdf8" />
-            <rect x="44" y="118" width="32" height="6" rx="3" fill="#1f2937" opacity="0.6" />
+            <rect x="38" y="88" width="44" height="12" fill="#fff" opacity="0.92" />
+            <rect x="50" y="102" width="20" height="14" rx="7" fill="#0a1326" opacity="0.55" />
+            <circle cx="60" cy="109" r="4" fill="#fde68a" />
+            <rect x="42" y="120" width="36" height="7" rx="3" fill="#facc15" />
           </>
         )}
         {v.body === "drone" && (
@@ -1285,10 +1287,10 @@ const Mascot = forwardRef<MascotHandle, Props>(function Mascot(
         {v.body === "rocket" && (
           <>
             <g data-arm-l>
-              <path d="M38 100 L22 126 L38 122 Z" fill={v.to} />
+              <path d="M38 96 L18 128 L38 122 Z" fill="#facc15" />
             </g>
             <g data-arm-r>
-              <path d="M82 100 L98 126 L82 122 Z" fill={v.from} />
+              <path d="M82 96 L102 128 L82 122 Z" fill="#facc15" />
             </g>
           </>
         )}
