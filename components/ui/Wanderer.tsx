@@ -21,7 +21,7 @@ const OTHERS: Variant[] = ["drone", "crane", "rover", "ufo", "sparky", "bolt", "
 const FLIERS: Variant[] = ["drone", "ufo"];
 const GROUND = OTHERS.filter((v) => !FLIERS.includes(v));
 const FACES: Expression[] = ["neutral", "happy", "thinking", "surprised", "cool", "cheeky"];
-const MAX_VISITS = 8;
+const MAX_VISITS = 20;
 
 type Bot = { variant: Variant; face: Expression; fromLeft: boolean };
 type Visit = { key: number; bots: Bot[] };
@@ -50,7 +50,7 @@ export default function Wanderer() {
         for (let i = 0; i < n; i++) {
           list.push({
             // groups squabble on the floor, so groups are ground robots only
-            variant: pick(n === 1 ? OTHERS : GROUND, list[0]?.variant),
+            variant: pick(GROUND, list[0]?.variant),
             face: pick(FACES),
             // groups arrive from both sides so they can meet
             fromLeft: n === 1 ? Math.random() > 0.5 : i % 2 === 0,
@@ -59,14 +59,89 @@ export default function Wanderer() {
         setVisit({ key: Date.now(), bots: list });
       }, delay);
     };
-    next(5000 + Math.random() * 5000);
-    const onDone = () => next(20000 + Math.random() * 25000);
+    next(3000 + Math.random() * 4000);
+    const onDone = () => next(10000 + Math.random() * 15000);
     window.addEventListener("wanderer:done", onDone);
     return () => {
       if (t) window.clearTimeout(t);
       window.removeEventListener("wanderer:done", onDone);
     };
   }, []);
+
+  /**
+   * Fliers (drone, UFO) run on their OWN clock, independent of the ground
+   * scenes, so one is in the air most of the time. Each flight is a random
+   * path: enter from any edge, wander through 3-4 waypoints with a sine bob,
+   * a barrel-roll or a hover-and-look now and then, leave from another edge.
+   */
+  const [flight, setFlight] = useState<{ key: number; variant: Variant } | null>(null);
+  const flierWrap = useRef<HTMLDivElement | null>(null);
+  const flierBot = useRef<MascotHandle | null>(null);
+  useEffect(() => {
+    if (prefersReducedMotion()) return;
+    let t: number | null = null;
+    const next = (delay: number) => {
+      t = window.setTimeout(() => setFlight({ key: Date.now(), variant: pick(FLIERS) }), delay);
+    };
+    next(2000 + Math.random() * 3000);
+    const onDone = () => next(6000 + Math.random() * 10000);
+    window.addEventListener("flier:done", onDone);
+    return () => {
+      if (t) window.clearTimeout(t);
+      window.removeEventListener("flier:done", onDone);
+    };
+  }, []);
+
+  useEffect(() => {
+    const el = flierWrap.current;
+    if (!flight || !el) return;
+    const { gsap } = registerGsap();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const size = vw < 640 ? 60 : 84;
+    // random entry / exit edges (never the same one)
+    const edges = ["left", "right", "top"] as const;
+    const from = edges[Math.floor(Math.random() * edges.length)];
+    const to = pick(edges.filter((e) => e !== from) as unknown as string[]) as (typeof edges)[number];
+    const edgePoint = (e: (typeof edges)[number]) =>
+      e === "left"
+        ? { x: -size * 1.5, y: vh * (0.15 + Math.random() * 0.5) }
+        : e === "right"
+          ? { x: vw + size * 0.5, y: vh * (0.15 + Math.random() * 0.5) }
+          : { x: vw * (0.1 + Math.random() * 0.8), y: -size * 1.5 };
+    const start = edgePoint(from);
+    const end = edgePoint(to);
+    // 3-4 waypoints across the middle band of the screen
+    const n = 3 + Math.floor(Math.random() * 2);
+    const pts = Array.from({ length: n }, (_, i) => ({
+      x: start.x + ((end.x - start.x) * (i + 1)) / (n + 1) + (Math.random() - 0.5) * vw * 0.2,
+      y: vh * (0.12 + Math.random() * 0.55),
+    }));
+
+    const ctx = gsap.context(() => {
+      gsap.set(el, { x: start.x, y: start.y, opacity: 1, scaleX: end.x > start.x ? 1 : -1 });
+      gsap.to(el.querySelector("[data-body]"), { y: -12, duration: 1.3, yoyo: true, repeat: -1, ease: "sine.inOut" });
+      const tl = gsap.timeline({
+        onComplete: () => {
+          setFlight(null);
+          window.dispatchEvent(new Event("flier:done"));
+        },
+      });
+      pts.forEach((p, i) => {
+        tl.to(el, { x: p.x, y: p.y, duration: 2.2 + Math.random() * 1.2, ease: "sine.inOut" });
+        // now and then: a hover-and-look, a wave, or a barrel roll
+        const r = Math.random();
+        if (r < 0.3) tl.call(() => flierBot.current?.express("surprised", 900)).to({}, { duration: 0.9 });
+        else if (r < 0.5) tl.call(() => flierBot.current?.wave()).to({}, { duration: 1 });
+        else if (r < 0.65 && i < pts.length - 1) tl.to(el, { rotation: 360, duration: 0.8, ease: "power2.inOut" }).set(el, { rotation: 0 });
+        // face the direction of travel
+        const nx = i < pts.length - 1 ? pts[i + 1].x : end.x;
+        tl.set(el, { scaleX: nx > p.x ? 1 : -1 });
+      });
+      tl.to(el, { x: end.x, y: end.y, duration: 2.4, ease: "sine.in" });
+    }, el);
+    return () => ctx.revert();
+  }, [flight]);
 
   // The scene.
   useEffect(() => {
@@ -187,11 +262,28 @@ export default function Wanderer() {
     return () => ctx.revert();
   }, [visit]);
 
-  if (!visit) return null;
+  if (!visit && !flight) return null;
 
   return (
     <>
-      {visit.bots.map((b, i) => (
+      {flight && (
+        <div
+          key={flight.key}
+          ref={flierWrap}
+          aria-hidden
+          className="fixed left-0 top-0 z-30 opacity-0"
+          style={{ transformOrigin: "50% 50%" }}
+        >
+          <Mascot
+            ref={flierBot}
+            variant={flight.variant}
+            size={typeof window !== "undefined" && window.innerWidth < 640 ? 60 : 84}
+            trackCursor
+            antics={false}
+          />
+        </div>
+      )}
+      {visit?.bots.map((b, i) => (
         <div
           key={`${visit.key}-${i}`}
           ref={(el) => {

@@ -77,7 +77,14 @@ export const heroMedia = {
     mp4: "/images/bg/hero.mp4",
     webm: "/images/bg/hero.webm",
     poster: "/images/bg/hero-poster.jpg",
-  } as { mp4: string; webm?: string; poster?: string } | null,
+    /**
+     * Optional REEL: several clips played in continuity with a crossfade,
+     * looping as a whole. When present it replaces mp4/webm above. Drop the
+     * files in public/images/bg/ and list them in order. Each clip's last
+     * frame should match the next clip's first frame for a seamless story.
+     */
+    clips: ["/images/bg/hero.mp4"],
+  } as { mp4: string; webm?: string; poster?: string; clips?: string[] } | null,
   alt: "Students building a robot in a Robonest school lab",
 } as const;
 
@@ -127,18 +134,29 @@ export const aiFeatures = {
   ],
 } as const;
 
-export const hardware = [
+export type HardwareItem = {
+  title: string;
+  /** Still image; also the poster/fallback when a video is set. */
+  image: string;
+  /** Optional short silent loop (mp4). Drop the file in public/images/hw/. */
+  video?: string;
+  points: string[];
+};
+
+export const hardware: HardwareItem[] = [
   {
     title: "ARDUINO UNO",
     image: "/images/arduino-uno.webp",
+    // video: "/images/hw/arduino.mp4",
     points: ["Arduino projects", "Arduino programming", "Board design & learning"],
   },
   {
     title: "Sensors",
     image: "/images/sensors.webp",
+    // video: "/images/hw/sensors.mp4",
     points: ["How sensors work", "Sensor applications", "Sensor-based projects"],
   },
-] as const;
+];
 
 export const labsIntro = {
   eyebrow: "Modular Lab Solutions",

@@ -6,6 +6,7 @@ import { hero, heroMedia } from "@/content/site";
 import Icon from "@/components/ui/Icon";
 import { asset } from "@/lib/asset";
 import { prefersReducedMotion } from "@/lib/motion";
+import HeroReel from "@/components/sections/HeroReel";
 
 /**
  * Hero visual: still image or looping video, with hexagonal tech badges
@@ -134,8 +135,10 @@ export default function HeroMedia({
     <div className="relative h-full w-full">
       {/* Media */}
       <div className="relative h-full w-full overflow-hidden">
-        {heroMedia.video && allowVideo ? (
-          <HeroVideo {...heroMedia.video} />
+        {heroMedia.video && allowVideo && heroMedia.video.clips && heroMedia.video.clips.length > 1 ? (
+          <HeroReel clips={heroMedia.video.clips} poster={heroMedia.video.poster} label={heroMedia.alt} />
+        ) : heroMedia.video && allowVideo ? (
+          <HeroVideo mp4={heroMedia.video.mp4} webm={heroMedia.video.webm} poster={heroMedia.video.poster} />
         ) : (
           <Image
             src={asset(heroMedia.image)}

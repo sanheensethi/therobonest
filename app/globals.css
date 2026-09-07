@@ -65,6 +65,13 @@ html {
   /* Lenis drives scrolling; native smooth would fight it. */
   scroll-behavior: auto;
   -webkit-text-size-adjust: 100%;
+  /* No visible page scrollbar: the site scrolls with Lenis and the bar only
+     adds a grey strip beside full-bleed sections. Wheel, keys and touch all
+     still work. */
+  scrollbar-width: none;
+}
+html::-webkit-scrollbar {
+  display: none;
 }
 
 body {
@@ -414,6 +421,25 @@ html.lenis body {
   overflow: hidden;
 }
 
+/* Data pulse running around the hardware image frames */
+@keyframes pulse-dash {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -1000; }
+}
+.pulse-dash {
+  stroke-dasharray: 60 940;
+  animation: pulse-dash 6s linear infinite;
+}
+
+/* Sonar rings on the sensors card */
+@keyframes sonar {
+  0% { transform: scale(0.4); opacity: 0.7; }
+  100% { transform: scale(3.2); opacity: 0; }
+}
+.sonar {
+  animation: sonar 2.7s ease-out infinite;
+}
+
 /* Hide scrollbar on horizontal rails while keeping keyboard access */
 .no-scrollbar {
   scrollbar-width: none;
@@ -444,7 +470,9 @@ html.lenis body {
   .marquee-track-rev,
   .hex-float,
   .glow-pulse,
-  .scroll-cue {
+  .scroll-cue,
+  .pulse-dash,
+  .sonar {
     animation: none !important;
   }
 }
