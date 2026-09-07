@@ -250,7 +250,7 @@ export default function Gallery() {
           <div
             ref={sliderRef}
             data-lenis-prevent
-            className="no-scrollbar flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth px-[7vw] pb-2 lg:px-[27%]"
+            className="no-scrollbar flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth px-[8vw] pb-2 sm:px-[17vw] lg:px-[calc(50%-300px)] xl:px-[calc(50%-340px)]"
             onMouseEnter={() => setPaused(true)}
             onMouseLeave={() => setPaused(false)}
           >
@@ -272,7 +272,7 @@ export default function Gallery() {
                 }}
                 aria-label={i === slide ? `Open gallery image ${i + 1}` : `Go to image ${i + 1}`}
                 className={[
-                  "group relative aspect-[16/10] w-[86vw] shrink-0 snap-center overflow-hidden rounded-[var(--radius-card)] border border-ink/8 bg-sand transition-[transform,opacity] duration-500 ease-[var(--ease-brand)] sm:w-[70vw] lg:w-[46%]",
+                  "group relative aspect-[16/10] w-[84vw] shrink-0 snap-center overflow-hidden rounded-[var(--radius-card)] border border-ink/8 bg-sand transition-[transform,opacity] duration-500 ease-[var(--ease-brand)] sm:w-[66vw] lg:w-[600px] xl:w-[680px]",
                   i === slide ? "scale-100 opacity-100" : "scale-[0.94] opacity-60",
                 ].join(" ")}
               >
@@ -280,7 +280,7 @@ export default function Gallery() {
                   src={asset(src)}
                   alt={`Robonest lab session ${i + 1}`}
                   fill
-                  sizes="(min-width: 1024px) 46vw, 86vw"
+                  sizes="(min-width: 1024px) 680px, 84vw"
                   className="object-cover transition-transform duration-700 ease-[var(--ease-brand)] group-hover:scale-[1.05]"
                 />
                 <span className="absolute inset-0 bg-night/0 transition-colors duration-500 group-hover:bg-night/25" />
