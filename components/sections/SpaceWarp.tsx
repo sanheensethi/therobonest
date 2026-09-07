@@ -475,7 +475,6 @@ export default function SpaceWarp({
         </div>
 
         <div data-cta className="absolute inset-x-6 bottom-20 flex flex-col items-start gap-4 opacity-0 lg:bottom-28">
-          <p className="text-on-photo font-display text-3xl sm:text-4xl">Your students can run this lab.</p>
           <Link
             href={href}
             className="pointer-events-auto rounded-full bg-brand px-7 py-3.5 text-sm font-semibold text-paper shadow-lg shadow-brand/30 transition-all hover:bg-brand-600 hover:shadow-xl"
