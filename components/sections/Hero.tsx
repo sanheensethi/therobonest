@@ -65,7 +65,7 @@ export default function Hero() {
   return (
     <section
       ref={sectionRef}
-      className="relative overflow-hidden bg-night pt-[var(--nav-h)]"
+      className="relative overflow-hidden bg-night pt-[var(--nav-h)] lg:min-h-[56.25vw]"
     >
       {/* Ambient background wash */}
       <div
@@ -73,18 +73,14 @@ export default function Hero() {
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_90%_at_75%_0%,rgba(59,130,246,0.28),transparent_60%),radial-gradient(80%_70%_at_10%_100%,rgba(139,92,246,0.18),transparent_60%)]"
       />
 
-      {/* Media: bleeds to the right edge, vertically centred.
-         The box is given the source photo's own proportions (~16/11) instead
-         of the full hero height. Filling the taller box forced object-cover
-         into a hard zoom-crop that cut the students off; matching the aspect
-         ratio shows the whole scene with no distortion. */}
-      <div className="absolute right-0 top-1/2 hidden w-[64%] -translate-y-1/2 lg:block xl:w-[62%]">
-        <div className="relative aspect-[16/11] w-full">
-          <HeroMedia />
-        </div>
+      {/* Media: full-bleed 16:9 background behind everything. The section is
+         kept at least 16:9 tall (min-h) so the video never letterboxes; on
+         taller content it simply covers, cropping a little top/bottom. */}
+      <div className="absolute inset-0 hidden lg:block">
+        <HeroMedia />
       </div>
 
-      <div className="relative mx-auto grid max-w-7xl gap-10 px-6 pb-24 pt-10 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-12 lg:pb-32 lg:pt-16 xl:grid-cols-[minmax(0,1fr)_400px]">
+      <div className="relative z-10 mx-auto grid max-w-7xl gap-10 px-6 pb-24 pt-10 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-12 lg:pb-32 lg:pt-16 xl:grid-cols-[minmax(0,1fr)_400px]">
         {/* ---------- Left: copy + proof ---------- */}
         <div className="max-w-xl">
           <p
@@ -187,8 +183,8 @@ export default function Hero() {
         </div>
 
         {/* ---------- Mobile media ---------- */}
-        <div className="relative -mx-6 aspect-[16/11] overflow-hidden lg:hidden">
-          <HeroMedia allowVideo={false} />
+        <div className="relative -mx-6 aspect-video overflow-hidden lg:hidden">
+          <HeroMedia allowVideo />
         </div>
 
         {/* ---------- Right: enquiry form ---------- */}

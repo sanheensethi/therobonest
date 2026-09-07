@@ -22,10 +22,10 @@ import { prefersReducedMotion } from "@/lib/motion";
    two hexagons squarely on students' faces in the photo; the people are in
    the middle band (y ~30-65), so the badges now stay out of it. */
 const BADGE_POS = [
-  { x: 22, y: 88 }, // Robotics
-  { x: 23, y: 9 }, // AI
-  { x: 37, y: 14 }, // IoT
-  { x: 37, y: 84 }, // Coding
+  { x: 46, y: 78 }, // Robotics
+  { x: 48, y: 16 }, // AI
+  { x: 58, y: 28 }, // IoT
+  { x: 57, y: 66 }, // Coding
 ];
 
 function Hexagon({
@@ -132,14 +132,8 @@ export default function HeroMedia({
 } = {}) {
   return (
     <div className="relative h-full w-full">
-      {/* pulsing glow behind the subject */}
-      <div
-        aria-hidden
-        className="glow-pulse pointer-events-none absolute left-1/2 top-1/2 h-[70%] w-[70%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-azure/25 blur-3xl"
-      />
-
       {/* Media */}
-      <div className="media-feather relative h-full w-full overflow-hidden">
+      <div className="relative h-full w-full overflow-hidden">
         {heroMedia.video && allowVideo ? (
           <HeroVideo {...heroMedia.video} />
         ) : (
@@ -154,19 +148,20 @@ export default function HeroMedia({
                students sit centre-left, the right third of the frame is a
                tree and a wall. Scaling from a point near the students keeps
                them where they are and pushes the dead space out of the box. */
-            className="scale-[1.16] object-cover object-center origin-[38%_55%]"
+            className="object-cover object-center"
           />
         )}
 
         {/* Blend the media into the navy on every edge so it reads as one
             composition rather than a pasted-in rectangle. */}
+        <div aria-hidden className="absolute inset-0 bg-night/45" />
         <div
           aria-hidden
-          className="absolute inset-0 bg-gradient-to-r from-night/85 via-transparent to-night/80"
+          className="absolute inset-0 bg-gradient-to-r from-night/70 via-night/10 to-transparent"
         />
         <div
           aria-hidden
-          className="absolute inset-0 bg-gradient-to-t from-night/75 via-transparent to-night/45"
+          className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-night/80 to-transparent"
         />
       </div>
 

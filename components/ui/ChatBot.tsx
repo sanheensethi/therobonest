@@ -396,6 +396,7 @@ export default function ChatBot({ event }: { event?: ChatEvent | null }) {
         <span
           className={[
             "absolute bottom-full right-full mb-1 mr-1 w-max max-w-[13rem] rounded-2xl rounded-br-sm bg-paper px-3.5 py-2.5 text-left text-xs font-medium leading-snug text-ink shadow-lg shadow-night/20 transition-all duration-300",
+            "group-data-[docked=true]:bottom-auto group-data-[docked=true]:top-1/2 group-data-[docked=true]:mb-0 group-data-[docked=true]:mr-4 group-data-[docked=true]:-translate-y-1/2 group-data-[docked=true]:rounded-br-2xl group-data-[docked=true]:rounded-r-sm",
             tip && !open ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-2 opacity-0",
           ].join(" ")}
           aria-live="polite"
