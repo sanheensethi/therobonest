@@ -56,6 +56,24 @@ export default function SpaceWarp({
     // missiles the rocket fires at the saucer; the saucer gets dizzy on a hit
     const missiles: { x: number; y: number; vx: number; vy: number; life: number }[] = [];
     let lastShot = 0;
+    // the saucer fires back: a short green beam, the rocket tumbles if it lands
+    const zaps: { x1: number; y1: number; x2: number; y2: number; a: number }[] = [];
+    let lastZap = 0;
+    let heading = 0; // rocket rotation in radians (0 = nose up)
+
+    /** Centre of an overlay sprite in canvas coordinates. */
+    const centreOf = (el: HTMLElement | null) => {
+      if (!el) return null;
+      const r = el.getBoundingClientRect();
+      const c = cv.getBoundingClientRect();
+      return { x: r.left + r.width / 2 - c.left, y: r.top + r.height / 2 - c.top };
+    };
+    /** The rocket's nozzle: 36px "below" its centre, rotated by its heading. */
+    const nozzle = () => {
+      const c = centreOf(rocket.current);
+      if (!c) return null;
+      return { x: c.x - Math.sin(heading) * 36, y: c.y + Math.cos(heading) * 36 };
+    };
     const state = { p: 0, t: 0 };
 
     const build = () => {
@@ -205,10 +223,40 @@ export default function SpaceWarp({
       }
 
       // missiles: yellow streaks that home loosely on the saucer
-      const ur = ufo.current?.getBoundingClientRect();
-      const cr = cv.getBoundingClientRect();
-      const ux = ur ? ur.left + ur.width / 2 - cr.left : -999;
-      const uy = ur ? ur.top + ur.height / 2 - cr.top : -999;
+      const uc = centreOf(ufo.current);
+      const rc = centreOf(rocket.current);
+      const ux = uc ? uc.x : -999;
+      const uy = uc ? uc.y : -999;
+
+      // the saucer zaps back every few seconds when the rocket is in range
+      const nowMs = performance.now();
+      if (uc && rc && nowMs - lastZap > 5500 && Math.hypot(rc.x - ux, rc.y - uy) < W * 0.6) {
+        lastZap = nowMs;
+        zaps.push({ x1: ux, y1: uy + 20, x2: rc.x, y2: rc.y, a: 1 });
+        ufoBot.current?.express("angry", 900);
+        // did it land? (the rocket is moving, so this is a coin-flip on purpose)
+        if (Math.random() < 0.6 && rocket.current) {
+          window.setTimeout(() => {
+            rocketBot.current?.express("dizzy", 1500);
+            if (rocket.current) gsap.to(rocket.current, { rotation: "+=360", duration: 0.8, ease: "power2.out" });
+            if (rc) waves.push({ x: rc.x, y: rc.y, r: 6, a: 0.8 });
+          }, 120);
+        } else {
+          rocketBot.current?.express("cheeky", 900);
+        }
+      }
+      for (let i = zaps.length - 1; i >= 0; i--) {
+        const z = zaps[i];
+        z.a *= 0.86;
+        ctx.strokeStyle = `rgba(74,222,128,${z.a})`;
+        ctx.lineWidth = 3;
+        ctx.lineCap = "round";
+        ctx.beginPath(); ctx.moveTo(z.x1, z.y1); ctx.lineTo(z.x2, z.y2); ctx.stroke();
+        ctx.strokeStyle = `rgba(255,255,255,${z.a * 0.8})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(z.x1, z.y1); ctx.lineTo(z.x2, z.y2); ctx.stroke();
+        if (z.a < 0.04) zaps.splice(i, 1);
+      }
       for (let i = missiles.length - 1; i >= 0; i--) {
         const m = missiles[i];
         // gentle homing
@@ -271,8 +319,8 @@ export default function SpaceWarp({
       const to = { x: W * (0.08 + Math.random() * 0.84), y: H * (0.1 + Math.random() * 0.7) };
       const mid = { x: (from.x + to.x) / 2 + (Math.random() - 0.5) * W * 0.4, y: (from.y + to.y) / 2 + (Math.random() - 0.5) * H * 0.5 };
       const ang = (Math.atan2(to.y - from.y, to.x - from.x) * 180) / Math.PI;
-      const rad = ((ang + 90) * Math.PI) / 180;
-      gsap.to(r, { rotation: ang + 90, duration: 0.6, ease: "power2.out" });
+      gsap.to(r, { rotation: ang + 90, duration: 0.6, ease: "power2.out",
+        onUpdate: () => { heading = (Number(gsap.getProperty(r, "rotation")) * Math.PI) / 180; } });
       gsap.to(r, {
         duration: 3 + Math.random() * 2,
         ease: "power1.inOut",
@@ -284,12 +332,9 @@ export default function SpaceWarp({
           const x = (1 - t) * (1 - t) * from.x + 2 * (1 - t) * t * mid.x + t * t * to.x;
           const y = (1 - t) * (1 - t) * from.y + 2 * (1 - t) * t * mid.y + t * t * to.y;
           gsap.set(r, { x, y });
-          // nozzle sits ~55px below the sprite's centre in its own frame; rotate that offset
-          if (Math.random() < 0.8) {
-            const ox = 38, oy = 55;
-            const nx = x + ox + (-Math.sin(rad) * oy);
-            const ny = y + 40 + (Math.cos(rad) * oy);
-            embers.push({ x: nx + (Math.random() - 0.5) * 8, y: ny + (Math.random() - 0.5) * 8, a: 0.95, r: 2.5 + Math.random() * 3 });
+          const n = nozzle();
+          if (n && Math.random() < 0.85) {
+            embers.push({ x: n.x + (Math.random() - 0.5) * 6, y: n.y + (Math.random() - 0.5) * 6, a: 0.95, r: 2.5 + Math.random() * 3 });
           }
         },
         onComplete: () => {
@@ -301,10 +346,14 @@ export default function SpaceWarp({
           const now = performance.now();
           if (now - lastShot > 4000 && ufo.current) {
             lastShot = now;
-            const nx = from.x + 38 + -Math.sin(rad) * 55;
-            const ny = from.y + 40 + Math.cos(rad) * 55;
-            missiles.push({ x: nx, y: ny, vx: Math.cos(rad - Math.PI / 2) * 4, vy: Math.sin(rad - Math.PI / 2) * 4, life: 220 });
-            rocketBot.current?.express("angry", 900);
+            // fire from the nose (opposite the nozzle), in the heading direction
+            const c = centreOf(rocket.current);
+            if (c) {
+              const nx = c.x + Math.sin(heading) * 30;
+              const ny = c.y - Math.cos(heading) * 30;
+              missiles.push({ x: nx, y: ny, vx: Math.sin(heading) * 4, vy: -Math.cos(heading) * 4, life: 220 });
+              rocketBot.current?.express("angry", 900);
+            }
           }
         },
       });
