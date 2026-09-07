@@ -10,7 +10,7 @@ import { registerGsap, prefersReducedMotion } from "@/lib/motion";
  * leave. Projectiles, embers and impact rings are drawn on a full-screen
  * canvas that exists only while the scene is running.
  *
- * Rare and desktop-only: first one 25-45s after load, then every 70-130s.
+ * First one 12-20s after load, then every 45-80s. Works on phones too.
  * Everything sits at z-5, behind positioned page content, so the fight
  * happens *behind* forms and cards and never blocks a click.
  */
@@ -24,16 +24,15 @@ export default function Dogfight() {
   const botU = useRef<MascotHandle | null>(null);
   const canvas = useRef<HTMLCanvasElement | null>(null);
 
-  // scheduler
+  // scheduler - phones included, just smaller robots and a lighter canvas
   useEffect(() => {
     if (prefersReducedMotion()) return;
-    if (!window.matchMedia("(min-width: 1024px)").matches) return;
     let t: number | null = null;
     const next = (delay: number) => {
       t = window.setTimeout(() => setOn(true), delay);
     };
-    next(25000 + Math.random() * 20000);
-    const onDone = () => next(70000 + Math.random() * 60000);
+    next(12000 + Math.random() * 8000);
+    const onDone = () => next(45000 + Math.random() * 35000);
     window.addEventListener("dogfight:done", onDone);
     return () => {
       if (t) window.clearTimeout(t);
@@ -81,7 +80,8 @@ export default function Dogfight() {
     };
     const nose = () => {
       const c = centre(r);
-      return { x: c.x + Math.sin(R.heading) * 30, y: c.y - Math.cos(R.heading) * 30 };
+      const k = window.innerWidth < 1024 ? 21 : 30;
+      return { x: c.x + Math.sin(R.heading) * k, y: c.y - Math.cos(R.heading) * k };
     };
 
     gsap.set(r, { x: R.x, y: R.y, rotation: 90 });
@@ -275,15 +275,16 @@ export default function Dogfight() {
   }, [on]);
 
   if (!on) return null;
+  const small = typeof window !== "undefined" && window.innerWidth < 1024;
 
   return (
     <>
       <canvas ref={canvas} aria-hidden className="pointer-events-none fixed inset-0 z-[5] h-full w-full" />
-      <div ref={wrapU} aria-hidden className="pointer-events-none fixed left-0 top-0 z-[5] -ml-11 -mt-12">
-        <Mascot ref={botU} variant="ufo" size={92} trackCursor={false} antics={false} />
+      <div ref={wrapU} aria-hidden className="pointer-events-none fixed left-0 top-0 z-[5] -ml-8 -mt-9 lg:-ml-11 lg:-mt-12">
+        <Mascot ref={botU} variant="ufo" size={small ? 64 : 92} trackCursor={false} antics={false} />
       </div>
-      <div ref={wrapR} aria-hidden className="pointer-events-none fixed left-0 top-0 z-[5] -ml-9 -mt-11">
-        <Mascot ref={botR} variant="rocket" size={76} trackCursor={false} antics={false} />
+      <div ref={wrapR} aria-hidden className="pointer-events-none fixed left-0 top-0 z-[5] -ml-7 -mt-8 lg:-ml-9 lg:-mt-11">
+        <Mascot ref={botR} variant="rocket" size={small ? 54 : 76} trackCursor={false} antics={false} />
       </div>
     </>
   );

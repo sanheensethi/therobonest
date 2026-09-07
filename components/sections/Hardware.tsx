@@ -93,6 +93,51 @@ function SensorHud() {
   );
 }
 
+/**
+ * <video autoPlay> alone is unreliable on phones (it may start paused if the
+ * element was off-screen or not yet buffered when the page settled). Play it
+ * ourselves whenever it is visible and ready, and pause it off-screen.
+ */
+function ClipVideo({ src, poster, label }: { src: string; poster: string; label: string }) {
+  const ref = useRef<HTMLVideoElement | null>(null);
+  useEffect(() => {
+    const v = ref.current;
+    if (!v || prefersReducedMotion()) return;
+    let onScreen = false;
+    const tryPlay = () => {
+      if (onScreen && document.visibilityState === "visible" && v.paused) v.play().catch(() => {});
+    };
+    const io = new IntersectionObserver(([e]) => {
+      onScreen = e.isIntersecting;
+      if (onScreen) tryPlay();
+      else v.pause();
+    }, { threshold: 0.2 });
+    io.observe(v);
+    v.addEventListener("canplay", tryPlay);
+    document.addEventListener("visibilitychange", tryPlay);
+    const retries = [500, 1500, 3000].map((ms) => window.setTimeout(tryPlay, ms));
+    return () => {
+      io.disconnect();
+      v.removeEventListener("canplay", tryPlay);
+      document.removeEventListener("visibilitychange", tryPlay);
+      retries.forEach((t) => window.clearTimeout(t));
+    };
+  }, []);
+  return (
+    <video
+      ref={ref}
+      className="h-60 w-full object-cover transition-transform duration-700 ease-[var(--ease-brand)] group-hover:scale-[1.04] sm:h-64"
+      src={asset(src)}
+      poster={asset(poster)}
+      muted
+      loop
+      playsInline
+      preload="metadata"
+      aria-label={label}
+    />
+  );
+}
+
 /** A bright dash that runs around the image frame - data on the move. */
 function Pulse() {
   return (
@@ -129,17 +174,7 @@ export default function Hardware() {
               >
                 <div className="relative overflow-hidden bg-night">
                   {h.video ? (
-                    <video
-                      className="h-60 w-full object-cover transition-transform duration-700 ease-[var(--ease-brand)] group-hover:scale-[1.04] sm:h-64"
-                      src={asset(h.video)}
-                      poster={asset(h.image)}
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      preload="metadata"
-                      aria-label={h.title}
-                    />
+                    <ClipVideo src={h.video} poster={h.image} label={h.title} />
                   ) : (
                     <Image
                       src={asset(h.image)}

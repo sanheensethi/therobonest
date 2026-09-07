@@ -97,19 +97,32 @@ export default function HeroReel({
       layers.forEach((v) => v.addEventListener("timeupdate", onTime));
     }
 
+    // play() is not a one-shot: a call before the source is ready, or while
+    // the tab is hidden, silently does nothing. Ask again on every signal
+    // that could have changed the answer, and a few times after mount.
+    const tryPlay = () => {
+      if (!onScreen || document.visibilityState !== "visible") return;
+      const v = layers[current];
+      if (v.paused && !v.ended) v.play().catch(() => {});
+    };
     const io = new IntersectionObserver(
       ([e]) => {
         onScreen = e.isIntersecting;
-        const v = layers[current];
-        if (onScreen) v.play().catch(() => {});
+        if (onScreen) tryPlay();
         else layers.forEach((l) => l.pause());
       },
       { threshold: 0.15 }
     );
     io.observe(va);
+    layers.forEach((v) => v.addEventListener("canplay", tryPlay));
+    document.addEventListener("visibilitychange", tryPlay);
+    const retries = [400, 1200, 2500, 5000].map((ms) => window.setTimeout(tryPlay, ms));
 
     return () => {
       io.disconnect();
+      layers.forEach((v) => v.removeEventListener("canplay", tryPlay));
+      document.removeEventListener("visibilitychange", tryPlay);
+      retries.forEach((t) => window.clearTimeout(t));
       layers.forEach((v) => {
         v.removeEventListener("timeupdate", onTime);
         v.pause();
