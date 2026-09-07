@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { hero, schools } from "@/content/site";
@@ -20,6 +20,18 @@ import { asset } from "@/lib/asset";
  */
 export default function Hero() {
   const sectionRef = useRef<HTMLElement | null>(null);
+  // Desktop and phone each get their own media box (different layout), but
+  // only the VISIBLE one may load video - a CSS-hidden <video> still
+  // downloads. Decided after mount so server and client markup match; until
+  // then both show the poster only.
+  const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const apply = () => setIsDesktop(mq.matches);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -77,7 +89,7 @@ export default function Hero() {
       {/* Media: full-bleed background behind everything (object-cover, so it
          fills whatever height the content needs). */}
       <div className="absolute inset-0 hidden lg:block">
-        <HeroMedia />
+        <HeroMedia allowVideo={isDesktop === true} />
       </div>
 
       <div className="relative z-10 mx-auto grid max-w-7xl gap-10 px-6 pb-20 pt-8 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-12 lg:pb-16 lg:pt-8 xl:grid-cols-[minmax(0,1fr)_400px]">
@@ -195,7 +207,7 @@ export default function Hero() {
 
         {/* ---------- Mobile media ---------- */}
         <div className="relative -mx-6 aspect-video overflow-hidden lg:hidden">
-          <HeroMedia allowVideo />
+          <HeroMedia allowVideo={isDesktop === false} />
         </div>
 
         {/* ---------- Right: enquiry form ---------- */}

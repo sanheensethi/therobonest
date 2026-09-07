@@ -78,7 +78,7 @@ export default function HeroMedia({
           <HeroVideo mp4={heroMedia.video.mp4} webm={heroMedia.video.webm} poster={heroMedia.video.poster} />
         ) : (
           <Image
-            src={asset(heroMedia.image)}
+            src={asset(heroMedia.video?.poster ?? heroMedia.image)}
             alt={heroMedia.alt}
             fill
             priority

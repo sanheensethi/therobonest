@@ -76,22 +76,17 @@ export const heroMedia = {
   // Silent, forward-then-reverse so it loops without a seam. `poster` is the
   // clip's own first frame so there is no visual jump when playback starts;
   // `image` above stays the real-school photo used on phones (no video there).
-  // Set to null while the Robot School reel is being generated - the
-  // placeholder clip was a face close-up behind the headline and read badly.
-  // To switch back: replace `null as ... | null` with the object below.
-  video: null as { mp4: string; webm?: string; poster?: string; clips?: string[] } | null,
-  _videoDraft: {
-    mp4: "/images/bg/hero.mp4",
-    webm: "/images/bg/hero.webm",
+  /**
+   * Hero reel: clips play in order with a crossfade, once through, then hold
+   * on the last frame. Slide 1 Robot School, slide 2 the robotics bench;
+   * slide 3 (rooftop astronomy) joins when generated.
+   */
+  video: {
+    mp4: "/images/bg/hero-1.mp4",
     poster: "/images/bg/hero-poster.jpg",
-    /**
-     * Optional REEL: several clips played in continuity with a crossfade,
-     * looping as a whole. When present it replaces mp4/webm above. Drop the
-     * files in public/images/bg/ and list them in order. Each clip's last
-     * frame should match the next clip's first frame for a seamless story.
-     */
-    clips: ["/images/bg/hero.mp4"],
-  },
+    clips: ["/images/bg/hero-1.mp4", "/images/bg/hero-2.mp4"],
+  } as { mp4: string; webm?: string; poster?: string; clips?: string[] } | null,
+
   alt: "Students building a robot in a Robonest school lab",
 } as const;
 
