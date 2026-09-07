@@ -34,6 +34,11 @@ export default function SpaceWarp({
   eyebrow, title, body, cta, href,
 }: { eyebrow: string; title: string; body: string; cta: string; href: string }) {
   const section = useRef<HTMLElement | null>(null);
+  // Pin THIS inner box, never the <section> React owns. ScrollTrigger wraps
+  // whatever it pins in a .pin-spacer div; if that were the section, React's
+  // unmount on route change would try to remove a node that has been
+  // re-parented and throw "removeChild: not a child of this node".
+  const pinBox = useRef<HTMLDivElement | null>(null);
   const canvas = useRef<HTMLCanvasElement | null>(null);
   const rocket = useRef<HTMLDivElement | null>(null);
   const rocketBot = useRef<MascotHandle | null>(null);
@@ -424,7 +429,8 @@ export default function SpaceWarp({
       trigger: el,
       start: "top top",
       end: reduced ? "+=10%" : "+=170%",
-      pin: !reduced,
+      pin: reduced ? false : pinBox.current,
+      pinSpacing: true,
       scrub: 0.4,
       onToggle: (self) => (self.isActive ? start() : stop()),
       onUpdate: (self) => {
@@ -452,7 +458,8 @@ export default function SpaceWarp({
   }, []);
 
   return (
-    <section ref={section} data-nesty="space" className="relative h-[100svh] cursor-crosshair overflow-hidden bg-night text-paper">
+    <section ref={section} data-nesty="space" className="relative cursor-crosshair bg-night text-paper">
+      <div ref={pinBox} className="relative h-[100svh] overflow-hidden">
       <canvas ref={canvas} className="absolute inset-0 h-full w-full" />
       {/* feather the top and bottom into the neighbouring navy sections */}
       <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-night to-transparent" />
@@ -482,6 +489,7 @@ export default function SpaceWarp({
             {cta}
           </Link>
         </div>
+      </div>
       </div>
     </section>
   );
