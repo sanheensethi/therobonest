@@ -59,6 +59,8 @@ export default function Dogfight() {
     const start = performance.now();
     const missiles: { x: number; y: number; vx: number; vy: number; life: number }[] = [];
     const zaps: { x1: number; y1: number; x2: number; y2: number; a: number }[] = [];
+    const bombs: { x: number; y: number; vx: number; vy: number; life: number }[] = [];
+    let lastBomb = 0;
     const embers: { x: number; y: number; a: number; r: number }[] = [];
     const waves: { x: number; y: number; r: number; a: number }[] = [];
     let lastShot = 0;
@@ -146,6 +148,36 @@ export default function Dogfight() {
             botU.current?.express("dizzy", 1500);
             gsap.to(u, { rotation: "+=360", duration: 0.9, ease: "power2.out" });
             botR.current?.express("cheeky", 1000);
+          }
+        }
+      }
+
+      // ---- saucer drops a bomb every ~3.5s ----
+      if (!leaving && now - lastBomb > 3500 && t > 1800) {
+        lastBomb = now;
+        bombs.push({ x: uc.x, y: uc.y + 26, vx: (Math.random() - 0.5) * 2, vy: 3, life: 220 });
+        botU.current?.express("smug", 800);
+      }
+      // ---- saucer bombs: green orbs that home on the rocket ----
+      for (let i = bombs.length - 1; i >= 0; i--) {
+        const b = bombs[i];
+        const dx = rc.x - b.x, dy = rc.y - b.y;
+        const d = Math.hypot(dx, dy) || 1;
+        b.vx += (dx / d) * 0.32; b.vy += (dy / d) * 0.32;
+        const sp = Math.hypot(b.vx, b.vy);
+        if (sp > 7.5) { b.vx = (b.vx / sp) * 7.5; b.vy = (b.vy / sp) * 7.5; }
+        b.x += b.vx; b.y += b.vy; b.life -= 1;
+        const g = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, 9);
+        g.addColorStop(0, "#ffffff"); g.addColorStop(0.35, "#4ade80"); g.addColorStop(1, "rgba(74,222,128,0)");
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(b.x, b.y, 9, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#22c55e"; ctx.beginPath(); ctx.arc(b.x, b.y, 3.2, 0, Math.PI * 2); ctx.fill();
+        if (d < 34 || b.life <= 0) {
+          bombs.splice(i, 1);
+          if (d < 34) {
+            waves.push({ x: rc.x, y: rc.y, r: 8, a: 1 });
+            botR.current?.express("dizzy", 1400);
+            gsap.to(r, { rotation: "+=360", duration: 0.8, ease: "power2.out", onComplete: () => { gsap.set(r, { rotation: (R.heading * 180) / Math.PI }); } });
+            botU.current?.express("laugh", 1000);
           }
         }
       }

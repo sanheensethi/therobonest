@@ -59,6 +59,8 @@ export default function SpaceWarp({
     // the saucer fires back: a short green beam, the rocket tumbles if it lands
     const zaps: { x1: number; y1: number; x2: number; y2: number; a: number }[] = [];
     let lastZap = 0;
+    const bombs: { x: number; y: number; vx: number; vy: number; life: number }[] = [];
+    let lastBomb = 0;
     let heading = 0; // rocket rotation in radians (0 = nose up)
 
     /** Centre of an overlay sprite in canvas coordinates. */
@@ -225,8 +227,38 @@ export default function SpaceWarp({
       const ux = uc ? uc.x : -999;
       const uy = uc ? uc.y : -999;
 
-      // the saucer zaps back every few seconds when the rocket is in range
       const nowMs = performance.now();
+      // the saucer drops a bomb every ~4s while the rocket is around
+      if (uc && rc && nowMs - lastBomb > 4000) {
+        lastBomb = nowMs;
+        bombs.push({ x: uc.x, y: uc.y + 26, vx: (Math.random() - 0.5) * 2, vy: 3, life: 220 });
+        ufoBot.current?.express("smug", 800);
+      }
+      // ---- saucer bombs: green orbs that home on the rocket ----
+      for (let i = bombs.length - 1; i >= 0; i--) {
+        const b = bombs[i];
+        const dx = (rc ? rc.x : -999) - b.x, dy = (rc ? rc.y : -999) - b.y;
+        const d = Math.hypot(dx, dy) || 1;
+        b.vx += (dx / d) * 0.32; b.vy += (dy / d) * 0.32;
+        const sp = Math.hypot(b.vx, b.vy);
+        if (sp > 7.5) { b.vx = (b.vx / sp) * 7.5; b.vy = (b.vy / sp) * 7.5; }
+        b.x += b.vx; b.y += b.vy; b.life -= 1;
+        const g = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, 9);
+        g.addColorStop(0, "#ffffff"); g.addColorStop(0.35, "#4ade80"); g.addColorStop(1, "rgba(74,222,128,0)");
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(b.x, b.y, 9, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#22c55e"; ctx.beginPath(); ctx.arc(b.x, b.y, 3.2, 0, Math.PI * 2); ctx.fill();
+        if (d < 34 || b.life <= 0) {
+          bombs.splice(i, 1);
+          if (d < 34) {
+            waves.push({ x: (rc ? rc.x : -999), y: (rc ? rc.y : -999), r: 8, a: 1 });
+            rocketBot.current?.express("dizzy", 1400);
+            if (rocket.current) gsap.to(rocket.current, { rotation: "+=360", duration: 0.8, ease: "power2.out" });
+            ufoBot.current?.express("laugh", 1000);
+          }
+        }
+      }
+
+      // the saucer zaps back every few seconds when the rocket is in range
       if (uc && rc && nowMs - lastZap > 5500 && Math.hypot(rc.x - ux, rc.y - uy) < W * 0.6) {
         lastZap = nowMs;
         zaps.push({ x1: ux, y1: uy + 20, x2: rc.x, y2: rc.y, a: 1 });
