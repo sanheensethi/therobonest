@@ -38,46 +38,107 @@ export default function Gallery() {
   const openedAt = useRef<number | null>(null);
 
   // ---- slider ----
-  const sliderRef = useRef<HTMLDivElement | null>(null);
-  const [slide, setSlide] = useState(0);
+  // A transform-driven track instead of native scroll-snap: the browser's
+  // snap points fought scrollTo() and mis-centred the first/last slide, and
+  // it cannot loop. The photo set is rendered three times; `pos` indexes the
+  // middle copy, and after any move that leaves it we jump back by one set
+  // with the transition switched off, so the loop is invisible.
+  const n: number = gallery.images.length;
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const slideRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const [pos, setPos] = useState<number>(n); // 3n space, starts on the middle copy
+  const [animate, setAnimate] = useState(true);
   const [paused, setPaused] = useState(false);
-  const goTo = useCallback((i: number) => {
-    const n = gallery.images.length;
-    const idx = ((i % n) + n) % n;
-    const el = sliderRef.current?.querySelector<HTMLElement>(`[data-slide="${idx}"]`);
-    if (el && sliderRef.current) {
-      const box = sliderRef.current;
-      box.scrollTo({ left: el.offsetLeft - (box.clientWidth - el.clientWidth) / 2, behavior: "smooth" });
-    }
-    setSlide(idx);
-  }, []);
-  // the centred slide is the active one (drag/swipe/scroll all update it)
+  const slide = ((pos % n) + n) % n;
+  const dragX = useRef(0);
+  const drag = useRef<{ x: number; moved: boolean } | null>(null);
+
+  // Centre slide `pos` (plus any live drag offset) in the viewport.
+  const place = useCallback(
+    (offset = 0) => {
+      const track = trackRef.current;
+      const el = slideRefs.current[pos];
+      const box = track?.parentElement;
+      if (!track || !el || !box) return;
+      const x = box.clientWidth / 2 - (el.offsetLeft + el.clientWidth / 2) + offset;
+      track.style.transform = `translate3d(${x}px,0,0)`;
+    },
+    [pos]
+  );
+  useLayoutEffect(() => {
+    place();
+    const ro = new ResizeObserver(() => place());
+    if (trackRef.current?.parentElement) ro.observe(trackRef.current.parentElement);
+    return () => ro.disconnect();
+  }, [place]);
+  // Re-enable the transition on the frame after a silent jump.
   useEffect(() => {
-    const box = sliderRef.current;
-    if (!box) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        const hit = entries.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (hit) setSlide(Number((hit.target as HTMLElement).dataset.slide));
-      },
-      { root: box, threshold: [0.6, 0.8] }
-    );
-    box.querySelectorAll("[data-slide]").forEach((n) => io.observe(n));
-    return () => io.disconnect();
+    if (animate) return;
+    const id = requestAnimationFrame(() => setAnimate(true));
+    return () => cancelAnimationFrame(id);
+  }, [animate]);
+
+  // Manual navigation; also holds autoplay off for a moment so the timer
+  // cannot fire right after a click and undo it.
+  const lastUser = useRef(0);
+  const goTo = useCallback((i: number) => {
+    lastUser.current = Date.now();
+    setPos(i);
   }, []);
+  const move = useCallback((d: number) => {
+    lastUser.current = Date.now();
+    setPos((p) => p + d);
+  }, []);
+  const onTrackTransitionEnd = () => {
+    if (pos >= n && pos < 2 * n) return;
+    setAnimate(false);
+    setPos(((pos % n) + n) % n + n);
+  };
+
+  // Pointer drag / swipe on the track.
+  const onPointerDown = (e: React.PointerEvent) => {
+    drag.current = { x: e.clientX, moved: false };
+    dragX.current = 0;
+    setPaused(true);
+  };
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!drag.current) return;
+    dragX.current = e.clientX - drag.current.x;
+    if (Math.abs(dragX.current) > 6) {
+      drag.current.moved = true;
+      const track = trackRef.current;
+      if (track) track.style.transition = "none";
+      place(dragX.current);
+    }
+  };
+  const onPointerUp = () => {
+    const d = drag.current;
+    drag.current = null;
+    const track = trackRef.current;
+    if (track) track.style.transition = "";
+    if (!d) return;
+    if (d.moved) {
+      if (dragX.current < -60) move(1);
+      else if (dragX.current > 60) move(-1);
+      else place();
+    }
+    dragX.current = 0;
+  };
+
   // autoplay: every 4s, unless hovered, lightbox open, tab hidden or reduced motion
   useEffect(() => {
     if (paused || active !== null || prefersReducedMotion()) return;
     const id = window.setInterval(() => {
       if (document.visibilityState !== "visible") return;
-      const box = sliderRef.current;
+      const box = trackRef.current;
       if (!box) return;
       const r = box.getBoundingClientRect();
       if (r.bottom < 0 || r.top > window.innerHeight) return; // off-screen: don't bother
-      goTo(slide + 1);
+      if (Date.now() - lastUser.current < 3500) return; // the visitor just moved it
+      setPos((p) => p + 1);
     }, 4000);
     return () => window.clearInterval(id);
-  }, [paused, active, slide, goTo]);
+  }, [paused, active]);
 
   // Strip: jump to the tapped photo on open, then let scrolling drive `active`.
   useEffect(() => {
@@ -246,57 +307,80 @@ export default function Gallery() {
         {/* Slider: one big slide centred with the neighbours peeking. Native
             scroll-snap does the dragging/swiping; we add arrows, dots and a
             gentle autoplay that pauses on hover or while the lightbox is open. */}
-        <div className="relative mt-12">
+        <div
+          className="relative mt-12 overflow-hidden"
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => {
+            setPaused(false);
+            if (drag.current) onPointerUp();
+          }}
+        >
           <div
-            ref={sliderRef}
-            data-lenis-prevent
-            className="no-scrollbar flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth px-[8vw] pb-2 sm:px-[17vw] lg:px-[calc(50%-300px)] xl:px-[calc(50%-340px)]"
-            onMouseEnter={() => setPaused(true)}
-            onMouseLeave={() => setPaused(false)}
+            ref={trackRef}
+            onTransitionEnd={onTrackTransitionEnd}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+            onPointerCancel={onPointerUp}
+            className={[
+              "flex touch-pan-y select-none gap-5 pb-2 will-change-transform",
+              animate ? "transition-transform duration-[650ms] ease-[var(--ease-brand)]" : "",
+            ].join(" ")}
           >
-            {gallery.images.map((src, i) => (
-              <button
-                key={src}
-                ref={(n) => {
-                  thumbsRef.current[i] = n;
-                }}
-                data-slide={i}
-                type="button"
-                onClick={() => {
-                  if (i !== slide) {
-                    goTo(i);
-                    return;
-                  }
-                  zoomFromThumb.current = true;
-                  setActive(i);
-                }}
-                aria-label={i === slide ? `Open gallery image ${i + 1}` : `Go to image ${i + 1}`}
-                className={[
-                  "group relative aspect-[16/10] w-[84vw] shrink-0 snap-center overflow-hidden rounded-[var(--radius-card)] border border-ink/8 bg-sand transition-[transform,opacity] duration-500 ease-[var(--ease-brand)] sm:w-[66vw] lg:w-[600px] xl:w-[680px]",
-                  i === slide ? "scale-100 opacity-100" : "scale-[0.94] opacity-60",
-                ].join(" ")}
-              >
-                <Image
-                  src={asset(src)}
-                  alt={`Robonest lab session ${i + 1}`}
-                  fill
-                  sizes="(min-width: 1024px) 680px, 84vw"
-                  className="object-cover transition-transform duration-700 ease-[var(--ease-brand)] group-hover:scale-[1.05]"
-                />
-                <span className="absolute inset-0 bg-night/0 transition-colors duration-500 group-hover:bg-night/25" />
-                {i === slide && (
-                  <span className="absolute bottom-3 right-3 rounded-full bg-paper/90 px-3 py-1 text-[11px] font-semibold text-ink opacity-0 transition-opacity group-hover:opacity-100">
-                    Click to enlarge
-                  </span>
-                )}
-              </button>
-            ))}
+            {[0, 1, 2].map((copy) =>
+              gallery.images.map((src, i) => {
+                const k = copy * n + i;
+                const current = k === pos;
+                return (
+                  <button
+                    key={`${copy}-${src}`}
+                    ref={(node) => {
+                      slideRefs.current[k] = node;
+                      if (copy === 1) thumbsRef.current[i] = node;
+                    }}
+                    type="button"
+                    draggable={false}
+                    onClick={() => {
+                      if (drag.current?.moved || Math.abs(dragX.current) > 6) return; // was a drag
+                      if (!current) {
+                        goTo(k);
+                        return;
+                      }
+                      zoomFromThumb.current = true;
+                      setActive(i);
+                    }}
+                    tabIndex={copy === 1 ? 0 : -1}
+                    aria-hidden={copy !== 1}
+                    aria-label={current ? `Open gallery image ${i + 1}` : `Go to image ${i + 1}`}
+                    className={[
+                      "group relative aspect-[16/10] w-[84vw] shrink-0 overflow-hidden rounded-[var(--radius-card)] border border-ink/8 bg-sand transition-[transform,opacity] duration-500 ease-[var(--ease-brand)] sm:w-[66vw] lg:w-[600px] xl:w-[680px]",
+                      current ? "scale-100 opacity-100" : "scale-[0.94] opacity-60",
+                    ].join(" ")}
+                  >
+                    <Image
+                      src={asset(src)}
+                      alt={`RoboNest lab session ${i + 1}`}
+                      fill
+                      draggable={false}
+                      sizes="(min-width: 1024px) 680px, 84vw"
+                      className="pointer-events-none object-cover transition-transform duration-700 ease-[var(--ease-brand)] group-hover:scale-[1.05]"
+                    />
+                    <span className="absolute inset-0 bg-night/0 transition-colors duration-500 group-hover:bg-night/25" />
+                    {current && (
+                      <span className="absolute bottom-3 right-3 rounded-full bg-paper/90 px-3 py-1 text-[11px] font-semibold text-ink opacity-0 transition-opacity group-hover:opacity-100">
+                        Click to enlarge
+                      </span>
+                    )}
+                  </button>
+                );
+              })
+            )}
           </div>
 
           {/* arrows */}
           <button
             type="button"
-            onClick={() => goTo(slide - 1)}
+            onClick={() => move(-1)}
             aria-label="Previous photo"
             className="absolute left-3 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-ink text-paper shadow-lg shadow-ink/20 transition-all hover:scale-105 hover:bg-brand sm:flex lg:left-[10%]"
           >
@@ -304,7 +388,7 @@ export default function Gallery() {
           </button>
           <button
             type="button"
-            onClick={() => goTo(slide + 1)}
+            onClick={() => move(1)}
             aria-label="Next photo"
             className="absolute right-3 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-ink text-paper shadow-lg shadow-ink/20 transition-all hover:scale-105 hover:bg-brand sm:flex lg:right-[10%]"
           >
@@ -317,7 +401,7 @@ export default function Gallery() {
               <button
                 key={i}
                 type="button"
-                onClick={() => goTo(i)}
+                onClick={() => goTo(n + i)}
                 aria-label={`Photo ${i + 1}`}
                 className={[
                   "h-2 rounded-full transition-all duration-300",
