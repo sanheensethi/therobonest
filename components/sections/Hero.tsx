@@ -80,7 +80,7 @@ export default function Hero() {
         <HeroMedia />
       </div>
 
-      <div className="relative z-10 mx-auto grid max-w-7xl gap-10 px-6 pb-24 pt-10 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-12 lg:pb-32 lg:pt-16 xl:grid-cols-[minmax(0,1fr)_400px]">
+      <div className="relative z-10 mx-auto grid max-w-7xl gap-10 px-6 pb-20 pt-8 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-12 lg:pb-16 lg:pt-8 xl:grid-cols-[minmax(0,1fr)_400px]">
         {/* ---------- Left: copy + proof ---------- */}
         <div className="max-w-2xl">
           <p
@@ -106,7 +106,7 @@ export default function Hero() {
 
           <p
             data-hero-fade
-            className="mt-5 text-base leading-relaxed text-white/75 sm:text-lg"
+            className="mt-4 text-base leading-relaxed text-white/75 sm:text-lg"
           >
             {hero.body} —{" "}
             <span className="font-semibold text-brand-300">
@@ -115,7 +115,7 @@ export default function Hero() {
           </p>
 
           {/* Secondary CTA - the form is the primary ("Book a Demo Lab Setup") */}
-          <div data-hero-fade className="mt-6">
+          <div data-hero-fade className="mt-5">
             <Link
               href={hero.secondaryCta.href}
               className="group inline-flex items-center gap-2 rounded-full border border-white/25 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:border-brand-300 hover:text-brand-300"
@@ -128,7 +128,7 @@ export default function Hero() {
           {/* Proof points */}
           <dl
             data-hero-fade
-            className="mt-9 grid grid-cols-2 gap-x-5 gap-y-6 sm:grid-cols-4 sm:gap-x-4"
+            className="mt-7 grid grid-cols-2 gap-x-5 gap-y-6 sm:grid-cols-4 sm:gap-x-4"
           >
             {hero.proofPoints.map((p) => (
               <div key={p.label}>
@@ -150,7 +150,7 @@ export default function Hero() {
           {/* Trusted by */}
           <div
             data-hero-fade
-            className="mt-9 rounded-2xl border border-white/12 bg-white/[0.045] p-4 backdrop-blur-sm"
+            className="mt-6 rounded-2xl border border-white/12 bg-white/[0.045] p-3.5 backdrop-blur-sm"
           >
             <p className="text-xs font-medium text-white/60">
               {hero.trustedByLabel}
@@ -180,7 +180,7 @@ export default function Hero() {
             data-hero-fade
             type="button"
             onClick={() => scrollToTarget("#labs")}
-            className="group mt-9 flex items-center gap-3 text-white/55 transition-colors hover:text-brand-300"
+            className="group mt-6 flex items-center gap-3 text-white/55 transition-colors hover:text-brand-300 lg:hidden"
           >
             <span className="flex h-9 w-6 items-center justify-center rounded-full border border-current">
               <Icon name="mouse" className="h-4 w-4" />

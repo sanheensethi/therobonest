@@ -271,7 +271,7 @@ export default function Wanderer() {
           key={flight.key}
           ref={flierWrap}
           aria-hidden
-          className="fixed left-0 top-0 z-30 opacity-0"
+          className="fixed left-0 top-0 z-[5] opacity-0"
           style={{ transformOrigin: "50% 50%" }}
         >
           <Mascot
