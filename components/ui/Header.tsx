@@ -8,6 +8,7 @@ import { nav, contact, site } from "@/content/site";
 import { scrollToTarget } from "@/components/motion/SmoothScroll";
 import { asset } from "@/lib/asset";
 import Magnetic from "@/components/motion/Magnetic";
+import { openEnquiry } from "@/components/ui/EnquiryDrawer";
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -106,12 +107,13 @@ export default function Header() {
               {contact.phones[0]}
             </a>
             <Magnetic className="hidden sm:block">
-              <Link
-                href="/contact"
+              <button
+                type="button"
+                onClick={openEnquiry}
                 className="block rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-paper shadow-sm transition-all hover:bg-brand-600 hover:shadow-md"
               >
                 Book a Demo
-              </Link>
+              </button>
             </Magnetic>
 
             <button

@@ -10,7 +10,7 @@ import { registerGsap, prefersReducedMotion } from "@/lib/motion";
  * leave. Projectiles, embers and impact rings are drawn on a full-screen
  * canvas that exists only while the scene is running.
  *
- * First one 12-20s after load, then every 45-80s. Works on phones too.
+ * First one 22-34s after load, then every 90-150s. Works on phones too.
  * Everything sits at z-5, behind positioned page content, so the fight
  * happens *behind* forms and cards and never blocks a click.
  */
@@ -31,8 +31,8 @@ export default function Dogfight() {
     const next = (delay: number) => {
       t = window.setTimeout(() => setOn(true), delay);
     };
-    next(12000 + Math.random() * 8000);
-    const onDone = () => next(45000 + Math.random() * 35000);
+    next(22000 + Math.random() * 12000);
+    const onDone = () => next(90000 + Math.random() * 60000);
     window.addEventListener("dogfight:done", onDone);
     return () => {
       if (t) window.clearTimeout(t);

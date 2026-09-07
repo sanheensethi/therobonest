@@ -21,7 +21,7 @@ const OTHERS: Variant[] = ["drone", "crane", "rover", "ufo", "sparky", "bolt", "
 const FLIERS: Variant[] = ["drone", "ufo"];
 const GROUND = OTHERS.filter((v) => !FLIERS.includes(v));
 const FACES: Expression[] = ["neutral", "happy", "thinking", "surprised", "cool", "cheeky"];
-const MAX_VISITS = 20;
+const MAX_VISITS = 10;
 
 type Bot = { variant: Variant; face: Expression; fromLeft: boolean };
 type Visit = { key: number; bots: Bot[] };
@@ -59,8 +59,8 @@ export default function Wanderer() {
         setVisit({ key: Date.now(), bots: list });
       }, delay);
     };
-    next(3000 + Math.random() * 4000);
-    const onDone = () => next(10000 + Math.random() * 15000);
+    next(9000 + Math.random() * 6000);
+    const onDone = () => next(35000 + Math.random() * 40000);
     window.addEventListener("wanderer:done", onDone);
     return () => {
       if (t) window.clearTimeout(t);
@@ -83,8 +83,8 @@ export default function Wanderer() {
     const next = (delay: number) => {
       t = window.setTimeout(() => setFlight({ key: Date.now(), variant: pick(FLIERS) }), delay);
     };
-    next(2000 + Math.random() * 3000);
-    const onDone = () => next(6000 + Math.random() * 10000);
+    next(14000 + Math.random() * 8000);
+    const onDone = () => next(30000 + Math.random() * 40000);
     window.addEventListener("flier:done", onDone);
     return () => {
       if (t) window.clearTimeout(t);

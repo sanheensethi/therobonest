@@ -65,8 +65,11 @@ export default function HeroMedia({
    * copy falls back to the poster image, which is a single cached request.
    */
   allowVideo = true,
+  blend = "left",
 }: {
   allowVideo?: boolean;
+  /** Which edge dissolves into the navy: the left (split hero) or the bottom (stacked). */
+  blend?: "left" | "bottom" | "none";
 } = {}) {
   return (
     <div className="relative h-full w-full">
@@ -94,15 +97,14 @@ export default function HeroMedia({
 
         {/* Blend the media into the navy on every edge so it reads as one
             composition rather than a pasted-in rectangle. */}
-        <div aria-hidden className="absolute inset-0 bg-night/45" />
-        <div
-          aria-hidden
-          className="absolute inset-0 bg-gradient-to-r from-night/70 via-night/10 to-transparent"
-        />
-        <div
-          aria-hidden
-          className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-night/80 to-transparent"
-        />
+        {/* No uniform scrim: the copy no longer sits on the video. Only the
+            edge that meets the navy panel dissolves. */}
+        {blend === "left" && (
+          <div aria-hidden className="absolute inset-y-0 left-0 w-[38%] bg-gradient-to-r from-night via-night/55 to-transparent" />
+        )}
+        {blend === "bottom" && (
+          <div aria-hidden className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-night to-transparent" />
+        )}
       </div>
 
     </div>
