@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { nav, contact } from "@/content/site";
+import { nav, contact, site } from "@/content/site";
 import { scrollToTarget } from "@/components/motion/SmoothScroll";
 import { asset } from "@/lib/asset";
 import Magnetic from "@/components/motion/Magnetic";
@@ -71,7 +71,7 @@ export default function Header() {
               className="h-9 w-auto rounded-md"
             />
             <span className="font-display text-lg leading-none text-paper">
-              Robonest
+              {site.name}
             </span>
           </Link>
 

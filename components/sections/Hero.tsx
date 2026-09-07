@@ -83,7 +83,7 @@ export default function Hero() {
 
       <div className="relative z-10 mx-auto grid max-w-7xl gap-10 px-6 pb-24 pt-10 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-12 lg:pb-32 lg:pt-16 xl:grid-cols-[minmax(0,1fr)_400px]">
         {/* ---------- Left: copy + proof ---------- */}
-        <div className="max-w-xl">
+        <div className="max-w-2xl">
           <p
             data-hero-eyebrow
             className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-300"
@@ -91,14 +91,14 @@ export default function Hero() {
             {hero.eyebrow}
           </p>
 
-          <h1 className="mt-3 font-display text-[2.6rem] leading-[1.08] text-white sm:text-6xl lg:text-[4.1rem]">
+          <h1 className="mt-3 font-display text-[2.4rem] leading-[1.08] text-white sm:text-5xl lg:text-[3.4rem] xl:text-[3.7rem]">
             {hero.titleLines.map((line, i) => (
               <span
                 key={line}
                 data-hero-line
                 className="block overflow-hidden py-[0.04em]"
               >
-                <span className={i === 1 ? "text-gradient block" : "block"}>
+                <span className={i === hero.titleLines.length - 1 ? "text-gradient block" : "block"}>
                   {line}
                 </span>
               </span>

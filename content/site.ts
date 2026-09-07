@@ -41,10 +41,10 @@ export const nav = [
 
 export const hero = {
   eyebrow: "Robotics · AI · Astronomy labs for schools & colleges",
-  titleLines: ["Empowering the", "Next Generation of", "Innovators & Explorers"],
-  /** The second line renders with the cyan-to-violet gradient. */
+  titleLines: ["Empowering the Next", "Generation of", "Innovators & Explorers"],
+  /** The last line renders with the cyan-to-violet gradient. */
   body:
-    "Turnkey Robotics, AI and Astronomy labs for schools and colleges - complete with cutting-edge equipment, future-ready curricula and",
+    "Turnkey Robotics, AI and Astronomy labs for schools and colleges - complete with cutting-edge equipment, future-ready curricula",
   bodyHighlight: "dedicated expert educators on your campus.",
   /** Secondary call to action beside the form's primary one. */
   secondaryCta: { label: "Partner with Us", href: "/contact" },
