@@ -12,6 +12,9 @@ import Journey from "@/components/sections/Journey";
 import Schools from "@/components/sections/Schools";
 import FeaturedVideos from "@/components/sections/FeaturedVideos";
 import EnquiryForm from "@/components/sections/EnquiryForm";
+import ScrollFreeze from "@/components/sections/ScrollFreeze";
+import SpaceWarp from "@/components/sections/SpaceWarp";
+import { freeze, space } from "@/content/site";
 
 export default async function HomePage() {
   // Homepage shows only the people tagged for it, capped. If nobody is
@@ -26,10 +29,16 @@ export default async function HomePage() {
   return (
     <>
       <Hero />
+      <ScrollFreeze
+        frames={Array.from({ length: freeze.frameCount }, (_, i) => freeze.framePath(i + 1))}
+        captions={[...freeze.captions]}
+        poster={freeze.poster}
+      />
       <LabIndex />
       <Stats />
       <AboutShowcase />
       <LabsRail />
+      <SpaceWarp {...space} />
       <Hardware />
       <Team members={team} singleTier />
       <FeaturedVideos />

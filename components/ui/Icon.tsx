@@ -134,6 +134,13 @@ const ICONS: Record<string, React.ReactNode> = {
     </>
   ),
   arrow: <path d="M4 12h15m-5-5 5 5-5 5" />,
+  telescope: (
+    <>
+      <path d="M4 14l12-7 2 4-12 7z" />
+      <path d="M16 7l3-2 2 4-3 2" />
+      <path d="M10 15l-3 6M12 14l3 7" />
+    </>
+  ),
   chevronLeft: <path d="M15 5l-7 7 7 7" />,
   chevronRight: <path d="M9 5l7 7-7 7" />,
   close: <path d="M6 6l12 12M18 6L6 18" />,

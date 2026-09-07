@@ -59,6 +59,9 @@ export default function AboutShowcase() {
             >
               {aiFeatures.title}
             </h3>
+            <p data-reveal className="mt-3 max-w-lg text-sm leading-relaxed text-ink-700">
+              {aiFeatures.intro}
+            </p>
 
             <ul className="mt-8 space-y-4">
               {aiFeatures.items.map((item, i) => (

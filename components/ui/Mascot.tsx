@@ -28,7 +28,7 @@ import { registerGsap, prefersReducedMotion } from "@/lib/motion";
  * "celebrate", "make a face for a second" are one-off events, not state a
  * parent should have to hold and reset.
  */
-export type Variant = "nesty" | "sparky" | "bolt" | "pixel" | "puppy" | "crane" | "rover" | "ufo" | "drone";
+export type Variant = "nesty" | "sparky" | "bolt" | "pixel" | "puppy" | "crane" | "rover" | "ufo" | "drone" | "rocket";
 
 export type Expression =
   | "neutral"
@@ -121,7 +121,7 @@ const VARIANTS: Record<
     /** chest ornament */
     chest: "lights" | "screen" | "bolt" | "heart";
     /** Body plan. Biped is the default rig; the others swap torso + limbs. */
-    body?: "biped" | "puppy" | "crane" | "rover" | "ufo" | "drone";
+    body?: "biped" | "puppy" | "crane" | "rover" | "ufo" | "drone" | "rocket";
   }
 > = {
   nesty: {
@@ -180,6 +180,14 @@ const VARIANTS: Record<
     head: { x: 28, y: 34, w: 64, h: 46, r: 16 },
     face: { x: 35, y: 41, w: 50, h: 32, r: 12 },
     earR: 3, antenna: "none", torsoR: 8, chest: "lights", body: "drone",
+  },
+  // Nesty in a rocket: the head looks out of the nose section, fins for
+  // arms, a live flame underneath (flickers in idle). Flies in space scenes.
+  rocket: {
+    from: "#38bdf8", to: "#8b5cf6", accent: "#38bdf8",
+    head: { x: 30, y: 26, w: 60, h: 50, r: 26 },
+    face: { x: 36, y: 33, w: 48, h: 36, r: 18 },
+    earR: 4, antenna: "single", torsoR: 12, chest: "lights", body: "rocket",
   },
   ufo: {
     from: "#a78bfa", to: "#22d3ee", accent: "#e9d5ff",
@@ -606,6 +614,7 @@ const Mascot = forwardRef<MascotHandle, Props>(function Mascot(
       gsap.to($("[data-ufo-light]"), {
         opacity: 0.25, duration: 0.35, stagger: { each: 0.12, repeat: -1, yoyo: true }, ease: "sine.inOut",
       });
+      gsap.to($("[data-flame]"), { scaleY: 1.35, scaleX: 0.85, duration: 0.09, yoyo: true, repeat: -1, ease: "sine.inOut" });
       gsap.to($("[data-rotor] ellipse"), { scaleX: 0.15, transformOrigin: "50% 50%", duration: 0.08, yoyo: true, repeat: -1, ease: "sine.inOut" });
       gsap.to($("[data-beam]"), { opacity: 0.28, scaleX: 1.08, transformOrigin: "50% 0%", duration: 1.4, yoyo: true, repeat: -1, ease: "sine.inOut" });
       // Poses: arm angles measured on the rig (left arm UP = positive).
@@ -992,6 +1001,21 @@ const Mascot = forwardRef<MascotHandle, Props>(function Mascot(
             )}
           </>
         )}
+        {v.body === "rocket" && (
+          <>
+            {/* flame: three tongues, animated in idle */}
+            <g data-flame style={{ transformBox: "fill-box", transformOrigin: "50% 0%" }}>
+              <path d="M46 126 q14 30 28 0 q-6 6 -14 4 q-8 2 -14 -4z" fill="#fb923c" />
+              <path d="M51 126 q9 20 18 0 q-4 4 -9 3 q-5 1 -9 -3z" fill="#fde68a" />
+              <path d="M55 126 q5 11 10 0 q-3 2 -5 2 q-2 0 -5 -2z" fill="#fff" />
+            </g>
+            {/* rocket body */}
+            <path d="M38 78 q22 -30 44 0 v44 q0 6 -6 6 h-32 q-6 0 -6 -6z" fill={`url(#${gid}-body)`} />
+            <rect x="52" y="96" width="16" height="16" rx="8" fill="#0a1326" opacity="0.55" />
+            <circle cx="60" cy="104" r="4" fill="#38bdf8" />
+            <rect x="44" y="118" width="32" height="6" rx="3" fill="#1f2937" opacity="0.6" />
+          </>
+        )}
         {v.body === "drone" && (
           <>
             {/* rotor arms */}
@@ -1108,7 +1132,7 @@ const Mascot = forwardRef<MascotHandle, Props>(function Mascot(
             </>
           ) : v.body === "crane" ? (
             <rect x="46" y="18" width="28" height="10" rx="2" fill="#1f2937" />
-          ) : v.body === "drone" ? null : (
+          ) : v.body === "drone" || v.body === "rocket" ? null : (
             <>
               <rect x={v.head.x - 6} y="46" width="8" height="20" rx={v.earR} fill={v.to} />
               <rect x={v.head.x + v.head.w - 2} y="46" width="8" height="20" rx={v.earR} fill={v.from} />
@@ -1258,6 +1282,16 @@ const Mascot = forwardRef<MascotHandle, Props>(function Mascot(
         {/* limbs - pivot at the shoulder. Drawn AFTER the head so a raised arm
             (celebrate, wave) crosses in front of the face instead of vanishing
             behind it. Each body plan supplies its own pair. */}
+        {v.body === "rocket" && (
+          <>
+            <g data-arm-l>
+              <path d="M38 100 L22 126 L38 122 Z" fill={v.to} />
+            </g>
+            <g data-arm-r>
+              <path d="M82 100 L98 126 L82 122 Z" fill={v.from} />
+            </g>
+          </>
+        )}
         {v.body === "drone" && (
           <>
             <g data-arm-l>

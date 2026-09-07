@@ -25,7 +25,7 @@ export default function LabIndex() {
   return (
     <section data-nesty="lab-index" ref={ref} className="bg-sand">
       <div className="mx-auto max-w-7xl px-6 pb-16 pt-4 lg:pb-20">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-4 sm:grid-cols-3">
           {labs.map((lab, i) => {
             const tint = TINTS[lab.tint] ?? TINTS.blue;
             return (

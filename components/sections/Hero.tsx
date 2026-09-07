@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { hero, schools } from "@/content/site";
 import { registerGsap, prefersReducedMotion } from "@/lib/motion";
 import { scrollToTarget } from "@/components/motion/SmoothScroll";
@@ -113,6 +114,17 @@ export default function Hero() {
               {hero.bodyHighlight}
             </span>
           </p>
+
+          {/* Secondary CTA - the form is the primary ("Book a Demo Lab Setup") */}
+          <div data-hero-fade className="mt-6">
+            <Link
+              href={hero.secondaryCta.href}
+              className="group inline-flex items-center gap-2 rounded-full border border-white/25 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:border-brand-300 hover:text-brand-300"
+            >
+              {hero.secondaryCta.label}
+              <Icon name="arrow" className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </Link>
+          </div>
 
           {/* Proof points */}
           <dl

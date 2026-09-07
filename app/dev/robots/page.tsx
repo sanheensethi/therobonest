@@ -13,7 +13,7 @@ import Mascot, {
  * Not linked from anywhere and excluded from the sitemap. Use it to check a
  * new expression or body plan without hunting for it on the real pages.
  */
-const VARIANTS: Variant[] = ["nesty", "sparky", "bolt", "pixel", "crane", "rover", "ufo", "drone"];
+const VARIANTS: Variant[] = ["nesty", "sparky", "bolt", "pixel", "crane", "rover", "ufo", "drone", "rocket"];
 const EXPRESSIONS: Expression[] = [
   "neutral", "happy", "surprised", "thinking", "sad", "wink", "sleepy", "love",
   "giggle", "cool", "dizzy", "proud", "cheeky", "angry",

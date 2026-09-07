@@ -5,20 +5,21 @@
  */
 
 export const site = {
-  name: "Robonest",
-  legalName: "Robonest Private Limited",
-  tagline: "Creating AI & Robotics Schools",
+  name: "RoboNest",
+  legalName: "RoboNest Pvt. Ltd.",
+  tagline: "Empowering the Next Generation of Innovators and Explorers",
   description:
-    "Robonest transforms education through Robotics, Artificial Intelligence, Coding and STEM lab solutions for schools across India.",
+    "Turnkey Robotics, AI and Astronomy labs for schools and colleges - complete with cutting-edge equipment, future-ready curricula and dedicated expert educators.",
   url: "https://www.therobonest.com",
 } as const;
 
 export const contact = {
-  addressLabel: "Branch Office",
-  address: "E-22, Sector-72, Noida, Uttar Pradesh",
-  phones: ["8860788886", "7217704018", "9953610316"],
+  addressLabel: "Registered Office",
+  address: "Ground Floor, B-1057/1, Kh. No. 204, Gali No. 6, Khajoori Khas, New Delhi 110094",
+  /** First number is WhatsApp-enabled; second is the office landline. */
+  phones: ["8860788886", "0120-5278820"],
   email: "robonestacc@gmail.com",
-  mapQuery: "E-22, Sector 72, Noida, Uttar Pradesh, India",
+  mapQuery: "B-1057/1, Gali No 6, Khajoori Khas, New Delhi 110094, India",
 } as const;
 
 /**
@@ -39,18 +40,20 @@ export const nav = [
 ] as const;
 
 export const hero = {
-  eyebrow: "India's trusted partner for",
-  titleLines: ["Future-Ready", "School Labs"],
+  eyebrow: "Robotics · AI · Astronomy labs for schools & colleges",
+  titleLines: ["Empowering the", "Next Generation of", "Innovators & Explorers"],
   /** The second line renders with the cyan-to-violet gradient. */
   body:
-    "Complete Robotics, AI & IoT labs with curriculum, kits, software & teacher training",
-  bodyHighlight: "installed in just 10 days.",
+    "Turnkey Robotics, AI and Astronomy labs for schools and colleges - complete with cutting-edge equipment, future-ready curricula and",
+  bodyHighlight: "dedicated expert educators on your campus.",
+  /** Secondary call to action beside the form's primary one. */
+  secondaryCta: { label: "Partner with Us", href: "/contact" },
   /** Trust strip under the headline. `icon` maps to components/ui/Icon.tsx. */
   proofPoints: [
     { icon: "cap", value: "10,000+", label: "Students Reached" },
-    { icon: "clock", value: "Complete Setup", label: "in ~10 Days" },
-    { icon: "badge", value: "NEP Aligned", label: "Curriculum" },
-    { icon: "support", value: "Teacher Training", label: "& Support" },
+    { icon: "clock", value: "Turnkey Setup", label: "labs live in ~10 days" },
+    { icon: "support", value: "Certified Educators", label: "placed on campus" },
+    { icon: "badge", value: "Future-Ready", label: "curricula" },
   ],
   trustedByLabel: "Trusted by Leading Schools",
   scrollCue: "Scroll to explore",
@@ -58,7 +61,7 @@ export const hero = {
   techBadges: [
     { icon: "robot", label: "Robotics" },
     { icon: "ai", label: "AI" },
-    { icon: "iot", label: "IoT" },
+    { icon: "telescope", label: "Astronomy" },
     { icon: "code", label: "Coding" },
   ],
 } as const;
@@ -90,46 +93,49 @@ export const heroMedia = {
 
 /** Compact lead-capture form in the hero. */
 export const heroForm = {
-  title: "Bring Innovation to Your School",
-  subtitle: "Enquire now for your school lab",
+  title: "Book a Demo Lab Setup",
+  subtitle: "For schools and colleges - we come to your campus",
   note: "Our team will connect with you shortly!",
-  submit: "Submit Enquiry",
+  submit: "Book a Demo",
 } as const;
 
 /** Grounded in real site copy only - no invented figures. */
 export const stats = [
   { value: 10000, suffix: "+", label: "Students Empowered" },
-  { value: 10, suffix: " Days", label: "Complete Lab Setup" },
-  { value: 5, suffix: "", label: "Modular Lab Solutions" },
-  { value: 12, suffix: "", label: "Grades Covered (1-12)" },
+  { value: 10, suffix: " Days", label: "Turnkey Lab Setup" },
+  { value: 3, suffix: "", label: "Lab Programmes - Robotics, AI, Astronomy" },
+  { value: 100, suffix: "%", label: "Educator-Led - certified instructors on campus" },
 ] as const;
 
 export const about = {
-  eyebrow: "About Us",
-  titleLines: ["Redefining modern", "learning"],
+  eyebrow: "About RoboNest",
+  titleLines: ["Hands-on STEM,", "on your campus"],
   body:
-    "With engaging lessons and a curriculum that is both dynamic and innovative, we create an atmosphere that keeps students motivated from start to finish.",
+    "RoboNest is transforming STEM education by bringing hands-on, experiential learning directly to academic campuses. We partner with progressive schools and colleges to design, build and operate state-of-the-art innovation labs.",
   extra:
-    "At Robonest, we are revolutionizing the way we learn and train with cutting-edge AI technology. Our platform is designed to make learning more efficient, personalized and accessible than ever before.",
+    "Beyond delivering cutting-edge hardware, we provide certified, expert educators who manage daily lab operations, guide students through project-based learning and ensure seamless curriculum delivery.",
 } as const;
 
+/** "The RoboNest Advantage" - rendered beside the About copy. */
 export const aiFeatures = {
-  title: "Unlock the Power of AI-Driven Learning",
+  title: "The RoboNest Advantage: the Embedded Educator Model",
+  intro:
+    "A lab is only as effective as the mentor guiding it. RoboNest removes the training burden from institutions entirely.",
   items: [
     {
-      title: "Personalized Learning Paths",
+      title: "Certified In-House Instructors",
       body:
-        "Our AI-powered system creates customized learning journeys tailored to your unique needs and goals.",
+        "Rigorously trained STEM educators placed on your campus, full-time or part-time.",
     },
     {
-      title: "Real-Time Feedback and Assessment",
+      title: "Turnkey Management",
       body:
-        "Get instant feedback and assessment on your progress, helping you stay on track and achieve your objectives.",
+        "Complete responsibility for lesson plans, hardware maintenance, inventory and student assessments.",
     },
     {
-      title: "Immersive Interactive Experiences",
+      title: "Interdisciplinary Learning",
       body:
-        "Engage with interactive simulations, virtual labs and gamification elements that make learning fun and effective.",
+        "Lessons structured to reinforce core physics, mathematics and computer science through practical experimentation.",
     },
   ],
 } as const;
@@ -159,10 +165,10 @@ export const hardware: HardwareItem[] = [
 ];
 
 export const labsIntro = {
-  eyebrow: "Modular Lab Solutions",
-  title: "Transform Learning with Our Future Leaders Lab Solutions",
+  eyebrow: "Our Labs",
+  title: "Three labs. One turnkey model.",
   body:
-    "From foundational tinkering spaces to advanced Artificial Intelligence centres - we deliver modular, NEP-aligned ecosystems equipped with authentic LEGO® Education and Arduino technologies, and our signature RoboGenius kits.",
+    "Robotics & Automation, Artificial Intelligence & Coding, and Astronomy & Space Science - each delivered complete with equipment, a future-ready curriculum and a certified educator on your campus.",
 } as const;
 
 export type Lab = {
@@ -179,83 +185,48 @@ export type Lab = {
 
 export const labs: Lab[] = [
   {
-    id: "integrated",
-    icon: "lab",
+    id: "robotics",
+    icon: "robot",
     tint: "amber",
-    badge: "Foundation",
-    grades: "Grades 1-12",
-    title: "Integrated Lab Solution",
+    badge: "Build",
+    grades: "Schools & Colleges",
+    title: "Robotics & Automation Lab",
     body:
-      "Transforms traditional classrooms into innovation hubs where students learn through experimentation, coding, robotics and real-world applications.",
+      "Practical mechanics, sensors, microcontrollers and circuit design - students build functional robots and IoT prototypes, not just read about them.",
     features: [
-      { label: "LEGO® Kits", detail: "Robotics and coding fundamentals." },
-      { label: "Arduino Kits", detail: "Advanced AI and IoT prototyping." },
-      { label: "RoboGenius Kits", detail: "Core electronics and hands-on tinkering." },
-      { label: "Scalable Progression", detail: "From block-based logic to Python." },
-    ],
-  },
-  {
-    id: "curriculum",
-    icon: "book",
-    tint: "green",
-    badge: "Curriculum",
-    grades: "Grades 1-12",
-    title: "Curriculum Base",
-    body:
-      "A well-designed curriculum that introduces students to AI, Robotics, Coding and Innovation through age-appropriate practical activities and projects.",
-    features: [
-      { label: "Curriculum-Based Learning", detail: "AI & robotics mapped to grade level." },
-      { label: "Hands-on Training", detail: "Project-based practical sessions." },
-      { label: "Teacher Support", detail: "Expert mentorship and training." },
-      { label: "Future-Ready Skills", detail: "Industry-oriented technology exposure." },
-    ],
-  },
-  {
-    id: "arduino",
-    icon: "chip",
-    tint: "blue",
-    badge: "Industry Ready",
-    grades: "Grades 6-12",
-    title: "Arduino Inspiration Lab",
-    body:
-      "The engineering frontier focusing on the Internet of Things (IoT) and electronic circuits using the Arduino UNO R4 and Explore IoT Kit.",
-    features: [
-      { label: "Real-World IoT", detail: "Design deployable IoT solutions." },
-      { label: "Cloud Connectivity", detail: "Real-time data collection." },
-      { label: "Wireless Prototyping", detail: "Wi-Fi & Bluetooth enabled builds." },
-      { label: "Circuit Design", detail: "Electrical and electronic fundamentals." },
-    ],
-  },
-  {
-    id: "iot",
-    icon: "cog",
-    tint: "ember",
-    badge: "Industry Ready",
-    grades: "Grades 6+",
-    title: "Electronics, IoT & Robotics Lab",
-    body:
-      "Our core engineering setup focused heavily on real-world application, bridging core electronics with the Internet of Things and functional robotics.",
-    features: [
-      { label: "Extensive Curriculum", detail: "30+ comprehensive hands-on projects." },
-      { label: "Automation & Control", detail: "Build and program mechanical systems." },
-      { label: "Robust Hardware", detail: "50+ diverse electronic components." },
-      { label: "Core Focus", detail: "Deep dive into electronics and IoT." },
+      { label: "Hands-on Engineering", detail: "Mechanics, sensors, microcontrollers and circuit design." },
+      { label: "Project-Based Kits", detail: "Build functional robots and IoT prototypes." },
+      { label: "Competition Prep", detail: "Coaching for national and international robotics leagues." },
     ],
   },
   {
     id: "ai",
     icon: "brain",
     tint: "violet",
-    badge: "Advanced Tech",
-    grades: "Grades 6-12",
-    title: "Artificial Intelligence (A.I.) Lab",
+    badge: "Code",
+    grades: "Schools & Colleges",
+    title: "Artificial Intelligence & Coding Lab",
     body:
-      "A scalable AI ecosystem. While the Arduino Alvik introduces robotics to younger students, the Tiny ML Kit empowers seniors to deploy real ML models.",
+      "Python, machine-learning logic, computer vision and data fundamentals - taught in safe sandboxes where students build real AI applications.",
     features: [
-      { label: "Tiny Machine Learning", detail: "Run ML on microcontrollers." },
-      { label: "Arduino Alvik", detail: "Smart robotic companion." },
-      { label: "Python & TensorFlow Lite", detail: "Real framework integration." },
-      { label: "Sensor-Based AI", detail: "Environmental interaction models." },
+      { label: "Practical Modules", detail: "Python, ML logic, computer vision and data fundamentals." },
+      { label: "Safe Sandboxes", detail: "Build real-world AI applications and conversational tools." },
+      { label: "Ethical AI", detail: "Training designed to foster critical thinking and digital literacy." },
+    ],
+  },
+  {
+    id: "astronomy",
+    icon: "telescope",
+    tint: "blue",
+    badge: "Explore",
+    grades: "Schools & Colleges",
+    title: "Astronomy & Space Science Lab",
+    body:
+      "Professional telescopes, solar scopes and a digital sky observatory - with sky-watching sessions, astrophotography and orbital mechanics workshops.",
+    features: [
+      { label: "Professional Optics", detail: "Optical telescopes, solar scopes and digital sky observatories." },
+      { label: "Practical Sessions", detail: "Sky-watching, astrophotography and orbital mechanics workshops." },
+      { label: "Celestial Mapping", detail: "Interactive software aligned with global space-science frameworks." },
     ],
   },
 ];
@@ -346,9 +317,9 @@ export const schools = {
 
 export const ctaForm = {
   eyebrow: "Contact us",
-  title: "Ready to Transform Your School?",
+  title: "Ready to bring a lab to your campus?",
   body:
-    "Get a free consultation with our education experts. We will help you design the perfect robotics lab solution for your school's unique needs and budget.",
+    "Book a demo lab setup or partner with us. Our team will design the right Robotics, AI or Astronomy lab for your school or college - equipment, curriculum and educators included.",
   designations: [
     "Principal",
     "Headmaster",
@@ -360,6 +331,8 @@ export const ctaForm = {
     "Teacher / HOD",
     "School Manager",
     "Trustee / Director",
+    "College Dean / HOD",
+    "Chairperson",
     "Other",
   ],
 } as const;
@@ -410,7 +383,7 @@ export const videosPage = {
   eyebrow: "Watch",
   title: "Robonest in Action",
   body:
-    "Lab installations, student projects, exhibitions and teacher training - see what a Robonest classroom actually looks like.",
+    "Lab installations, student projects, exhibitions and educator-led sessions - see what a RoboNest lab actually looks like.",
   categories: ["All", "Lab Setup", "Student Projects", "Astronomy", "Events"],
   items: [
     {
@@ -439,7 +412,7 @@ export const videosPage = {
     },
     {
       youtubeId: "dQw4w9WgXcQ",
-      title: "Teacher Training Programme",
+      title: "An Educator-Led Lab Session",
       category: "Lab Setup",
       duration: "6:15",
     },
@@ -457,67 +430,67 @@ export const videosPage = {
 export const aboutPage = {
   hero: { eyebrow: "About Us", title: "About Robonest" },
   intro: [
-    "Robonest is a forward-thinking technology company dedicated to transforming education through innovation. We specialize in Robotics, Artificial Intelligence (AI), Coding, STEM education and advanced lab solutions for schools and institutions.",
-    "At Robonest, we believe that the future belongs to creators, innovators and problem-solvers. Our mission is to equip students with 21st-century skills by providing hands-on learning experiences that go beyond textbooks. We design and implement smart labs - including AI Labs, Robotics Labs, Language Labs, ATL Labs and Digital Classrooms - to create an interactive and future-ready learning environment.",
-    "Our team consists of experienced engineers, educators and technology experts who are passionate about empowering young minds. From installation and training to ongoing support, we ensure seamless implementation and long-term success for every institution we work with.",
+    "RoboNest is transforming STEM education by bringing hands-on, experiential learning directly to academic campuses. We partner with progressive schools and colleges to design, build and operate state-of-the-art innovation labs.",
+    "Beyond just delivering cutting-edge hardware, we provide certified, expert educators who manage daily lab operations, guide students through project-based learning and ensure seamless curriculum delivery.",
+    "Our three programmes - Robotics & Automation, Artificial Intelligence & Coding, and Astronomy & Space Science - are structured to reinforce core physics, mathematics and computer science through practical experimentation.",
   ],
   focus: {
     title: "We focus on",
     items: [
-      "Practical, hands-on learning",
-      "Industry-relevant curriculum",
-      "Affordable and scalable solutions",
-      "Complete setup, training & support",
-      "Future-ready technology integration",
+      "Certified in-house instructors on your campus",
+      "Turnkey management - lessons, maintenance, inventory, assessment",
+      "Interdisciplinary, project-based learning",
+      "Three lab tracks: Robotics, AI, Astronomy",
+      "Competition preparation for robotics leagues",
     ],
   },
-  closing: "At Robonest, we do not just build labs - we build innovators.",
+  closing: "At RoboNest, we do not just build labs - we run them, so your students can explore.",
   why: {
-    eyebrow: "Why?",
-    title: "Why Choose Us?",
+    eyebrow: "The RoboNest Advantage",
+    title: "The Embedded Educator Model",
     items: [
       {
-        title: "Cutting-Edge Technology",
+        title: "Certified In-House Instructors",
         body:
-          "Our AI-powered platform is built on the latest advancements in machine learning and natural language processing.",
+          "Rigorously trained STEM educators placed on your campus full-time or part-time - no training burden on your staff.",
       },
       {
-        title: "Expert Content Creators",
+        title: "Turnkey Management",
         body:
-          "Our team of experts curate high-quality, relevant and engaging content that is tailored to your needs.",
+          "Complete responsibility for lesson plans, hardware maintenance, inventory and student assessments.",
       },
       {
-        title: "Continuous Innovation",
+        title: "Interdisciplinary Learning",
         body:
-          "We are constantly updating and improving our platform to ensure you stay ahead of the curve.",
+          "Lessons structured to reinforce core physics, mathematics and computer science concepts through practical experimentation.",
       },
     ],
   },
   programs: {
-    eyebrow: "About Us",
-    title: "Empowering the Next Generation with AI Education",
+    eyebrow: "Our Labs",
+    title: "Three labs, delivered turnkey",
     body:
-      "Prepare students for the future with our AI training programs, designed to integrate seamlessly into school and college curricula. Our expert-led courses and workshops equip students with the skills and knowledge needed to thrive in an AI-driven world.",
+      "Every programme arrives complete: the equipment, a future-ready curriculum and a certified RoboNest educator who runs it on your campus.",
     items: [
       {
-        title: "AI Fundamentals",
-        body: "Introduction to AI, machine learning and data science.",
+        title: "Robotics & Automation",
+        body: "Mechanics, sensors, microcontrollers, circuit design - and competition prep.",
       },
       {
-        title: "Real-World Projects",
-        body: "Collaborate with industry partners on real-world AI projects and competitions.",
+        title: "Artificial Intelligence & Coding",
+        body: "Python, ML logic, computer vision and ethical-AI training in safe sandboxes.",
       },
       {
-        title: "Practical Applications",
+        title: "Astronomy & Space Science",
         body:
-          "Hands-on projects and case studies in image recognition, natural language processing and more.",
+          "Telescopes, solar scopes, digital sky observatories, astrophotography and orbital mechanics.",
       },
     ],
   },
   cta: {
-    titleLines: ["Experience the real", "Learning of Artificial Intelligence & Robotics"],
-    body: "Join us and create the future with us.",
-    action: "Book an Appointment",
+    titleLines: ["Bring a RoboNest lab", "to your campus"],
+    body: "Book a demo lab setup, or partner with us to run innovation labs across your institution.",
+    action: "Book a Demo Lab Setup",
   },
 } as const;
 
@@ -527,28 +500,28 @@ export const contactPage = {
   eyebrow: "Contact us",
   title: "Let us build your lab",
   body:
-    "Talk to us about lab solutions, curriculum, training or anything else related to Robonest.",
+    "Talk to us about a Robotics, AI or Astronomy lab for your school or college, partnerships, or anything else RoboNest.",
   responseNote: "We typically respond within 1-2 business days.",
   faq: [
     {
-      q: "Which grades do your labs support?",
-      a: "Our modular solutions span Grades 1 to 12. Foundation tinkering and LEGO® based robotics start from Grade 1, while Arduino IoT and Artificial Intelligence labs are designed for Grades 6 and above.",
+      q: "Who are the labs for?",
+      a: "Schools and colleges. Each of our three programmes - Robotics & Automation, AI & Coding, and Astronomy & Space Science - is delivered with an age-appropriate curriculum, from school classes through to undergraduate cohorts.",
     },
     {
       q: "How long does a complete lab setup take?",
-      a: "A standard lab is delivered, installed and made classroom-ready in about 10 days from confirmation, including hardware installation and initial teacher orientation.",
+      a: "A standard lab is delivered, installed and ready to run in about 10 days from confirmation - hardware, curriculum and the educator who will run it.",
     },
     {
       q: "Is the curriculum aligned to NEP?",
       a: "Yes. Our lab ecosystems and curriculum are NEP-aligned and built around age-appropriate, project-based progression from block-based logic through to Python and machine learning.",
     },
     {
-      q: "Do you train our existing teachers?",
-      a: "We do. Every installation includes expert mentorship and teacher training, plus ongoing academic support so your staff can run sessions independently.",
+      q: "Who runs the lab day to day?",
+      a: "We do - that is the RoboNest difference. A certified in-house instructor is placed on your campus, full-time or part-time, and takes complete responsibility for lesson plans, hardware maintenance, inventory and student assessments. There is no training burden on your staff.",
     },
     {
-      q: "What hardware is included?",
-      a: "Depending on the lab tier: authentic LEGO® Education kits, Arduino UNO R4 and Explore IoT kits, Arduino Alvik robots, Tiny ML kits and our signature RoboGenius electronics kits - 50+ components and 30+ guided projects in the Electronics, IoT & Robotics tier.",
+      q: "What equipment is included?",
+      a: "Robotics: microcontrollers, sensors, mechanics and project kits for building robots and IoT prototypes. AI: coding workstations with safe sandboxes for Python, machine learning and computer vision. Astronomy: professional optical telescopes, solar scopes, a digital sky observatory and celestial mapping software.",
     },
     {
       q: "Do you provide support after installation?",
@@ -567,15 +540,15 @@ export const contactPage = {
 export const mascot = {
   name: "Nesty",
   greeting:
-    "Hi! I'm Nesty, Robonest's lab robot. Ask me about our labs, or tap a question below.",
+    "Hi! I'm Nesty, RoboNest's lab robot. Ask me about our labs, or tap a question below.",
   placeholder: "Ask Nesty…",
   fallback:
     "Good question - that one's for a human. Tap WhatsApp and the team will answer directly, or leave your details and we'll call you.",
   quickReplies: [
     "What labs do you offer?",
+    "Who runs the lab?",
     "How long does setup take?",
-    "Which grades is it for?",
-    "Do you train our teachers?",
+    "Is it for colleges too?",
     "How do I get pricing?",
   ],
   /** Keyword-matched answers. First match wins; keep keywords lowercase. */
@@ -583,22 +556,22 @@ export const mascot = {
     {
       keywords: ["lab", "labs", "offer", "solution", "product"],
       answer:
-        "We set up five modular labs: Integrated Lab (grades 1-12), Curriculum Base, Arduino Inspiration Lab (6-12), AI & Robotics Lab and the Astronomy Lab. Each comes with kits, curriculum, software and teacher training. Scroll to the Labs section for details.",
+        "Three turnkey labs: Robotics & Automation, Artificial Intelligence & Coding, and Astronomy & Space Science. Each comes complete with equipment, a future-ready curriculum and a certified RoboNest educator on your campus. Scroll to the Labs section for details.",
     },
     {
       keywords: ["long", "time", "setup", "install", "days", "fast", "quick"],
       answer:
-        "A complete lab - hardware, furniture, curriculum and trained teachers - is installed in about 10 working days from sign-off.",
+        "A complete lab - equipment, curriculum and the educator who runs it - is up and running in about 10 working days from sign-off.",
     },
     {
-      keywords: ["grade", "grades", "class", "age", "standard", "nep"],
+      keywords: ["grade", "grades", "class", "age", "standard", "nep", "college", "colleges", "university", "school"],
       answer:
-        "Grades 1 to 12. The curriculum is NEP-2020 aligned and progresses from block coding with LEGO® Education in the junior classes to Python, Arduino and AI projects in the senior classes.",
+        "Schools and colleges. Each programme has an age-appropriate curriculum - from school classes up to undergraduate cohorts - structured to reinforce physics, mathematics and computer science through practical work.",
     },
     {
-      keywords: ["teacher", "train", "training", "staff", "support"],
+      keywords: ["teacher", "train", "training", "staff", "support", "who runs", "instructor", "educator", "mentor"],
       answer:
-        "Yes. Every lab includes hands-on teacher training and ongoing support from our education team, so your own staff can run the sessions confidently.",
+        "We run it. A certified RoboNest instructor is placed on your campus - full-time or part-time - and handles lesson plans, hardware maintenance, inventory and assessments. Your staff carry no training burden.",
     },
     {
       keywords: ["price", "pricing", "cost", "quote", "budget", "fee", "rate", "demo"],
@@ -608,7 +581,7 @@ export const mascot = {
     {
       keywords: ["where", "location", "noida", "delhi", "city", "office", "address"],
       answer:
-        "We're based in Noida (Sector 72) and install labs across India. Travel is included in the setup.",
+        "We're based in New Delhi (Khajoori Khas) and set up labs across India. Travel is included in the setup.",
     },
     {
       keywords: ["event", "exhibition", "workshop", "showcase"],
@@ -630,12 +603,12 @@ export const mascot = {
    * them to one short sentence - it is a speech bubble, not a paragraph.
    */
   sectionTips: {
-    "lab-index": "These are our five labs. Tap any card to jump to the details.",
-    stats: "Real numbers - 10,000+ students have built with us so far.",
+    "lab-index": "Our three labs. Tap any card to jump to the details.",
+    stats: "Real numbers - 10,000+ students, and every lab educator-led.",
     about: "Who we are, and why we do this.",
-    labs: "Swipe through the labs. Each one comes with kits, curriculum and teacher training.",
+    labs: "Three labs - Robotics, AI, Astronomy. Each comes with its own RoboNest educator.",
     hardware: "The actual hardware your students will work with - Arduino, sensors and more.",
-    team: "The people who will set up and support your lab.",
+    team: "The people who set up your lab - and the educators who run it.",
     videos: "See a real lab in action - pick any video.",
     gallery: "Photos from labs and events we've run.",
     journey: "How Robonest grew, year by year.",
@@ -647,5 +620,33 @@ export const mascot = {
     "video-grid": "Our full video library. Shorts are marked.",
     contact: "Call, WhatsApp or drop a note - whichever is easiest for you.",
     "about-body": "Our story, mission and the team behind Robonest.",
+    freeze: "Scroll slowly - time is stopped, you're moving the camera.",
+    space: "Keep scrolling. You're flying. This is the Astronomy Lab.",
   } as Record<string, string>,
+} as const;
+
+/**
+ * Scroll-driven showpieces on the homepage.
+ * `freeze` is the time-stop moment after the hero: a frame sequence the
+ * visitor scrubs through by scrolling. Frames live in public/images/freeze/
+ * (f-001.webp ...). The current set is a placeholder cut from the hero clip;
+ * replace with the "frozen classroom orbit" frames when generated.
+ */
+export const freeze = {
+  frameCount: 60,
+  framePath: (i: number) => `/images/freeze/f-${String(i).padStart(3, "0")}.webp`,
+  poster: "/images/bg/hero-poster.jpg",
+  captions: [
+    { at: 0, kicker: "The bell rings", text: "And for a moment, everything stops." },
+    { at: 0.3, kicker: "Look closer", text: "Every build, every wire, every idea mid-air." },
+    { at: 0.6, kicker: "This is the lab", text: "Where curiosity gets its hands dirty." },
+  ],
+} as const;
+
+export const space = {
+  eyebrow: "Astronomy & Space Science Lab",
+  title: "Some labs look up.",
+  body: "Professional optical telescopes, solar scopes and a digital sky observatory - with sky-watching sessions, astrophotography and orbital mechanics workshops, run by a RoboNest educator on your campus.",
+  cta: "Explore the Astronomy Lab",
+  href: "/#labs",
 } as const;
