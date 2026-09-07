@@ -37,6 +37,48 @@ export default function Gallery() {
   const stripRef = useRef<HTMLDivElement | null>(null);
   const openedAt = useRef<number | null>(null);
 
+  // ---- slider ----
+  const sliderRef = useRef<HTMLDivElement | null>(null);
+  const [slide, setSlide] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const goTo = useCallback((i: number) => {
+    const n = gallery.images.length;
+    const idx = ((i % n) + n) % n;
+    const el = sliderRef.current?.querySelector<HTMLElement>(`[data-slide="${idx}"]`);
+    if (el && sliderRef.current) {
+      const box = sliderRef.current;
+      box.scrollTo({ left: el.offsetLeft - (box.clientWidth - el.clientWidth) / 2, behavior: "smooth" });
+    }
+    setSlide(idx);
+  }, []);
+  // the centred slide is the active one (drag/swipe/scroll all update it)
+  useEffect(() => {
+    const box = sliderRef.current;
+    if (!box) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const hit = entries.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (hit) setSlide(Number((hit.target as HTMLElement).dataset.slide));
+      },
+      { root: box, threshold: [0.6, 0.8] }
+    );
+    box.querySelectorAll("[data-slide]").forEach((n) => io.observe(n));
+    return () => io.disconnect();
+  }, []);
+  // autoplay: every 4s, unless hovered, lightbox open, tab hidden or reduced motion
+  useEffect(() => {
+    if (paused || active !== null || prefersReducedMotion()) return;
+    const id = window.setInterval(() => {
+      if (document.visibilityState !== "visible") return;
+      const box = sliderRef.current;
+      if (!box) return;
+      const r = box.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > window.innerHeight) return; // off-screen: don't bother
+      goTo(slide + 1);
+    }, 4000);
+    return () => window.clearInterval(id);
+  }, [paused, active, slide, goTo]);
+
   // Strip: jump to the tapped photo on open, then let scrolling drive `active`.
   useEffect(() => {
     if (!isMobile || active === null) return;
@@ -201,36 +243,89 @@ export default function Gallery() {
       <div className="mx-auto max-w-7xl px-6 py-20 lg:py-28">
         <SectionHeading eyebrow={gallery.eyebrow} title={gallery.title} />
 
-        <div className="mt-12 grid auto-rows-[200px] grid-cols-2 gap-4 md:grid-cols-4">
-          {gallery.images.map((src, i) => (
-            <button
-              key={src}
-              ref={(n) => {
-                thumbsRef.current[i] = n;
-              }}
-              type="button"
-              data-reveal="scale"
-              onClick={() => {
-                zoomFromThumb.current = true;
-                setActive(i);
-              }}
-              aria-label={`Open gallery image ${i + 1}`}
-              className={[
-                "group relative overflow-hidden rounded-[var(--radius-card)] border border-ink/8",
-                i === 0 ? "col-span-2 row-span-2" : "",
-                i === 3 ? "md:col-span-2" : "",
-              ].join(" ")}
-            >
-              <Image
-                src={asset(src)}
-                alt={`Robonest lab session ${i + 1}`}
-                fill
-                sizes="(min-width: 768px) 33vw, 50vw"
-                className="object-cover transition-transform duration-700 ease-[var(--ease-brand)] group-hover:scale-[1.07]"
+        {/* Slider: one big slide centred with the neighbours peeking. Native
+            scroll-snap does the dragging/swiping; we add arrows, dots and a
+            gentle autoplay that pauses on hover or while the lightbox is open. */}
+        <div className="relative mt-12">
+          <div
+            ref={sliderRef}
+            data-lenis-prevent
+            className="no-scrollbar flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth px-[7vw] pb-2 lg:px-[27%]"
+            onMouseEnter={() => setPaused(true)}
+            onMouseLeave={() => setPaused(false)}
+          >
+            {gallery.images.map((src, i) => (
+              <button
+                key={src}
+                ref={(n) => {
+                  thumbsRef.current[i] = n;
+                }}
+                data-slide={i}
+                type="button"
+                onClick={() => {
+                  if (i !== slide) {
+                    goTo(i);
+                    return;
+                  }
+                  zoomFromThumb.current = true;
+                  setActive(i);
+                }}
+                aria-label={i === slide ? `Open gallery image ${i + 1}` : `Go to image ${i + 1}`}
+                className={[
+                  "group relative aspect-[16/10] w-[86vw] shrink-0 snap-center overflow-hidden rounded-[var(--radius-card)] border border-ink/8 bg-sand transition-[transform,opacity] duration-500 ease-[var(--ease-brand)] sm:w-[70vw] lg:w-[46%]",
+                  i === slide ? "scale-100 opacity-100" : "scale-[0.94] opacity-60",
+                ].join(" ")}
+              >
+                <Image
+                  src={asset(src)}
+                  alt={`Robonest lab session ${i + 1}`}
+                  fill
+                  sizes="(min-width: 1024px) 46vw, 86vw"
+                  className="object-cover transition-transform duration-700 ease-[var(--ease-brand)] group-hover:scale-[1.05]"
+                />
+                <span className="absolute inset-0 bg-night/0 transition-colors duration-500 group-hover:bg-night/25" />
+                {i === slide && (
+                  <span className="absolute bottom-3 right-3 rounded-full bg-paper/90 px-3 py-1 text-[11px] font-semibold text-ink opacity-0 transition-opacity group-hover:opacity-100">
+                    Click to enlarge
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* arrows */}
+          <button
+            type="button"
+            onClick={() => goTo(slide - 1)}
+            aria-label="Previous photo"
+            className="absolute left-3 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-ink text-paper shadow-lg shadow-ink/20 transition-all hover:scale-105 hover:bg-brand sm:flex lg:left-[10%]"
+          >
+            <Icon name="chevronLeft" className="h-5 w-5" strokeWidth={2} />
+          </button>
+          <button
+            type="button"
+            onClick={() => goTo(slide + 1)}
+            aria-label="Next photo"
+            className="absolute right-3 top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-ink text-paper shadow-lg shadow-ink/20 transition-all hover:scale-105 hover:bg-brand sm:flex lg:right-[10%]"
+          >
+            <Icon name="chevronRight" className="h-5 w-5" strokeWidth={2} />
+          </button>
+
+          {/* dots */}
+          <div className="mt-5 flex items-center justify-center gap-2">
+            {gallery.images.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => goTo(i)}
+                aria-label={`Photo ${i + 1}`}
+                className={[
+                  "h-2 rounded-full transition-all duration-300",
+                  i === slide ? "w-7 bg-brand" : "w-2 bg-ink/20 hover:bg-ink/40",
+                ].join(" ")}
               />
-              <span className="absolute inset-0 bg-night/0 transition-colors duration-500 group-hover:bg-night/35" />
-            </button>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
