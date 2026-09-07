@@ -136,7 +136,9 @@ export default function SpaceWarp({
 
     const render = () => {
       state.t += 0.016;
-      ctx.fillStyle = "#04091a";
+      // Same navy as the sections above and below so there is no hard edge;
+      // the star field then just "starts" inside the same dark.
+      ctx.fillStyle = "#0a1326";
       ctx.fillRect(0, 0, W, H);
 
       // stage weights: g = how galaxy, w = how word. The galaxy dissolves as
@@ -148,7 +150,7 @@ export default function SpaceWarp({
         const glow = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, Math.min(W, H) * 0.32);
         glow.addColorStop(0, `rgba(255,244,214,${0.55 * g})`);
         glow.addColorStop(0.25, `rgba(196,181,253,${0.25 * g})`);
-        glow.addColorStop(1, "rgba(4,9,26,0)");
+        glow.addColorStop(1, "rgba(10,19,38,0)");
         ctx.fillStyle = glow;
         ctx.fillRect(0, 0, W, H);
       }
@@ -371,10 +373,10 @@ export default function SpaceWarp({
       if (ticking) return;
       ticking = true; gsap.ticker.add(tick);
       flying = true;
-      if (rocket.current) gsap.set(rocket.current, { x: -80, y: H * 0.5 });
+      if (rocket.current) gsap.set(rocket.current, { x: -80, y: H * 0.5, opacity: 1 });
       flyNext();
       drifting = true;
-      if (ufo.current) gsap.set(ufo.current, { x: W * 0.7, y: H * 0.2 });
+      if (ufo.current) gsap.set(ufo.current, { x: W * 0.7, y: -120, opacity: 1 });
       driftNext();
     };
     const stop = () => {
@@ -382,8 +384,8 @@ export default function SpaceWarp({
       ticking = false; gsap.ticker.remove(tick);
       flying = false;
       drifting = false;
-      if (rocket.current) gsap.killTweensOf(rocket.current);
-      if (ufo.current) gsap.killTweensOf(ufo.current);
+      if (rocket.current) { gsap.killTweensOf(rocket.current); gsap.set(rocket.current, { opacity: 0 }); }
+      if (ufo.current) { gsap.killTweensOf(ufo.current); gsap.set(ufo.current, { opacity: 0 }); }
     };
 
     const st = ScrollTrigger.create({
@@ -418,15 +420,18 @@ export default function SpaceWarp({
   }, []);
 
   return (
-    <section ref={section} data-nesty="space" className="relative h-[100svh] cursor-crosshair overflow-hidden bg-[#04091a] text-paper">
+    <section ref={section} data-nesty="space" className="relative h-[100svh] cursor-crosshair overflow-hidden bg-night text-paper">
       <canvas ref={canvas} className="absolute inset-0 h-full w-full" />
+      {/* feather the top and bottom into the neighbouring navy sections */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-night to-transparent" />
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-night to-transparent" />
 
       {/* the saucer the rocket keeps taking pot-shots at */}
-      <div ref={ufo} className="pointer-events-none absolute left-0 top-0 z-10 -ml-10 -mt-12 hidden lg:block">
+      <div ref={ufo} className="pointer-events-none absolute left-0 top-0 z-10 -ml-10 -mt-12 hidden opacity-0 lg:block">
         <Mascot ref={ufoBot} variant="ufo" size={92} trackCursor={false} antics={false} />
       </div>
       {/* rocket robot - flames are part of the variant */}
-      <div ref={rocket} className="pointer-events-none absolute left-0 top-0 z-10 -ml-8 -mt-10 hidden lg:block">
+      <div ref={rocket} className="pointer-events-none absolute left-0 top-0 z-10 -ml-8 -mt-10 hidden opacity-0 lg:block">
         <Mascot ref={rocketBot} variant="rocket" size={76} trackCursor={false} antics={false} />
       </div>
 
