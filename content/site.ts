@@ -78,13 +78,13 @@ export const heroMedia = {
   // `image` above stays the real-school photo used on phones (no video there).
   /**
    * Hero reel: clips play in order with a crossfade, once through, then hold
-   * on the last frame. Slide 1 Robot School, slide 2 the robotics bench;
-   * slide 3 (rooftop astronomy) joins when generated.
+   * on the last frame. Slide 1 Robot School, slide 2 the robotics bench,
+   * slide 3 the rooftop astronomy night.
    */
   video: {
     mp4: "/images/bg/hero-1.mp4",
     poster: "/images/bg/hero-poster.jpg",
-    clips: ["/images/bg/hero-1.mp4", "/images/bg/hero-2.mp4"],
+    clips: ["/images/bg/hero-1.mp4", "/images/bg/hero-2.mp4", "/images/bg/hero-3.mp4"],
   } as { mp4: string; webm?: string; poster?: string; clips?: string[] } | null,
 
   alt: "Students building a robot in a Robonest school lab",

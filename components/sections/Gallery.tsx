@@ -19,6 +19,47 @@ export default function Gallery() {
   const backdropRef = useRef<HTMLDivElement | null>(null);
   const figureRef = useRef<HTMLDivElement | null>(null);
   const closingRef = useRef(false);
+  // True only for the open triggered by a thumbnail click. Stepping with the
+  // arrows re-renders the figure too, and re-running the zoom on every step
+  // felt like the popup kept re-opening; steps just crossfade.
+  const zoomFromThumb = useRef(false);
+  const touchX = useRef<number | null>(null);
+  // Phones get a vertical, snap-scrolling strip of every photo (the current
+  // one full, neighbours faded) instead of the desktop one-at-a-time viewer.
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px)");
+    const apply = () => setIsMobile(mq.matches);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
+  const stripRef = useRef<HTMLDivElement | null>(null);
+  const openedAt = useRef<number | null>(null);
+
+  // Strip: jump to the tapped photo on open, then let scrolling drive `active`.
+  useEffect(() => {
+    if (!isMobile || active === null) return;
+    const strip = stripRef.current;
+    if (!strip) return;
+    if (openedAt.current === null) {
+      openedAt.current = active;
+      strip.querySelector<HTMLElement>(`[data-idx="${active}"]`)?.scrollIntoView({ block: "center" });
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        const hit = entries.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (hit) setActive(Number((hit.target as HTMLElement).dataset.idx));
+      },
+      { root: strip, threshold: [0.55, 0.75] }
+    );
+    strip.querySelectorAll("[data-idx]").forEach((n) => io.observe(n));
+    return () => io.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isMobile, active === null]);
+  useEffect(() => {
+    if (active === null) openedAt.current = null;
+  }, [active]);
 
   /**
    * FLIP: the lightboxed image is rendered at its FINAL layout position, then
@@ -30,7 +71,11 @@ export default function Gallery() {
     if (active === null) return;
     const figure = figureRef.current;
     const backdrop = backdropRef.current;
-    if (!figure || !backdrop) return;
+    if (!backdrop) return;
+    if (isMobile || !figure) {
+      backdrop.style.opacity = "1";
+      return;
+    }
 
     if (prefersReducedMotion()) {
       backdrop.style.opacity = "1";
@@ -43,6 +88,13 @@ export default function Gallery() {
 
     const ctx = gsap.context(() => {
       gsap.to(backdrop, { opacity: 1, duration: 0.3, ease: "power2.out" });
+
+      if (!zoomFromThumb.current) {
+        // arrow / keyboard / swipe step: a quick crossfade, no zoom
+        gsap.from(figure, { opacity: 0, duration: 0.22, ease: "power2.out" });
+        return;
+      }
+      zoomFromThumb.current = false;
 
       if (!thumb) {
         gsap.from(figure, { opacity: 0, scale: 0.94, duration: 0.4, ease: "power3.out" });
@@ -62,7 +114,7 @@ export default function Gallery() {
     }, figure);
 
     return () => ctx.revert();
-  }, [active]);
+  }, [active, isMobile]);
 
   /** Reverse the FLIP, then unmount. */
   const close = useCallback(() => {
@@ -71,7 +123,7 @@ export default function Gallery() {
 
     if (active === null || closingRef.current) return;
 
-    if (prefersReducedMotion() || !figure || !backdrop) {
+    if (prefersReducedMotion() || isMobile || !figure || !backdrop) {
       setActive(null);
       return;
     }
@@ -111,7 +163,7 @@ export default function Gallery() {
       transformOrigin: "top left",
       onComplete: done,
     });
-  }, [active]);
+  }, [active, isMobile]);
 
   const step = useCallback(
     (dir: 1 | -1) =>
@@ -158,7 +210,10 @@ export default function Gallery() {
               }}
               type="button"
               data-reveal="scale"
-              onClick={() => setActive(i)}
+              onClick={() => {
+                zoomFromThumb.current = true;
+                setActive(i);
+              }}
               aria-label={`Open gallery image ${i + 1}`}
               className={[
                 "group relative overflow-hidden rounded-[var(--radius-card)] border border-ink/8",
@@ -193,17 +248,49 @@ export default function Gallery() {
           <div
             ref={backdropRef}
             aria-hidden
-            className="absolute inset-0 bg-night/95 opacity-0 backdrop-blur-sm"
+            className="absolute inset-0 bg-paper/96 opacity-0 backdrop-blur-sm"
           />
 
           <button
             type="button"
             onClick={close}
             aria-label="Close"
-            className="absolute right-4 top-4 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-paper/30 bg-night/60 text-paper backdrop-blur-sm transition-colors hover:bg-paper/15"
+            className="absolute right-4 top-4 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-ink text-paper shadow-lg shadow-ink/20 transition-all hover:scale-105 hover:bg-brand"
           >
             <Icon name="close" className="h-5 w-5" strokeWidth={2} />
           </button>
+
+          {isMobile ? (
+            <div
+              ref={stripRef}
+              data-lenis-prevent
+              className="no-scrollbar absolute inset-0 z-10 snap-y snap-mandatory overflow-y-auto py-[12vh]"
+              onClick={close}
+            >
+              {gallery.images.map((src, i) => (
+                <div
+                  key={src}
+                  data-idx={i}
+                  className="flex h-[76vh] snap-center items-center justify-center px-4 py-3 transition-opacity duration-300"
+                  style={{ opacity: i === active ? 1 : 0.3 }}
+                >
+                  <div
+                    className="relative aspect-[4/3] max-h-full w-full overflow-hidden rounded-2xl bg-sand shadow-2xl shadow-ink/15 ring-1 ring-ink/10"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Image
+                      src={asset(src)}
+                      alt={`Robonest lab session ${i + 1}`}
+                      fill
+                      sizes="100vw"
+                      className="object-contain"
+                      priority={i === active}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : null}
 
           <button
             type="button"
@@ -212,15 +299,25 @@ export default function Gallery() {
               step(-1);
             }}
             aria-label="Previous image"
-            className="absolute left-3 z-20 flex h-12 w-12 items-center justify-center rounded-full border border-paper/30 bg-night/60 text-paper backdrop-blur-sm transition-colors hover:bg-paper/15 sm:left-5"
+            className="absolute left-3 z-20 hidden h-12 w-12 items-center justify-center rounded-full bg-ink text-paper shadow-lg shadow-ink/20 transition-all hover:scale-105 hover:bg-brand sm:left-6 sm:flex"
           >
             <Icon name="chevronLeft" className="h-6 w-6" strokeWidth={2} />
           </button>
 
+          {!isMobile && (
           <div
             ref={figureRef}
-            className="relative z-10 h-[68vh] w-full max-w-5xl overflow-hidden rounded-2xl sm:h-[78vh]"
+            className="relative z-10 h-[68vh] w-full max-w-5xl overflow-hidden rounded-2xl bg-sand shadow-2xl shadow-ink/15 ring-1 ring-ink/10 sm:h-[78vh]"
             onClick={(e) => e.stopPropagation()}
+            onTouchStart={(e) => {
+              touchX.current = e.touches[0].clientX;
+            }}
+            onTouchEnd={(e) => {
+              if (touchX.current === null) return;
+              const dx = e.changedTouches[0].clientX - touchX.current;
+              touchX.current = null;
+              if (Math.abs(dx) > 40) step(dx < 0 ? 1 : -1);
+            }}
           >
             <Image
               src={asset(gallery.images[active])}
@@ -231,6 +328,7 @@ export default function Gallery() {
               priority
             />
           </div>
+          )}
 
           <button
             type="button"
@@ -239,12 +337,12 @@ export default function Gallery() {
               step(1);
             }}
             aria-label="Next image"
-            className="absolute right-3 z-20 flex h-12 w-12 items-center justify-center rounded-full border border-paper/30 bg-night/60 text-paper backdrop-blur-sm transition-colors hover:bg-paper/15 sm:right-5"
+            className="absolute right-3 z-20 hidden h-12 w-12 items-center justify-center rounded-full bg-ink text-paper shadow-lg shadow-ink/20 transition-all hover:scale-105 hover:bg-brand sm:right-6 sm:flex"
           >
             <Icon name="chevronRight" className="h-6 w-6" strokeWidth={2} />
           </button>
 
-          <p className="absolute bottom-5 z-20 text-xs text-paper/70">
+          <p className="absolute bottom-5 z-20 rounded-full bg-ink px-3 py-1 text-xs font-semibold text-paper">
             {active + 1} / {gallery.images.length}
           </p>
         </div>
