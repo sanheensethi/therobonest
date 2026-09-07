@@ -629,24 +629,7 @@ export const mascot = {
   } as Record<string, string>,
 } as const;
 
-/**
- * Scroll-driven showpieces on the homepage.
- * `freeze` is the time-stop moment after the hero: a frame sequence the
- * visitor scrubs through by scrolling. Frames live in public/images/freeze/
- * (f-001.webp ...). The current set is a placeholder cut from the hero clip;
- * replace with the "frozen classroom orbit" frames when generated.
- */
-export const freeze = {
-  frameCount: 60,
-  framePath: (i: number) => `/images/freeze/f-${String(i).padStart(3, "0")}.webp`,
-  poster: "/images/bg/hero-poster.jpg",
-  captions: [
-    { at: 0, kicker: "The bell rings", text: "And for a moment, everything stops." },
-    { at: 0.3, kicker: "Look closer", text: "Every build, every wire, every idea mid-air." },
-    { at: 0.6, kicker: "This is the lab", text: "Where curiosity gets its hands dirty." },
-  ],
-} as const;
-
+/** Astronomy lab teaser (SpaceWarp): the interactive particle sky. */
 export const space = {
   eyebrow: "Astronomy & Space Science Lab",
   title: "Some labs look up.",
