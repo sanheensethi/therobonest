@@ -66,7 +66,7 @@ export default function Hero() {
   return (
     <section
       ref={sectionRef}
-      className="relative overflow-hidden bg-night pt-[var(--nav-h)] lg:min-h-[56.25vw]"
+      className="relative overflow-hidden bg-night pt-[var(--nav-h)]"
     >
       {/* Ambient background wash */}
       <div
@@ -74,9 +74,8 @@ export default function Hero() {
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_90%_at_75%_0%,rgba(59,130,246,0.28),transparent_60%),radial-gradient(80%_70%_at_10%_100%,rgba(139,92,246,0.18),transparent_60%)]"
       />
 
-      {/* Media: full-bleed 16:9 background behind everything. The section is
-         kept at least 16:9 tall (min-h) so the video never letterboxes; on
-         taller content it simply covers, cropping a little top/bottom. */}
+      {/* Media: full-bleed background behind everything (object-cover, so it
+         fills whatever height the content needs). */}
       <div className="absolute inset-0 hidden lg:block">
         <HeroMedia />
       </div>

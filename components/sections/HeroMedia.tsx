@@ -2,77 +2,15 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
-import { hero, heroMedia } from "@/content/site";
-import Icon from "@/components/ui/Icon";
+import { heroMedia } from "@/content/site";
 import { asset } from "@/lib/asset";
 import { prefersReducedMotion } from "@/lib/motion";
 import HeroReel from "@/components/sections/HeroReel";
 
 /**
- * Hero visual: still image or looping video, with hexagonal tech badges
- * connected by faint lines floating over it.
- *
- * Badge coordinates live in one place (BADGE_POS) and are shared by both the
- * badges and the connector SVG, so the lines can never drift away from the
- * hexagons they join. The SVG uses a 0-100 viewBox with
- * preserveAspectRatio="none" so its coordinates ARE the percentage positions.
+ * Hero visual: full-bleed still image or video behind the hero copy, with a
+ * uniform scrim so the headline stays legible on any frame.
  */
-/* X is constrained to 19-39: on desktop this box sits under BOTH the
-   headline column (ends ~15%) and the form card (starts ~44%). Y is pushed
-   to the top and bottom bands. The first layout only avoided TEXT and put
-   two hexagons squarely on students' faces in the photo; the people are in
-   the middle band (y ~30-65), so the badges now stay out of it. */
-const BADGE_POS = [
-  { x: 46, y: 78 }, // Robotics
-  { x: 48, y: 16 }, // AI
-  { x: 58, y: 28 }, // IoT
-  { x: 57, y: 66 }, // Coding
-];
-
-function Hexagon({
-  icon,
-  label,
-  delay,
-}: {
-  icon: string;
-  label: string;
-  delay: string;
-}) {
-  return (
-    <div
-      className="hex-float absolute z-20 -translate-x-1/2 -translate-y-1/2"
-      style={{ animationDelay: delay }}
-    >
-      <div className="relative flex h-[74px] w-[66px] items-center justify-center sm:h-[86px] sm:w-[78px]">
-        <svg
-          viewBox="0 0 78 86"
-          className="absolute inset-0 h-full w-full"
-          aria-hidden="true"
-        >
-          <polygon
-            points="39,2 76,22 76,64 39,84 2,64 2,22"
-            fill="rgba(10,19,38,0.72)"
-            stroke="url(#hexStroke)"
-            strokeWidth="1.6"
-          />
-          <defs>
-            <linearGradient id="hexStroke" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#38bdf8" />
-              <stop offset="100%" stopColor="#8b5cf6" />
-            </linearGradient>
-          </defs>
-        </svg>
-        <span className="relative flex flex-col items-center gap-1 text-cyan">
-          <Icon name={icon} className="h-5 w-5" />
-          <span className="text-[10px] font-semibold tracking-wide text-white sm:text-[11px]">
-            {label}
-          </span>
-        </span>
-      </div>
-    </div>
-  );
-}
-
 /**
  * Background video that only plays while on screen and never on a metered
  * connection. `preload="none"` + poster means the video costs nothing until
@@ -167,33 +105,6 @@ export default function HeroMedia({
         />
       </div>
 
-      {/* Connector lines - same coordinate space as the badges */}
-      <svg
-        viewBox="0 0 100 100"
-        preserveAspectRatio="none"
-        className="pointer-events-none absolute inset-0 z-10 h-full w-full"
-        aria-hidden="true"
-      >
-        <polyline
-          points={BADGE_POS.map((p) => `${p.x},${p.y}`).join(" ")}
-          fill="none"
-          stroke="#38bdf8"
-          strokeOpacity="0.35"
-          strokeWidth="0.3"
-          vectorEffect="non-scaling-stroke"
-        />
-      </svg>
-
-      {/* Badges */}
-      {hero.techBadges.map((b, i) => (
-        <div
-          key={b.label}
-          className="absolute"
-          style={{ left: `${BADGE_POS[i].x}%`, top: `${BADGE_POS[i].y}%` }}
-        >
-          <Hexagon icon={b.icon} label={b.label} delay={`${i * 0.8}s`} />
-        </div>
-      ))}
     </div>
   );
 }
