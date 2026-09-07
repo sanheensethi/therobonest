@@ -73,10 +73,6 @@ export default function Dogfight() {
       const b = el.getBoundingClientRect();
       return { x: b.left + b.width / 2, y: b.top + b.height / 2 };
     };
-    const nozzle = () => {
-      const c = centre(r);
-      return { x: c.x - Math.sin(R.heading) * 36, y: c.y + Math.cos(R.heading) * 36 };
-    };
     const nose = () => {
       const c = centre(r);
       return { x: c.x + Math.sin(R.heading) * 30, y: c.y - Math.cos(R.heading) * 30 };
@@ -122,8 +118,6 @@ export default function Dogfight() {
           R.heading += d * 0.12;
         }
         gsap.set(r, { x: R.x, y: R.y, rotation: (R.heading * 180) / Math.PI });
-        const n = nozzle();
-        if (Math.random() < 0.8) embers.push({ x: n.x + (Math.random() - 0.5) * 6, y: n.y + (Math.random() - 0.5) * 6, a: 0.95, r: 2.5 + Math.random() * 3 });
       }
 
       // ---- rocket fires ----
@@ -164,7 +158,7 @@ export default function Dogfight() {
         if (Math.random() < 0.55) {
           window.setTimeout(() => {
             botR.current?.express("dizzy", 1400);
-            gsap.to(r, { rotation: "+=360", duration: 0.8, ease: "power2.out", onComplete: () => gsap.set(r, { rotation: (R.heading * 180) / Math.PI }) });
+            gsap.to(r, { rotation: "+=360", duration: 0.8, ease: "power2.out", onComplete: () => { gsap.set(r, { rotation: (R.heading * 180) / Math.PI }); } });
             waves.push({ x: rc.x, y: rc.y, r: 6, a: 0.8 });
           }, 120);
         } else {

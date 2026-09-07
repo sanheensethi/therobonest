@@ -68,12 +68,7 @@ export default function SpaceWarp({
       const c = cv.getBoundingClientRect();
       return { x: r.left + r.width / 2 - c.left, y: r.top + r.height / 2 - c.top };
     };
-    /** The rocket's nozzle: 36px "below" its centre, rotated by its heading. */
-    const nozzle = () => {
-      const c = centreOf(rocket.current);
-      if (!c) return null;
-      return { x: c.x - Math.sin(heading) * 36, y: c.y + Math.cos(heading) * 36 };
-    };
+
     const state = { p: 0, t: 0 };
 
     const build = () => {
@@ -332,10 +327,7 @@ export default function SpaceWarp({
           const x = (1 - t) * (1 - t) * from.x + 2 * (1 - t) * t * mid.x + t * t * to.x;
           const y = (1 - t) * (1 - t) * from.y + 2 * (1 - t) * t * mid.y + t * t * to.y;
           gsap.set(r, { x, y });
-          const n = nozzle();
-          if (n && Math.random() < 0.85) {
-            embers.push({ x: n.x + (Math.random() - 0.5) * 6, y: n.y + (Math.random() - 0.5) * 6, a: 0.95, r: 2.5 + Math.random() * 3 });
-          }
+          // (no canvas ember trail: the rocket's own SVG flame is the exhaust)
         },
         onComplete: () => {
           if (Math.random() < 0.3) rocketBot.current?.express("cool", 1200);
