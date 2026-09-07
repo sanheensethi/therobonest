@@ -328,7 +328,11 @@ export default function SpaceWarp({
     };
 
     build();
-    window.addEventListener("resize", build);
+    const rebuild = () => {
+      build();
+      render();
+    };
+    window.addEventListener("resize", rebuild);
 
     const onMove = (e: PointerEvent) => {
       const r = cv.getBoundingClientRect();
@@ -425,6 +429,11 @@ export default function SpaceWarp({
       if (ufo.current) { gsap.killTweensOf(ufo.current); gsap.set(ufo.current, { opacity: 0 }); }
     };
 
+    // Visibility drives the render loop (so the sky is alive as it scrolls into
+    // view, on phones too); the ScrollTrigger below only drives progress.
+    const io = new IntersectionObserver(([e]) => (e.isIntersecting ? start() : stop()), { threshold: 0.05 });
+    io.observe(el);
+
     const st = ScrollTrigger.create({
       trigger: el,
       start: "top top",
@@ -432,7 +441,6 @@ export default function SpaceWarp({
       pin: reduced ? false : pinBox.current,
       pinSpacing: true,
       scrub: 0.4,
-      onToggle: (self) => (self.isActive ? start() : stop()),
       onUpdate: (self) => {
         state.p = self.progress;
         const copy = el.querySelector<HTMLElement>("[data-copy]");
@@ -450,7 +458,8 @@ export default function SpaceWarp({
 
     return () => {
       st.kill(); stop();
-      window.removeEventListener("resize", build);
+      window.removeEventListener("resize", rebuild);
+      io.disconnect();
       el.removeEventListener("pointermove", onMove);
       el.removeEventListener("pointerleave", onLeave);
       el.removeEventListener("pointerdown", onDown);
