@@ -13,7 +13,6 @@ import { prefersReducedMotion } from "@/lib/motion";
  * Hardware cards with a "live bench" layer over each product photo:
  *   - a data pulse that travels around the frame (the board is talking),
  *   - a small serial-monitor HUD with values that tick like real readings,
- *   - for the sensors, sonar rings pulsing out from the centre.
  * Everything is CSS/SVG + one interval; no video, no assets, and the photo
  * geometry does not matter, so swapping the image in content never breaks it.
  */
@@ -76,16 +75,6 @@ function SensorHud() {
   const pct = Math.min(100, Math.max(0, Number(light)));
   return (
     <>
-      {/* sonar rings from the centre of the image */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        {[0, 1, 2].map((i) => (
-          <span
-            key={i}
-            className="sonar absolute h-16 w-16 rounded-full border border-cyan/50"
-            style={{ animationDelay: `${i * 0.9}s` }}
-          />
-        ))}
-      </div>
       <div className="pointer-events-none absolute bottom-3 left-3 rounded-lg border border-cyan/30 bg-night/80 px-3 py-2 font-mono text-[10px] leading-relaxed text-cyan backdrop-blur-sm">
         <div className="flex items-center gap-2 text-[9px] uppercase tracking-[0.18em] text-cyan/70">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />

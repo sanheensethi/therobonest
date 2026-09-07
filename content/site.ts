@@ -156,14 +156,14 @@ export type HardwareItem = {
 export const hardware: HardwareItem[] = [
   {
     title: "ARDUINO UNO",
-    image: "/images/arduino-uno.webp",
-    // video: "/images/hw/arduino.mp4",
+    image: "/images/hw/arduino-poster.jpg",
+    video: "/images/hw/arduino.mp4",
     points: ["Arduino projects", "Arduino programming", "Board design & learning"],
   },
   {
     title: "Sensors",
-    image: "/images/sensors.webp",
-    // video: "/images/hw/sensors.mp4",
+    image: "/images/hw/sensors-poster.jpg",
+    video: "/images/hw/sensors.mp4",
     points: ["How sensors work", "Sensor applications", "Sensor-based projects"],
   },
 ];
