@@ -9,7 +9,6 @@ import ScrollToTop from "@/components/ui/ScrollToTop";
 import EventPopup from "@/components/ui/EventPopup";
 import ChatBot from "@/components/ui/ChatBot";
 import Wanderer from "@/components/ui/Wanderer";
-import Dogfight from "@/components/ui/Dogfight";
 import EnquiryDrawer from "@/components/ui/EnquiryDrawer";
 import Preloader from "@/components/ui/Preloader";
 import { getPopupEvent, formatEventDate } from "@/lib/odoo-content";
@@ -68,7 +67,6 @@ export default async function RootLayout({
           <Footer />
           <ScrollToTop />
           <Wanderer />
-          <Dogfight />
           <EnquiryDrawer />
           <Preloader />
           <ChatBot

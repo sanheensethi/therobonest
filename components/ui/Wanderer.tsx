@@ -7,8 +7,9 @@ import { registerGsap, prefersReducedMotion } from "@/lib/motion";
 /**
  * The other lab robots occasionally wander across the bottom of the viewport,
  * treating the bottom edge as the ground. Sometimes one; sometimes two or
- * three turn up from opposite sides, meet in the middle and squabble - angry
- * faces, shoving, sparks - then make up and leave.
+ * three turn up from opposite sides, meet in the middle, wave and share a
+ * giggle or a dance, then carry on. (The only fight on the site is the rocket
+ * and the saucer in the Astronomy section.)
  *
  * Deliberately rare (a few visits per page view), never in the first seconds,
  * never for reduced-motion users. They sit under the floating buttons so they
@@ -21,7 +22,7 @@ const OTHERS: Variant[] = ["drone", "crane", "rover", "ufo", "sparky", "bolt", "
 const FLIERS: Variant[] = ["drone", "ufo"];
 const GROUND = OTHERS.filter((v) => !FLIERS.includes(v));
 const FACES: Expression[] = ["neutral", "happy", "thinking", "surprised", "cool", "cheeky"];
-const MAX_VISITS = 10;
+const MAX_VISITS = 6;
 
 type Bot = { variant: Variant; face: Expression; fromLeft: boolean };
 type Visit = { key: number; bots: Bot[] };
@@ -59,8 +60,8 @@ export default function Wanderer() {
         setVisit({ key: Date.now(), bots: list });
       }, delay);
     };
-    next(9000 + Math.random() * 6000);
-    const onDone = () => next(35000 + Math.random() * 40000);
+    next(20000 + Math.random() * 15000);
+    const onDone = () => next(70000 + Math.random() * 60000);
     window.addEventListener("wanderer:done", onDone);
     return () => {
       if (t) window.clearTimeout(t);
@@ -83,8 +84,8 @@ export default function Wanderer() {
     const next = (delay: number) => {
       t = window.setTimeout(() => setFlight({ key: Date.now(), variant: pick(FLIERS) }), delay);
     };
-    next(14000 + Math.random() * 8000);
-    const onDone = () => next(30000 + Math.random() * 40000);
+    next(35000 + Math.random() * 20000);
+    const onDone = () => next(80000 + Math.random() * 70000);
     window.addEventListener("flier:done", onDone);
     return () => {
       if (t) window.clearTimeout(t);
@@ -142,25 +143,6 @@ export default function Wanderer() {
     }, el);
     return () => ctx.revert();
   }, [flight]);
-
-  // A stray missile from the dogfight can land on a ground robot.
-  useEffect(() => {
-    const onHit = (e: Event) => {
-      const i = (e as CustomEvent<{ index: number }>).detail?.index;
-      const m = bots.current[i];
-      const el = wraps.current[i];
-      if (!m || !el) return;
-      m.walk(false);
-      m.express("dizzy", 1600);
-      const { gsap } = registerGsap();
-      gsap.timeline()
-        .to(el.querySelector("[data-body]"), { rotation: 360, transformOrigin: "50% 60%", duration: 0.8, ease: "power2.out" })
-        .set(el.querySelector("[data-body]"), { rotation: 0 })
-        .call(() => m.walk(true));
-    };
-    window.addEventListener("robot:hit", onHit);
-    return () => window.removeEventListener("robot:hit", onHit);
-  }, []);
 
   // The scene.
   useEffect(() => {
@@ -229,39 +211,22 @@ export default function Wanderer() {
           })
           .to({}, { duration: 3.4 });
       } else {
-        // the squabble
+        // a friendly meeting: surprised to see each other, a wave, a shared
+        // giggle or a little dance, then everyone carries on
         master
           .call(() => {
             visit.bots.forEach((_, i) => bots.current[i]?.express("surprised", 900));
           })
           .to({}, { duration: 0.9 })
           .call(() => {
-            visit.bots.forEach((_, i) => bots.current[i]?.express("angry", 2600));
-          });
-        // shove each other three times - each lunges toward the centre
-        for (let k = 0; k < 3; k++) {
-          const label = `shove${k}`;
-          master.addLabel(label);
-          visit.bots.forEach((_, i) => {
-            const dir = slots[i] < centre ? 1 : slots[i] > centre ? -1 : k % 2 ? 1 : -1;
-            master
-              .to(els[i], { x: `+=${dir * 10}`, duration: 0.12, ease: "power2.out" }, label)
-              .to(els[i], { x: `-=${dir * 10}`, duration: 0.22, ease: "bounce.out" }, `${label}+=0.12`);
-          });
-          master.to({}, { duration: 0.45 });
-        }
-        // sparks: everyone's confetti, ends the fight
-        master
-          .call(() => {
-            visit.bots.forEach((_, i) => bots.current[i]?.celebrate());
+            visit.bots.forEach((_, i) => bots.current[i]?.wave());
           })
           .to({}, { duration: 1.2 })
-          // one of them giggles and they make up
           .call(() => {
-            bots.current[Math.floor(Math.random() * n)]?.skit("giggle");
-            visit.bots.forEach((_, i) => bots.current[i]?.express("happy", 2000));
+            const r = Math.random();
+            visit.bots.forEach((_, i) => bots.current[i]?.skit(r < 0.5 ? "giggle" : "dance"));
           })
-          .to({}, { duration: 2 });
+          .to({}, { duration: 2.6 });
       }
 
       // leave, each the way it came
