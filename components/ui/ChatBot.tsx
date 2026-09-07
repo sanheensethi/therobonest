@@ -331,6 +331,8 @@ export default function ChatBot({ event }: { event?: ChatEvent | null }) {
       },
       { threshold: 0, rootMargin: "-35% 0px -35% 0px" }
     );
+    // A new route is a new visit: tips may speak again there.
+    said.current.clear();
     // Sections mount with the page; give the route a beat to render first.
     const scan = window.setTimeout(() => {
       document.querySelectorAll<HTMLElement>("[data-nesty]").forEach((el) => io.observe(el));
