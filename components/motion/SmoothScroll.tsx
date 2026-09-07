@@ -58,6 +58,7 @@ export default function SmoothScroll({
     // recompute start/end positions or every pin lands in the wrong place.
     const refresh = () => ScrollTrigger.refresh();
     window.addEventListener("load", refresh);
+    (document as Document & { fonts?: { ready: Promise<unknown> } }).fonts?.ready.then(refresh);
     const t = window.setTimeout(refresh, 400);
 
     return () => {

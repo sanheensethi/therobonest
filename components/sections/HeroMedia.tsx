@@ -108,7 +108,6 @@ function HeroVideo({ mp4, webm, poster }: { mp4: string; webm?: string; poster?:
       className="h-full w-full object-cover object-center"
       poster={asset(poster ?? heroMedia.image)}
       muted
-      loop
       playsInline
       preload="none"
       aria-label={heroMedia.alt}

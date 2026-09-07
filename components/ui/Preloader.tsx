@@ -101,6 +101,9 @@ export default function Preloader() {
       onComplete: () => {
         document.documentElement.classList.remove("lenis-stopped");
         setShow(false);
+        // The curtain held the page at overflow:hidden while the pinned
+        // sections measured themselves; re-measure now that it scrolls.
+        requestAnimationFrame(() => registerGsap().ScrollTrigger.refresh());
       },
     });
   }, [show, introDone, ready]);

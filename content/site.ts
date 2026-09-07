@@ -76,7 +76,11 @@ export const heroMedia = {
   // Silent, forward-then-reverse so it loops without a seam. `poster` is the
   // clip's own first frame so there is no visual jump when playback starts;
   // `image` above stays the real-school photo used on phones (no video there).
-  video: {
+  // Set to null while the Robot School reel is being generated - the
+  // placeholder clip was a face close-up behind the headline and read badly.
+  // To switch back: replace `null as ... | null` with the object below.
+  video: null as { mp4: string; webm?: string; poster?: string; clips?: string[] } | null,
+  _videoDraft: {
     mp4: "/images/bg/hero.mp4",
     webm: "/images/bg/hero.webm",
     poster: "/images/bg/hero-poster.jpg",
@@ -87,7 +91,7 @@ export const heroMedia = {
      * frame should match the next clip's first frame for a seamless story.
      */
     clips: ["/images/bg/hero.mp4"],
-  } as { mp4: string; webm?: string; poster?: string; clips?: string[] } | null,
+  },
   alt: "Students building a robot in a Robonest school lab",
 } as const;
 

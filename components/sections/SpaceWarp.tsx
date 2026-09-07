@@ -95,10 +95,10 @@ export default function SpaceWarp({
         const gy = 0.5 + (core ? (Math.random() - 0.5) * 0.06 : Math.sin(ang) * rad * 0.62);
         const sx = Math.random(), sy = Math.random();
         const [tx, ty] = pts.length ? textPoint(i) : [sx, sy];
-        const big = Math.random() < 0.06;
+        const big = Math.random() < 0.025;
         ps.push({
           sx, sy, gx, gy, tx, ty, x: sx * W, y: sy * H, vx: 0, vy: 0,
-          r: big ? 1.6 + Math.random() * 1.4 : 0.5 + Math.random() * 0.9,
+          r: big ? 1.3 + Math.random() * 0.7 : 0.35 + Math.random() * 0.75,
           c: COLOURS[Math.floor(Math.random() * COLOURS.length)],
           tw: Math.random() * Math.PI * 2,
         });
@@ -170,10 +170,10 @@ export default function SpaceWarp({
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r * (1 - w * 0.45), 0, Math.PI * 2);
         ctx.fill();
-        if (p.r > 1.6 && w < 0.5) {
-          ctx.globalAlpha = a * 0.25;
+        if (p.r > 1.3 && w < 0.5) {
+          ctx.globalAlpha = a * 0.12;
           ctx.beginPath();
-          ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2);
+          ctx.arc(p.x, p.y, p.r * 2.2, 0, Math.PI * 2);
           ctx.fill();
         }
       }

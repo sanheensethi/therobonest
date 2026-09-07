@@ -65,6 +65,8 @@ export default function HeroReel({
       const v = layers[current];
       if (switching || !v.duration) return;
       if (v.currentTime >= v.duration - FADE) {
+        // last clip: let it end and hold there
+        if (clip === clips.length - 1) return;
         switching = true;
         const next = layers[1 - current];
         next.currentTime = 0;
@@ -81,9 +83,10 @@ export default function HeroReel({
       }
     };
 
-    // Single clip: just loop it natively, no chaining needed.
+    // Single clip: play once and hold on the last frame. A 5-10s clip looping
+    // forever behind a headline reads as a glitch, not a video.
     if (clips.length === 1) {
-      va.loop = true;
+      va.loop = false;
       load(va, 0);
       va.style.opacity = "1";
     } else {
