@@ -5,19 +5,20 @@
  * website footer editor, which is easy to miss. Writing them directly is
  * faster and less error-prone.
  *
- * FILL IN the URLs below (leave a blank string to skip a network), then:
+ * FILL IN the URLs below (a blank string clears that network), then:
  *   node scripts/set-social-links.mjs
  *
  * The site reads these for the header and footer icons.
  */
 import fs from "node:fs";
 
+// A blank string CLEARS that network in Odoo (the site then shows no icon).
 const LINKS = {
-  social_facebook: "https://www.facebook.com/",
-  social_instagram: "https://www.instagram.com/",
-  social_linkedin: "https://www.linkedin.com/",
-  social_twitter: "https://x.com/",
-  social_youtube: "https://www.youtube.com/",
+  social_facebook: "",
+  social_instagram: "https://www.instagram.com/robonest2026",
+  social_linkedin: "",
+  social_twitter: "",
+  social_youtube: "https://www.youtube.com/@Robonest2026",
 };
 
 /* ------------------------------------------------------------------ */
@@ -45,13 +46,8 @@ const call = (model, method, args = [], kwargs = {}) =>
   rpc("object", "execute_kw", [env.ODOO_DB, uid, env.ODOO_API_KEY, model, method, args, kwargs]);
 
 const payload = Object.fromEntries(
-  Object.entries(LINKS).filter(([, v]) => v && v.trim())
+  Object.entries(LINKS).map(([k, v]) => [k, v && v.trim() ? v.trim() : false])
 );
-
-if (Object.keys(payload).length === 0) {
-  console.log("Nothing to set - fill in the LINKS object at the top of this file.");
-  process.exit(0);
-}
 
 const [site] = await call("website", "search_read", [[], ["id", "name"]], { limit: 1 });
 await call("website", "write", [[site.id], payload]);
