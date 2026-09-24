@@ -14,7 +14,7 @@ import fs from "node:fs";
 
 // A blank string CLEARS that network in Odoo (the site then shows no icon).
 const LINKS = {
-  social_facebook: "https://www.facebook.com/robonest2026",
+  social_facebook: "",
   social_instagram: "https://www.instagram.com/robonest2026",
   social_linkedin: "",
   social_twitter: "",
