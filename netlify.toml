@@ -37,6 +37,34 @@
   status = 301
   force = true
 
+# Domain cutover: once therobonest.com points here, anything that belonged to
+# Odoo on this hostname (the back office, login, portal, and /web/image URLs
+# inside old emails and links) is forwarded to Odoo's own hostname.
+# Harmless before the cutover - nothing on the Netlify address uses these paths.
+[[redirects]]
+  from = "/odoo"
+  to = "https://odoo.therobonest.com/odoo"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/odoo/*"
+  to = "https://odoo.therobonest.com/odoo/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/web/*"
+  to = "https://odoo.therobonest.com/web/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/my/*"
+  to = "https://odoo.therobonest.com/my/:splat"
+  status = 301
+  force = true
+
 # Hashed build assets never change under the same name - cache hard.
 [[headers]]
   for = "/_next/static/*"

@@ -1,11 +1,11 @@
 import type { MetadataRoute } from "next";
 import { site } from "@/content/site";
-import { getBlogPosts } from "@/lib/odoo-content";
+import { getBlogPosts, getEvents } from "@/lib/odoo-content";
 
 /**
  * Dynamic sitemap, generated from Odoo.
  *
- * Every post published in Odoo enters the sitemap on the next revalidation -
+ * Every post or event published in Odoo enters the sitemap on the next revalidation -
  * no deploy, no manual edit. Without this, search engines have to stumble on
  * new posts by crawling links, which is slow and unreliable for a site that
  * gains a page whenever someone hits Published.
@@ -38,5 +38,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     posts = [];
   }
 
-  return [...staticRoutes, ...posts];
+  // Event pages too - each published event is its own indexable page.
+  let events: MetadataRoute.Sitemap = [];
+  try {
+    events = (await getEvents(200)).map((e) => ({
+      url: `${base}/events/${e.slug}/`,
+      changeFrequency: (e.isPast ? "yearly" : "weekly") as "yearly" | "weekly",
+      priority: e.isPast ? 0.5 : 0.8,
+    }));
+  } catch {
+    events = [];
+  }
+
+  return [...staticRoutes, ...posts, ...events];
 }
