@@ -7,7 +7,7 @@
  *
  * Required Netlify environment variables (Site config -> Environment
  * variables). Note: NO `NEXT_PUBLIC_` prefix, so they stay server-only.
- *   ODOO_URL      https://www.therobonest.com
+ *   ODOO_URL      https://robonest-private-limited.odoo.com
  *   ODOO_DB       robonest-private-limited
  *   ODOO_LOGIN    the Odoo user's email
  *   ODOO_API_KEY  API key from Odoo -> My Profile -> Account Security

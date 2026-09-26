@@ -9,7 +9,7 @@
  * leaving it inline in the text.
  */
 
-const ODOO_URL = process.env.ODOO_URL ?? "https://www.therobonest.com";
+const ODOO_URL = process.env.ODOO_URL ?? "https://robonest-private-limited.odoo.com";
 
 /** Odoo stores relative asset paths; make them absolute for our domain. */
 export function absoluteOdooUrl(src: string): string {

@@ -159,7 +159,7 @@ Set these in Netlify under Site configuration, Environment variables. They are r
 
 | Variable | Required | Value |
 |---|---|---|
-| `ODOO_URL` | Yes | Odoo's base URL, currently `https://www.therobonest.com`. When the domain moves to the new site, this must change to Odoo's new hostname (for example `https://crm.therobonest.com`) or all content and images stop loading. |
+| `ODOO_URL` | Yes | `https://robonest-private-limited.odoo.com`, Odoo's own hostname. Use this, not a custom domain: it never changes, needs no DNS and cannot lose its certificate. `https://odoo.therobonest.com` also works. `https://www.therobonest.com` no longer works (it now belongs to the new website). |
 | `ODOO_DB` | Yes | `robonest-private-limited` |
 | `ODOO_LOGIN` | Yes | The Odoo user's login email that owns the API key |
 | `ODOO_API_KEY` | Yes | Generated in Odoo under the user's Preferences, Account Security, New API Key. Full permissions of that user, so treat it like a password. |

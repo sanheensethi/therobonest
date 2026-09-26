@@ -13,7 +13,10 @@
  *   endpoint        POST /jsonrpc  -> reachable, returns version
  */
 
-const URL_BASE = process.env.ODOO_URL ?? "https://www.therobonest.com";
+// Odoo's own hostname: permanent, independent of any custom domain or its
+// certificate. (www.therobonest.com stopped answering once it was removed from
+// Odoo's domain list during the move to Netlify.)
+const URL_BASE = process.env.ODOO_URL ?? "https://robonest-private-limited.odoo.com";
 const DB = process.env.ODOO_DB ?? "robonest-private-limited";
 const LOGIN = process.env.ODOO_LOGIN ?? "";
 const API_KEY = process.env.ODOO_API_KEY ?? "";
