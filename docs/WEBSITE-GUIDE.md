@@ -2,7 +2,7 @@
 
 Complete reference for therobonest.com: how the site is built, how it is deployed on Netlify, how it talks to Odoo, and how to add, change and remove every kind of content.
 
-Two audiences read this. Content editors need parts 3 to 6. Whoever maintains the code or the hosting needs all of it.
+Two audiences read this. Content editors need parts 3 to 6. Short, single-topic PDF versions for staff are in `docs/guides/` (start with guide 00). Whoever maintains the code or the hosting needs all of it.
 
 Last updated: 24 September 2026.
 
@@ -19,7 +19,7 @@ Visitor's browser
 Netlify (CDN + Next.js server runtime)
       |  reads content every 5 minutes (ISR)
       v
-Odoo Online  (therobonest.com, database robonest-private-limited)
+Odoo Online  (robonest-private-limited.odoo.com, login at odoo.therobonest.com)
       ^
       |  writes: crm.lead (enquiries), event.registration (sign-ups)
 Netlify Functions (enquiry.mjs, event-register.mjs)
@@ -104,6 +104,8 @@ Odoo's public `/web/image/` route does not serve employee photos. `hr.employee` 
 
 The proxy is strictly whitelisted to `hr.employee` and `res.partner`, fields `image_256`, `image_512`, `image_1024`. Anything else returns a 1x1 transparent GIF. Never widen this list casually: an open proxy would let anyone read any binary field in the database through an image tag.
 
+Odoo Online rate-limits bursts (HTTP 429). `lib/odoo.ts` therefore queues calls (max 3 in flight per instance), shares one login between parallel first calls, and retries 429 and 5xx with backoff, honoring Retry-After. The Netlify functions retry the same way. A photo that still fails returns 503 with `no-store`, so it is never cached as a blank; the Team component retries twice in the browser, then shows initials. Successful photos carry `Netlify-CDN-Cache-Control: durable, max-age=86400`, so Odoo sees about one request per photo per day.
+
 A related detail: Odoo never leaves an employee photo empty. It stores a 305-byte placeholder. The site treats anything under 2 KB as "no photo" and draws an initial-letter avatar instead.
 
 ### 2.6 Forms and writes into Odoo
@@ -138,7 +140,7 @@ All of it respects `prefers-reduced-motion`.
 
 Netlify is connected to the GitHub repo. Every push to `main` triggers a build and deploy. Nothing else is needed for code changes.
 
-Current production URL: `https://statuesque-gumption-d78cb1.netlify.app`. When the custom domain moves over, this stays as the fallback address.
+Production: `https://www.therobonest.com`. Netlify site name: `therobonest.netlify.app` (renamed from `statuesque-gumption-d78cb1`), which always works as a fallback address.
 
 ### 3.2 Build settings
 
@@ -414,9 +416,29 @@ Media files: hero clips in `public/images/bg/hero-1.mp4`, `hero-2.mp4`, `hero-3.
 
 ---
 
-## 9. Domain cutover plan
+## 9. Domain setup
 
-Today `therobonest.com` and `www.therobonest.com` point at Odoo Online, so `https://www.therobonest.com/web/login` is the back office. After the cutover the main domain serves the Netlify site and Odoo lives at `odoo.therobonest.com`. Do it in this order, and nothing is offline at any point.
+### 9.0 Current state (done, September 2026)
+
+DNS stays at GoDaddy (registrar and nameservers `ns55`/`ns56.domaincontrol.com`). The domain was deliberately not moved to Netlify DNS: company email runs on Google Workspace, and keeping DNS where it was meant changing three records instead of recreating all of them.
+
+| Record | Value | Purpose |
+|---|---|---|
+| `A @` | `75.2.60.5` | Bare domain to Netlify. GoDaddy has no ALIAS/ANAME, so Netlify's documented A record is used. |
+| `CNAME www` | `therobonest.netlify.app` | The website |
+| `CNAME odoo` | `robonest-private-limited.odoo.com` | Odoo back office, Let's Encrypt certificate issued by Odoo |
+| 5 x `MX`, SPF `TXT` x2, `_dmarc`, `google-site-verification` | unchanged | Google Workspace email |
+
+Lessons from the cutover, worth knowing if this is ever redone:
+
+- Removing GoDaddy Forwarding makes GoDaddy put a **parked page** on the bare domain (A records `3.33.130.190`, `15.197.148.33`). Those records were then edited to `75.2.60.5`. GoDaddy locks A records while Forwarding is active ("applied by a product or service"), so Forwarding must be deleted first.
+- The moment `www.therobonest.com` was removed from Odoo's domain list, every Odoo call through that hostname returned Odoo's "unknown domain" page. `ODOO_URL` must therefore be Odoo's own hostname, `https://robonest-private-limited.odoo.com`, which does not depend on any custom domain.
+- The domain expires **1 October 2026**. Auto-renew must be on.
+- DKIM is not configured for Google Workspace. Recommended: enable it in Google Admin and add the TXT record.
+
+The steps below are the original plan, kept for reference.
+
+### Original cutover plan
 
 ### 9.1 Before touching DNS
 
@@ -444,7 +466,7 @@ At this point both the old and new Odoo hostnames work, and the website already 
 1. Netlify, Domain management, Add a domain, enter `therobonest.com`. Netlify will list both `therobonest.com` and `www.therobonest.com`.
 2. Set `www.therobonest.com` as the primary domain. The site's canonical URL in code is `https://www.therobonest.com`, so the sitemap, `robots.txt` and `llms.txt` already use it. Netlify will redirect the bare domain to `www`.
 3. Netlify shows the records it wants. Typically:
-   - `www` CNAME `statuesque-gumption-d78cb1.netlify.app`
+   - `www` CNAME `therobonest.netlify.app`
    - `@` A `75.2.60.5` (Netlify's load balancer), or an ALIAS/ANAME to `apex-loadbalancer.netlify.com` if the DNS provider supports it.
    Use the values Netlify displays, not this document, if they differ.
 
