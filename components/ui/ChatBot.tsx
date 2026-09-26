@@ -140,9 +140,9 @@ export default function ChatBot({ event }: { event?: ChatEvent | null }) {
       const panel = panelRef.current;
       if (open && panel && vw < 640) {
         // Phone: no room beside the panel, so it stands in the header,
-        // left of the close button.
+        // just left of the close button (48px = 32px button + 16px padding).
         const pr = panel.getBoundingClientRect();
-        x = pr.right - LAUNCHER - 44;
+        x = pr.right - 48 - LAUNCHER - 4;
         y = pr.top - 2;
         if (!placed) { gsap.set(el, { x, y }); placed = true; el.style.visibility = "visible"; }
         xTo(x);
@@ -391,7 +391,7 @@ export default function ChatBot({ event }: { event?: ChatEvent | null }) {
           detaches and travels with the visitor in the bottom-right corner. */}
       <div
         ref={launcher}
-        className="group fixed left-0 top-0 z-[56] flex items-end will-change-transform"
+        className={`group fixed left-0 top-0 ${open ? "z-[58]" : "z-[56]"} flex items-end will-change-transform`}
         /* hidden until the first tick has placed it - otherwise it flashes at (0,0) on reload */
         style={{ width: LAUNCHER, height: LAUNCHER, visibility: "hidden" }}
       >
@@ -450,10 +450,11 @@ export default function ChatBot({ event }: { event?: ChatEvent | null }) {
         ].join(" ")}
 
       >
-        <div className="flex items-center gap-3 bg-gradient-to-r from-indigo to-violet px-4 py-3 pr-24 text-paper sm:pr-4">
-          <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-3 bg-gradient-to-r from-indigo to-violet px-4 py-3 text-paper">
+          {/* phone: leave room for Nesty, who stands in the header left of the X */}
+          <div className="min-w-0 flex-1 pr-[72px] sm:pr-0">
             <p className="font-display text-base leading-tight">{mascot.name}</p>
-            <p className="text-[11px] text-paper/75">Robonest lab assistant · replies instantly</p>
+            <p className="text-[11px] text-paper/75">RoboNest lab assistant · replies instantly</p>
           </div>
           <button
             type="button"
