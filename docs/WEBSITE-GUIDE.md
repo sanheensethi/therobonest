@@ -323,6 +323,8 @@ The one rule: saving is not publishing. Every record has a Published toggle (or 
 
 ### 6.3 Videos
 
+Currently switched off: RoboNest has no YouTube videos yet, so the Videos page and the home playlist are hidden (`features.videos` in `content/site.ts`). Their own clips are in the Institution Gallery instead. When real videos exist, add them as below and ask the developer to flip the switch.
+
 Only YouTube links. Nothing is uploaded to Odoo or the site.
 
 **Add.** eLearning, open or create a Course (its name becomes the filter button: Lab Setup, Student Projects, Astronomy, Events). Add Content, Video, paste the YouTube URL. Odoo fills in title, thumbnail and duration. Add tags (`Homepage` to feature, `Short` for vertical). Published on. Drag to reorder inside the course, that order is what the site uses.
@@ -378,7 +380,8 @@ These change by editing `content/site.ts` and pushing to `main`. Each is a plain
 | `stats` | The four numbers |
 | `about`, `aiFeatures`, `labsIntro`, `labs` | About section, RoboNest Advantage, the three lab cards |
 | `hardware` | Arduino and sensor cards, with their video files |
-| `gallery` | Institution Gallery photo list (files in `public/images/gallery/`) |
+| `gallery` | Institution Gallery: photos and short clips (files in `public/images/gallery/`). A clip entry is `{ src, poster, video: true }`. Clips play muted in the slider, with sound and controls in the viewer. |
+| `features` | `videos: false` hides everything built on YouTube (the /videos page returns 404, the home playlist, the nav link, sitemap and llms.txt entries). Set to `true` once real videos are in Odoo eLearning. |
 | `journey`, `schools`, `homeTeam` | Journey timeline copy, fallback school logos, home team tag and cap |
 | `ctaForm`, `contactPage`, `aboutPage`, `videosPage` | Bottom form copy, contact page FAQ, About and Videos page copy |
 | `mascot` | Nesty's name, greeting, quick replies, keyword answers, hand-off text, and the per-section tips |

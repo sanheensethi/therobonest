@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { site } from "@/content/site";
+import { site, features } from "@/content/site";
 import { getBlogPosts, getEvents } from "@/lib/odoo-content";
 
 /**
@@ -21,7 +21,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/contact/`, changeFrequency: "monthly", priority: 0.9 },
     { url: `${base}/blog/`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${base}/events/`, changeFrequency: "weekly", priority: 0.8 },
-    { url: `${base}/videos/`, changeFrequency: "monthly", priority: 0.6 },
+    ...(features.videos
+      ? [{ url: `${base}/videos/`, changeFrequency: "monthly" as const, priority: 0.6 }]
+      : []),
   ];
 
   // A CMS outage must not produce an empty sitemap - that would tell search

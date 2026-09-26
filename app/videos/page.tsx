@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import PageHero from "@/components/sections/PageHero";
 import VideoGrid, { type Video } from "@/components/sections/VideoGrid";
-import { videosPage } from "@/content/site";
+import { videosPage, features } from "@/content/site";
+import { notFound } from "next/navigation";
 import { getVideos } from "@/lib/odoo-content";
 
 /** Pick up newly published Odoo content within 5 minutes. */
@@ -13,6 +14,8 @@ export const metadata: Metadata = {
 };
 
 export default async function VideosPage() {
+  // Hidden until there are real YouTube videos (see `features` in content/site.ts).
+  if (!features.videos) notFound();
   // Prefer Odoo (eLearning videos). Falls back to the curated list in
   // content/site.ts so the page is never empty while Odoo has no videos yet.
   const fromOdoo = await getVideos();

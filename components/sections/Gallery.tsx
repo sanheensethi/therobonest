@@ -2,12 +2,61 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { gallery } from "@/content/site";
+import { gallery, type GalleryItem } from "@/content/site";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { useReveal } from "@/components/motion/useReveal";
 import Icon from "@/components/ui/Icon";
 import { registerGsap, prefersReducedMotion } from "@/lib/motion";
 import { asset } from "@/lib/asset";
+
+const items: GalleryItem[] = gallery.items;
+
+function PlayBadge() {
+  return (
+    <span className="pointer-events-none absolute left-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-night/70 text-paper shadow-lg backdrop-blur-sm">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+        <path d="M7 4.5v15l13-7.5z" />
+      </svg>
+    </span>
+  );
+}
+
+/**
+ * A clip inside the slider. The poster is always painted; the <video> is only
+ * mounted while its slide is centred AND on screen, so off-screen clips cost
+ * no bandwidth. When it finishes, the slider moves on.
+ */
+function SlideVideo({ item, playing, onEnded }: { item: GalleryItem; playing: boolean; onEnded: () => void }) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.5 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <div ref={ref} className="absolute inset-0">
+      {item.poster && (
+        <Image src={asset(item.poster)} alt="" fill draggable={false} sizes="(min-width: 1024px) 680px, 84vw" className="pointer-events-none object-cover" />
+      )}
+      {playing && inView && (
+        <video
+          src={asset(item.src)}
+          poster={item.poster ? asset(item.poster) : undefined}
+          muted
+          autoPlay
+          playsInline
+          preload="auto"
+          onEnded={onEnded}
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+        />
+      )}
+      <PlayBadge />
+    </div>
+  );
+}
 
 export default function Gallery() {
   const ref = useReveal<HTMLElement>({ stagger: 0.07 });
@@ -43,13 +92,15 @@ export default function Gallery() {
   // it cannot loop. The photo set is rendered three times; `pos` indexes the
   // middle copy, and after any move that leaves it we jump back by one set
   // with the transition switched off, so the loop is invisible.
-  const n: number = gallery.images.length;
+  const n: number = items.length;
   const trackRef = useRef<HTMLDivElement | null>(null);
   const slideRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [pos, setPos] = useState<number>(n); // 3n space, starts on the middle copy
   const [animate, setAnimate] = useState(true);
   const [paused, setPaused] = useState(false);
   const slide = ((pos % n) + n) % n;
+  const slideRef = useRef(slide);
+  slideRef.current = slide;
   const dragX = useRef(0);
   const drag = useRef<{ x: number; moved: boolean } | null>(null);
 
@@ -135,6 +186,7 @@ export default function Gallery() {
       const r = box.getBoundingClientRect();
       if (r.bottom < 0 || r.top > window.innerHeight) return; // off-screen: don't bother
       if (Date.now() - lastUser.current < 3500) return; // the visitor just moved it
+      if (items[slideRef.current]?.video) return; // a clip is playing; it advances itself
       setPos((p) => p + 1);
     }, 4000);
     return () => window.clearInterval(id);
@@ -271,7 +323,7 @@ export default function Gallery() {
   const step = useCallback(
     (dir: 1 | -1) =>
       setActive((i) =>
-        i === null ? null : (i + dir + gallery.images.length) % gallery.images.length
+        i === null ? null : (i + dir + items.length) % items.length
       ),
     []
   );
@@ -328,7 +380,8 @@ export default function Gallery() {
             ].join(" ")}
           >
             {[0, 1, 2].map((copy) =>
-              gallery.images.map((src, i) => {
+              items.map((item, i) => {
+                const src = item.src;
                 const k = copy * n + i;
                 const current = k === pos;
                 return (
@@ -351,24 +404,28 @@ export default function Gallery() {
                     }}
                     tabIndex={copy === 1 ? 0 : -1}
                     aria-hidden={copy !== 1}
-                    aria-label={current ? `Open gallery image ${i + 1}` : `Go to image ${i + 1}`}
+                    aria-label={current ? `Open gallery ${item.video ? "video" : "image"} ${i + 1}` : `Go to item ${i + 1}`}
                     className={[
                       "group relative aspect-[16/10] w-[84vw] shrink-0 overflow-hidden rounded-[var(--radius-card)] border border-ink/8 bg-sand transition-[transform,opacity] duration-500 ease-[var(--ease-brand)] sm:w-[66vw] lg:w-[600px] xl:w-[680px]",
                       current ? "scale-100 opacity-100" : "scale-[0.94] opacity-60",
                     ].join(" ")}
                   >
-                    <Image
-                      src={asset(src)}
-                      alt={`RoboNest lab session ${i + 1}`}
-                      fill
-                      draggable={false}
-                      sizes="(min-width: 1024px) 680px, 84vw"
-                      className="pointer-events-none object-cover transition-transform duration-700 ease-[var(--ease-brand)] group-hover:scale-[1.05]"
-                    />
+                    {item.video ? (
+                      <SlideVideo item={item} playing={current && active === null} onEnded={() => setPos((p) => (p === k ? p + 1 : p))} />
+                    ) : (
+                      <Image
+                        src={asset(src)}
+                        alt={`RoboNest lab session ${i + 1}`}
+                        fill
+                        draggable={false}
+                        sizes="(min-width: 1024px) 680px, 84vw"
+                        className="pointer-events-none object-cover transition-transform duration-700 ease-[var(--ease-brand)] group-hover:scale-[1.05]"
+                      />
+                    )}
                     <span className="absolute inset-0 bg-night/0 transition-colors duration-500 group-hover:bg-night/25" />
                     {current && (
                       <span className="absolute bottom-3 right-3 rounded-full bg-paper/90 px-3 py-1 text-[11px] font-semibold text-ink opacity-0 transition-opacity group-hover:opacity-100">
-                        Click to enlarge
+                        {item.video ? "Click to watch with sound" : "Click to enlarge"}
                       </span>
                     )}
                   </button>
@@ -397,12 +454,12 @@ export default function Gallery() {
 
           {/* dots */}
           <div className="mt-5 flex items-center justify-center gap-2">
-            {gallery.images.map((_, i) => (
+            {items.map((item, i) => (
               <button
                 key={i}
                 type="button"
                 onClick={() => goTo(n + i)}
-                aria-label={`Photo ${i + 1}`}
+                aria-label={`${item.video ? "Video" : "Photo"} ${i + 1}`}
                 className={[
                   "h-2 rounded-full transition-all duration-300",
                   i === slide ? "w-7 bg-brand" : "w-2 bg-ink/20 hover:bg-ink/40",
@@ -418,7 +475,7 @@ export default function Gallery() {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Gallery image viewer"
+          aria-label="Gallery viewer"
           className="fixed inset-0 z-[70] flex items-center justify-center p-4"
           onClick={close}
         >
@@ -446,9 +503,9 @@ export default function Gallery() {
               className="no-scrollbar absolute inset-0 z-10 snap-y snap-mandatory overflow-y-auto py-[12vh]"
               onClick={close}
             >
-              {gallery.images.map((src, i) => (
+              {items.map((item, i) => (
                 <div
-                  key={src}
+                  key={item.src}
                   data-idx={i}
                   className="flex h-[76vh] snap-center items-center justify-center px-4 py-3 transition-opacity duration-300"
                   style={{ opacity: i === active ? 1 : 0.3 }}
@@ -457,14 +514,25 @@ export default function Gallery() {
                     className="relative aspect-[4/3] max-h-full w-full overflow-hidden rounded-2xl bg-sand shadow-2xl shadow-ink/15 ring-1 ring-ink/10"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <Image
-                      src={asset(src)}
-                      alt={`Robonest lab session ${i + 1}`}
-                      fill
-                      sizes="100vw"
-                      className="object-contain"
-                      priority={i === active}
-                    />
+                    {item.video ? (
+                      <video
+                        src={asset(item.src)}
+                        poster={item.poster ? asset(item.poster) : undefined}
+                        controls
+                        playsInline
+                        preload="none"
+                        className="absolute inset-0 h-full w-full bg-night object-contain"
+                      />
+                    ) : (
+                      <Image
+                        src={asset(item.src)}
+                        alt={`RoboNest lab session ${i + 1}`}
+                        fill
+                        sizes="100vw"
+                        className="object-contain"
+                        priority={i === active}
+                      />
+                    )}
                   </div>
                 </div>
               ))}
@@ -498,14 +566,26 @@ export default function Gallery() {
               if (Math.abs(dx) > 40) step(dx < 0 ? 1 : -1);
             }}
           >
-            <Image
-              src={asset(gallery.images[active])}
-              alt={`Robonest lab session ${active + 1}`}
-              fill
-              sizes="90vw"
-              className="object-contain"
-              priority
-            />
+            {items[active].video ? (
+              <video
+                key={items[active].src}
+                src={asset(items[active].src)}
+                poster={items[active].poster ? asset(items[active].poster!) : undefined}
+                controls
+                autoPlay
+                playsInline
+                className="absolute inset-0 h-full w-full bg-night object-contain"
+              />
+            ) : (
+              <Image
+                src={asset(items[active].src)}
+                alt={`RoboNest lab session ${active + 1}`}
+                fill
+                sizes="90vw"
+                className="object-contain"
+                priority
+              />
+            )}
           </div>
           )}
 
@@ -522,7 +602,7 @@ export default function Gallery() {
           </button>
 
           <p className="absolute bottom-5 z-20 rounded-full bg-ink px-3 py-1 text-xs font-semibold text-paper">
-            {active + 1} / {gallery.images.length}
+            {active + 1} / {items.length}
           </p>
         </div>
       )}

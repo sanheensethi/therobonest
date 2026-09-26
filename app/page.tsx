@@ -13,7 +13,7 @@ import Schools from "@/components/sections/Schools";
 import FeaturedVideos from "@/components/sections/FeaturedVideos";
 import EnquiryForm from "@/components/sections/EnquiryForm";
 import SpaceWarp from "@/components/sections/SpaceWarp";
-import { space } from "@/content/site";
+import { space, features } from "@/content/site";
 
 export default async function HomePage() {
   // Homepage shows only the people tagged for it, capped. If nobody is
@@ -35,7 +35,7 @@ export default async function HomePage() {
       <SpaceWarp {...space} />
       <Hardware />
       <Team members={team} singleTier />
-      <FeaturedVideos />
+      {features.videos && <FeaturedVideos />}
       <Gallery />
       <Journey />
       <Schools odooLogos={schoolLogos} />

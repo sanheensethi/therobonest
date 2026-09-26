@@ -1,4 +1,4 @@
-import { site, contact, labs, stats } from "@/content/site";
+import { site, contact, labs, stats, features } from "@/content/site";
 import { getBlogPosts, getEvents, formatEventDate } from "@/lib/odoo-content";
 
 /**
@@ -55,7 +55,7 @@ export async function GET() {
     `- [Home](${base}/): overview of the three labs, the educator model, team and partner schools`,
     `- [About](${base}/about/): the company story, team and schools`,
     `- [Events](${base}/events/): upcoming workshops and exhibitions with online registration, plus past events`,
-    `- [Videos](${base}/videos/): lab setups, student projects and event recordings`,
+    ...(features.videos ? [`- [Videos](${base}/videos/): lab setups, student projects and event recordings`] : []),
     `- [Blog](${base}/blog/): articles on robotics, AI and astronomy education`,
     `- [Contact](${base}/contact/): enquiry form, address and FAQ`,
     "",

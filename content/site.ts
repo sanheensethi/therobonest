@@ -29,7 +29,17 @@ export const contact = {
  * dead links - so it was removed rather than kept as a fallback.
  */
 
-export const nav = [
+/**
+ * Feature switches.
+ * `videos`: the YouTube-based Videos page, the home page playlist and the nav
+ * link. Off until RoboNest has real videos on YouTube - with it off, /videos
+ * returns 404 and nothing links to it. Their own clips live in the gallery.
+ */
+export const features = {
+  videos: false,
+} as const;
+
+const allNav = [
   { label: "Home", href: "/" },
   { label: "Labs", href: "/#labs" },
   { label: "Events", href: "/events" },
@@ -37,7 +47,9 @@ export const nav = [
   { label: "Blog", href: "/blog" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
-] as const;
+];
+
+export const nav = allNav.filter((item) => features.videos || item.href !== "/videos");
 
 export const hero = {
   eyebrow: "Robotics · AI · Astronomy labs for schools & colleges",
@@ -281,19 +293,48 @@ export const execTeam = {
   ],
 } as const;
 
-export const gallery = {
-  eyebrow: "Photos",
+/**
+ * Institution Gallery: photos and short clips from real RoboNest sessions.
+ * A video entry needs a poster (shown until the clip plays). Clips play muted
+ * in the slider and with sound and controls in the viewer.
+ */
+export type GalleryItem = { src: string; poster?: string; video?: boolean };
+
+export const gallery: { eyebrow: string; title: string; items: GalleryItem[] } = {
+  eyebrow: "Photos & videos",
   title: "Institution Gallery",
-  images: [
-    "/images/gallery/g1.jpeg",
-    "/images/gallery/g2.jpeg",
-    "/images/gallery/g3.jpeg",
-    "/images/gallery/g4.jpeg",
-    "/images/gallery/g5.jpeg",
-    "/images/gallery/g6.jpeg",
-    "/images/gallery/g7.webp",
+  items: [
+    { src: "/images/gallery/g1.jpeg" },
+    { src: "/images/gallery/g2.jpeg" },
+    { src: "/images/gallery/v1.mp4", poster: "/images/gallery/v1.jpg", video: true },
+    { src: "/images/gallery/g3.jpeg" },
+    { src: "/images/gallery/g8.jpg" },
+    { src: "/images/gallery/g4.jpeg" },
+    { src: "/images/gallery/v3.mp4", poster: "/images/gallery/v3.jpg", video: true },
+    { src: "/images/gallery/g9.jpg" },
+    { src: "/images/gallery/g5.jpeg" },
+    { src: "/images/gallery/g10.jpg" },
+    { src: "/images/gallery/v2.mp4", poster: "/images/gallery/v2.jpg", video: true },
+    { src: "/images/gallery/g6.jpeg" },
+    { src: "/images/gallery/g11.jpg" },
+    { src: "/images/gallery/g7.webp" },
+    { src: "/images/gallery/g12.jpg" },
+    { src: "/images/gallery/v4.mp4", poster: "/images/gallery/v4.jpg", video: true },
+    { src: "/images/gallery/g13.jpg" },
+    { src: "/images/gallery/g14.jpg" },
+    { src: "/images/gallery/g15.jpg" },
+    { src: "/images/gallery/v5.mp4", poster: "/images/gallery/v5.jpg", video: true },
+    { src: "/images/gallery/g16.jpg" },
+    { src: "/images/gallery/g17.jpg" },
+    { src: "/images/gallery/g18.jpg" },
+    { src: "/images/gallery/v6.mp4", poster: "/images/gallery/v6.jpg", video: true },
+    { src: "/images/gallery/g19.jpg" },
+    { src: "/images/gallery/g20.jpg" },
+    { src: "/images/gallery/g21.jpg" },
+    { src: "/images/gallery/v7.mp4", poster: "/images/gallery/v7.jpg", video: true },
+    { src: "/images/gallery/g22.jpg" },
   ],
-} as const;
+};
 
 export const journey = {
   eyebrow: "About Us",
@@ -609,7 +650,7 @@ export const mascot = {
     hardware: "The actual hardware your students will work with - Arduino, sensors and more.",
     team: "The people who set up your lab - and the educators who run it.",
     videos: "See a real lab in action - pick any video.",
-    gallery: "Photos from labs and events we've run.",
+    gallery: "Photos and clips from labs and events we've run.",
     journey: "How Robonest grew, year by year.",
     schools: "Some of the schools already running our labs.",
     enquiry: "Leave your school name and number - the team calls back within a day.",
