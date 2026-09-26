@@ -78,6 +78,16 @@ export default function Team({
   const [failed, setFailed] = useState<Set<number>>(new Set());
   const markFailed = (id: number) =>
     setFailed((prev) => (prev.has(id) ? prev : new Set(prev).add(id)));
+  // Odoo rate-limits bursts, so a photo can fail once and load a moment
+  // later. Retry twice (1.5s, then 3s) before giving up to the initials.
+  const [tries, setTries] = useState<Record<number, number>>({});
+  const onPhotoError = (id: number) => {
+    const n = tries[id] ?? 0;
+    if (n >= 2) return markFailed(id);
+    window.setTimeout(() => setTries((t) => ({ ...t, [id]: n + 1 })), 1500 * (n + 1));
+  };
+  const photoSrc = (id: number, url: string) =>
+    tries[id] ? `${url}${url.includes("?") ? "&" : "?"}retry=${tries[id]}` : url;
 
   if (members.length > 0) {
     // Two tiers, from the Odoo employee Tag: leadership as large cards with a
@@ -119,10 +129,10 @@ export default function Team({
                     {p.imageUrl && !failed.has(p.id) ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img
-                        src={p.imageUrl}
+                        src={photoSrc(p.id, p.imageUrl)}
                         alt={`${p.name}, ${p.role || "Robonest team"}`}
                         loading="lazy"
-                        onError={() => markFailed(p.id)}
+                        onError={() => onPhotoError(p.id)}
                         className="h-full w-full object-cover object-top transition-transform duration-700 ease-[var(--ease-brand)] group-hover:scale-[1.05]"
                       />
                     ) : (
@@ -168,10 +178,10 @@ export default function Team({
                       {p.imageUrl && !failed.has(p.id) ? (
                         /* eslint-disable-next-line @next/next/no-img-element */
                         <img
-                          src={p.imageUrl}
+                          src={photoSrc(p.id, p.imageUrl)}
                           alt={`${p.name}, ${p.role || "Robonest team"}`}
                           loading="lazy"
-                          onError={() => markFailed(p.id)}
+                          onError={() => onPhotoError(p.id)}
                           className="h-full w-full object-cover object-top transition-transform duration-700 ease-[var(--ease-brand)] group-hover:scale-[1.07]"
                         />
                       ) : (

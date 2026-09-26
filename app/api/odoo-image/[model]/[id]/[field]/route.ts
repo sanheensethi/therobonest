@@ -29,6 +29,15 @@ const BLANK = Buffer.from(
   "base64"
 );
 
+/**
+ * Odoo could not be reached (rate limit even after retries, outage). A 503
+ * that nothing may cache: the browser's <img> fires onError, the Team card
+ * retries and then falls back to initials. Returning the blank GIF here was
+ * the bug - it "loaded", was cached for a minute, and left an empty card.
+ */
+const unavailable = () =>
+  new Response(null, { status: 503, headers: { "Cache-Control": "no-store", "Retry-After": "2" } });
+
 const blankResponse = () =>
   new Response(new Uint8Array(BLANK), {
     status: 200,
@@ -53,7 +62,9 @@ export async function GET(
     const rows = await odooCall<Array<Record<string, string | false>>>(
       model,
       "read",
-      [[recordId], [field]]
+      [[recordId], [field]],
+      {},
+      { noStore: true }
     );
     const b64 = rows?.[0]?.[field];
     if (!b64 || typeof b64 !== "string") return blankResponse();
@@ -70,10 +81,13 @@ export async function GET(
         // Odoo resizes on write, so the bytes for a given field are stable.
         "Content-Type": sniffMime(bytes),
         "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800",
+        // Netlify's shared edge cache (durable = shared across all edges), so
+        // Odoo is asked for each photo about once a day, not once per visitor.
+        "Netlify-CDN-Cache-Control": "public, durable, max-age=86400, stale-while-revalidate=604800",
       },
     });
   } catch {
-    return blankResponse();
+    return unavailable();
   }
 }
 

@@ -29,14 +29,60 @@ type RpcParams = {
 
 class OdooError extends Error {}
 
-async function rpc<T>(params: RpcParams): Promise<T> {
-  const res = await fetch(`${URL_BASE}/jsonrpc`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ jsonrpc: "2.0", method: "call", params, id: Date.now() }),
-    // Works in both modes: at build time under output:'export', and as an
-    // ISR revalidation window once we move to a server runtime.
-    next: { revalidate: 300 },
+/**
+ * Odoo Online rate-limits bursts (measured: HTTP 429 "Rate limit exceeded"
+ * when ~6 photo reads land at once). A page with a team grid does exactly
+ * that, so every call goes through a small per-instance queue and retries
+ * 429 / 5xx with backoff, honouring Retry-After.
+ */
+const MAX_IN_FLIGHT = 3;
+const RETRIES = 4;
+let inFlight = 0;
+const waiting: Array<() => void> = [];
+
+async function withSlot<T>(fn: () => Promise<T>): Promise<T> {
+  if (inFlight >= MAX_IN_FLIGHT) await new Promise<void>((r) => waiting.push(r));
+  inFlight++;
+  try {
+    return await fn();
+  } finally {
+    inFlight--;
+    waiting.shift()?.();
+  }
+}
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+function backoffMs(attempt: number, retryAfter: string | null): number {
+  const s = retryAfter ? Number(retryAfter) : NaN;
+  if (Number.isFinite(s) && s > 0) return Math.min(s * 1000, 3000);
+  return 300 * 2 ** attempt + Math.random() * 250;
+}
+
+type RpcOptions = {
+  /** Skip Next's data cache - for binary reads (photos), which the CDN caches instead. */
+  noStore?: boolean;
+};
+
+async function rpc<T>(params: RpcParams, opts: RpcOptions = {}): Promise<T> {
+  const res = await withSlot(async () => {
+    for (let attempt = 0; ; attempt++) {
+      let r: Response | null = null;
+      try {
+        r = await fetch(`${URL_BASE}/jsonrpc`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ jsonrpc: "2.0", method: "call", params, id: Date.now() }),
+          // ISR: content reads share the pages' 5-minute window.
+          ...(opts.noStore ? { cache: "no-store" as const } : { next: { revalidate: 300 } }),
+        });
+      } catch (err) {
+        if (attempt >= RETRIES - 1) throw err; // network error: retry, then give up
+      }
+      const retryable = !r || r.status === 429 || r.status >= 500;
+      if (!retryable || attempt >= RETRIES - 1) return r as Response;
+      await sleep(backoffMs(attempt, r?.headers.get("retry-after") ?? null));
+    }
   });
 
   if (!res.ok) throw new OdooError(`Odoo HTTP ${res.status}`);
@@ -56,10 +102,24 @@ async function rpc<T>(params: RpcParams): Promise<T> {
 }
 
 let cachedUid: number | null = null;
+let pendingUid: Promise<number> | null = null;
 
-/** Authenticate once per server instance and reuse the uid. */
+/**
+ * Authenticate once per server instance and reuse the uid. Parallel first
+ * calls share one login instead of each authenticating (which is itself a
+ * burst Odoo can rate-limit).
+ */
 export async function odooUid(): Promise<number> {
   if (cachedUid) return cachedUid;
+  if (!pendingUid) {
+    pendingUid = login().finally(() => {
+      pendingUid = null;
+    });
+  }
+  return pendingUid;
+}
+
+async function login(): Promise<number> {
   if (!LOGIN || !API_KEY) {
     throw new OdooError(
       "Odoo credentials missing. Set ODOO_LOGIN and ODOO_API_KEY."
@@ -84,14 +144,18 @@ export async function odooCall<T>(
   model: string,
   method: string,
   args: unknown[] = [],
-  kwargs: Record<string, unknown> = {}
+  kwargs: Record<string, unknown> = {},
+  opts: RpcOptions = {}
 ): Promise<T> {
   const uid = await odooUid();
-  return rpc<T>({
-    service: "object",
-    method: "execute_kw",
-    args: [DB, uid, API_KEY, model, method, args, kwargs],
-  });
+  return rpc<T>(
+    {
+      service: "object",
+      method: "execute_kw",
+      args: [DB, uid, API_KEY, model, method, args, kwargs],
+    },
+    opts
+  );
 }
 
 /** search_read with sensible defaults. */

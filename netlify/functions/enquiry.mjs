@@ -21,17 +21,28 @@ const json = (status, body) =>
     headers: { "Content-Type": "application/json" },
   });
 
+// Odoo Online rate-limits bursts (HTTP 429). Retry 429 / 5xx with backoff so
+// a lead or registration is never lost to a busy moment.
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
 async function rpc(service, method, args) {
-  const res = await fetch(`${ODOO_URL}/jsonrpc`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      jsonrpc: "2.0",
-      method: "call",
-      params: { service, method, args },
-      id: Date.now(),
-    }),
-  });
+  let res;
+  for (let attempt = 0; attempt < 4; attempt++) {
+    res = await fetch(`${ODOO_URL}/jsonrpc`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        method: "call",
+        params: { service, method, args },
+        id: Date.now(),
+      }),
+    });
+    if (res.status !== 429 && res.status < 500) break;
+    const ra = Number(res.headers.get("retry-after"));
+    await sleep(Number.isFinite(ra) && ra > 0 ? Math.min(ra * 1000, 3000) : 400 * 2 ** attempt);
+  }
+  if (!res.ok) throw new Error(`Odoo HTTP ${res.status}`);
   const data = await res.json();
   if (data.error) {
     throw new Error(data.error.data?.message || data.error.message || "Odoo error");
